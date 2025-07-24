@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fryzer Hub - Key System</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Orbitron', monospace;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #16213e 100%);
+            color: #ffffff;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            overflow-x: hidden;
+            position: relative;
+        }
+        
+        /* Animated background particles */
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                radial-gradient(2px 2px at 20px 30px, #00ffff, transparent),
+                radial-gradient(2px 2px at 40px 70px, rgba(0, 255, 255, 0.3), transparent),
+                radial-gradient(1px 1px at 90px 40px, #00ffff, transparent),
+                radial-gradient(1px 1px at 130px 80px, rgba(0, 255, 255, 0.3), transparent),
+                radial-gradient(2px 2px at 160px 30px, #00ffff, transparent);
+            background-repeat: repeat;
+            background-size: 200px 100px;
+            animation: sparkle 20s linear infinite;
+            opacity: 0.6;
+            z-index: -1;
+        }
+        
+        @keyframes sparkle {
+            from { transform: translateY(0px); }
+            to { transform: translateY(-200px); }
+        }
+        
+        .container {
+            text-align: center;
+            z-index: 1;
+            max-width: 800px;
+            padding: 40px;
+            backdrop-filter: blur(10px);
+            background: rgba(0, 20, 40, 0.3);
+            border-radius: 20px;
+            border: 1px solid rgba(0, 255, 255, 0.2);
+            box-shadow: 0 0 50px rgba(0, 255, 255, 0.1);
+        }
+        
+        .logo-image {
+            width: 100%;
+            max-width: 600px;
+            height: auto;
+            margin-bottom: 30px;
+            filter: drop-shadow(0 0 30px rgba(0, 255, 255, 0.5));
+            animation: pulse 3s ease-in-out infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); filter: drop-shadow(0 0 30px rgba(0, 255, 255, 0.5)); }
+            50% { transform: scale(1.02); filter: drop-shadow(0 0 40px rgba(0, 255, 255, 0.7)); }
+        }
+        
+        .main-title {
+            font-size: 4rem;
+            font-weight: 900;
+            color: #00ffff;
+            text-shadow: 
+                0 0 10px #00ffff,
+                0 0 20px #00ffff,
+                0 0 30px #00ffff,
+                0 0 40px #00ffff;
+            margin-bottom: 20px;
+            animation: glow 2s ease-in-out infinite alternate;
+            letter-spacing: 3px;
+        }
+        
+        @keyframes glow {
+            from { text-shadow: 0 0 10px #00ffff, 0 0 20px #00ffff, 0 0 30px #00ffff; }
+            to { text-shadow: 0 0 20px #00ffff, 0 0 30px #00ffff, 0 0 40px #00ffff, 0 0 50px #00ffff; }
+        }
+        
+        .subtitle {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #66d9ff;
+            margin-bottom: 15px;
+            text-shadow: 0 0 10px rgba(102, 217, 255, 0.8);
+            letter-spacing: 2px;
+        }
+        
+        .subtitle-2 {
+            font-size: 1.5rem;
+            font-weight: 400;
+            color: #99e6ff;
+            margin-bottom: 40px;
+            text-shadow: 0 0 8px rgba(153, 230, 255, 0.6);
+            letter-spacing: 1px;
+        }
+        
+        .checkpoint-button {
+            background: linear-gradient(45deg, #00ffff, #0080ff);
+            border: none;
+            padding: 20px 50px;
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #000;
+            border-radius: 50px;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-family: 'Orbitron', monospace;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            box-shadow: 
+                0 0 20px rgba(0, 255, 255, 0.5),
+                inset 0 0 20px rgba(255, 255, 255, 0.1);
+        }
+        
+        .checkpoint-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+            transition: left 0.5s;
+        }
+        
+        .checkpoint-button:hover::before {
+            left: 100%;
+        }
+        
+        .checkpoint-button:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 
+                0 10px 30px rgba(0, 255, 255, 0.7),
+                inset 0 0 30px rgba(255, 255, 255, 0.2);
+        }
+        
+        .checkpoint-button:active {
+            transform: translateY(-1px) scale(1.02);
+        }
+        
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .main-title {
+                font-size: 2.5rem;
+            }
+            
+            .subtitle {
+                font-size: 1.5rem;
+            }
+            
+            .subtitle-2 {
+                font-size: 1.2rem;
+            }
+            
+            .container {
+                padding: 20px;
+                margin: 20px;
+            }
+            
+            .checkpoint-button {
+                padding: 15px 30px;
+                font-size: 1.1rem;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .main-title {
+                font-size: 2rem;
+                letter-spacing: 1px;
+            }
+            
+            .subtitle {
+                font-size: 1.3rem;
+            }
+            
+            .subtitle-2 {
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <img src="https://i.imgur.com/placeholder.png" alt="Fryzer Hub Logo" class="logo-image" onerror="this.style.display='none'">
+        
+        <h1 class="main-title">FRYZER HUB</h1>
+        
+        <h2 class="subtitle">Key System</h2>
+        
+        <h3 class="subtitle-2">Checkpoint - 1</h3>
+        
+        <button class="checkpoint-button" onclick="redirectToLink()">
+            Enter Checkpoint
+        </button>
+    </div>
+    
+    <script>
+        function redirectToLink() {
+            // Add a small delay for visual feedback
+            setTimeout(() => {
+                window.open('https://direct-link.net/1345739/g4VCj2oaGuMg', '_blank');
+            }, 200);
+        }
+        
+        // Add some interactive particle effects on mouse move
+        document.addEventListener('mousemove', (e) => {
+            const particles = document.createElement('div');
+            particles.style.position = 'absolute';
+            particles.style.left = e.clientX + 'px';
+            particles.style.top = e.clientY + 'px';
+            particles.style.width = '4px';
+            particles.style.height = '4px';
+            particles.style.background = '#00ffff';
+            particles.style.borderRadius = '50%';
+            particles.style.pointerEvents = 'none';
+            particles.style.zIndex = '1000';
+            particles.style.boxShadow = '0 0 10px #00ffff';
+            
+            document.body.appendChild(particles);
+            
+            setTimeout(() => {
+                particles.style.transition = 'all 1s ease-out';
+                particles.style.transform = 'scale(0)';
+                particles.style.opacity = '0';
+                
+                setTimeout(() => {
+                    particles.remove();
+                }, 1000);
+            }, 100);
+        });
+    </script>
+</body>
+</html>
