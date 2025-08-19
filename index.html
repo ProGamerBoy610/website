@@ -12,492 +12,321 @@
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #0c0c0c 0%, #1a1a2e 50%, #16213e 100%);
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
-            color: #ffffff;
+            color: white;
             display: flex;
             justify-content: center;
             align-items: center;
         }
 
         .container {
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 20px;
-            padding: 3rem;
-            width: 90%;
-            max-width: 500px;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 40px;
+            border-radius: 15px;
             text-align: center;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            max-width: 500px;
+            width: 90%;
         }
 
         .logo {
             font-size: 2.5rem;
             font-weight: bold;
-            background: linear-gradient(45deg, #00d4ff, #ff6b6b);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            margin-bottom: 1rem;
+            color: #00d4ff;
+            margin-bottom: 20px;
         }
 
         .subtitle {
-            color: #b0b0b0;
-            margin-bottom: 2rem;
-            font-size: 1.1rem;
-        }
-
-        .progress-container {
-            margin-bottom: 2rem;
-        }
-
-        .progress-bar {
-            width: 100%;
-            height: 8px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 10px;
-            overflow: hidden;
-            margin-bottom: 1rem;
-        }
-
-        .progress-fill {
-            height: 100%;
-            background: linear-gradient(90deg, #00d4ff, #ff6b6b);
-            width: 0%;
-            transition: width 0.5s ease;
-            border-radius: 10px;
-        }
-
-        .progress-text {
-            color: #b0b0b0;
-            font-size: 0.9rem;
-        }
-
-        .checkpoint-container {
-            margin-bottom: 2rem;
-        }
-
-        .checkpoint {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 10px;
-            padding: 1.5rem;
-            margin-bottom: 1rem;
-            transition: all 0.3s ease;
-        }
-
-        .checkpoint.completed {
-            background: rgba(0, 212, 255, 0.1);
-            border-color: #00d4ff;
-        }
-
-        .checkpoint.active {
-            background: rgba(255, 107, 107, 0.1);
-            border-color: #ff6b6b;
-            transform: scale(1.02);
-        }
-
-        .checkpoint-title {
-            font-weight: bold;
-            margin-bottom: 0.5rem;
-            color: #ffffff;
-        }
-
-        .checkpoint-desc {
-            color: #b0b0b0;
-            font-size: 0.9rem;
-            margin-bottom: 1rem;
+            color: #ccc;
+            margin-bottom: 30px;
         }
 
         .btn {
             background: linear-gradient(45deg, #ff6b6b, #00d4ff);
             border: none;
+            padding: 15px 30px;
             border-radius: 10px;
             color: white;
-            padding: 1rem 2rem;
-            font-size: 1.1rem;
+            font-size: 16px;
             font-weight: bold;
             cursor: pointer;
-            transition: all 0.3s ease;
-            text-decoration: none;
-            display: inline-block;
-            margin: 0.5rem;
+            margin: 10px;
+            transition: transform 0.2s;
         }
 
         .btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(255, 107, 107, 0.3);
         }
 
         .btn:disabled {
-            background: #333;
+            background: #666;
             cursor: not-allowed;
             transform: none;
-            box-shadow: none;
         }
 
-        .btn-secondary {
+        .checkpoint {
             background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 20px;
+            margin: 15px 0;
+            border-radius: 10px;
+            border-left: 4px solid #666;
         }
 
-        .btn-secondary:hover {
-            background: rgba(255, 255, 255, 0.15);
-            box-shadow: 0 10px 20px rgba(255, 255, 255, 0.1);
+        .checkpoint.active {
+            border-left-color: #ff6b6b;
+            background: rgba(255, 107, 107, 0.1);
         }
 
-        .status-icon {
-            font-size: 1.5rem;
-            margin-right: 0.5rem;
+        .checkpoint.completed {
+            border-left-color: #00d4ff;
+            background: rgba(0, 212, 255, 0.1);
+        }
+
+        .progress {
+            background: #333;
+            height: 10px;
+            border-radius: 5px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            background: linear-gradient(90deg, #00d4ff, #ff6b6b);
+            height: 100%;
+            width: 0%;
+            transition: width 0.5s;
         }
 
         .key-display {
-            background: rgba(0, 0, 0, 0.3);
-            border: 1px solid #00d4ff;
-            border-radius: 10px;
-            padding: 1rem;
-            margin: 1rem 0;
-            font-family: 'Courier New', monospace;
-            font-size: 1.1rem;
+            background: #000;
+            border: 2px solid #00d4ff;
+            padding: 15px;
+            border-radius: 5px;
+            font-family: monospace;
+            font-size: 18px;
             color: #00d4ff;
+            margin: 20px 0;
             word-break: break-all;
-        }
-
-        .timer {
-            color: #ff6b6b;
-            font-weight: bold;
-            font-size: 0.9rem;
-            margin-top: 0.5rem;
         }
 
         .hidden {
             display: none;
         }
 
-        .fade-in {
-            animation: fadeIn 0.5s ease-in;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .particle {
-            position: absolute;
-            width: 4px;
-            height: 4px;
-            background: #00d4ff;
-            border-radius: 50%;
-            pointer-events: none;
-            animation: float 6s infinite;
-        }
-
-        @keyframes float {
-            0%, 100% { transform: translateY(0px) rotate(0deg); opacity: 1; }
-            50% { transform: translateY(-20px) rotate(180deg); opacity: 0.5; }
+        .timer {
+            color: #ff6b6b;
+            font-weight: bold;
+            margin-top: 10px;
         }
     </style>
 </head>
 <body>
     <div class="container">
         <!-- Start Screen -->
-        <div id="startScreen" class="fade-in">
+        <div id="startScreen">
             <div class="logo">FryzerX</div>
-            <div class="subtitle">Advanced Roblox Executor Key System</div>
+            <div class="subtitle">Roblox Executor Key System</div>
+            <p>Get your unique access key by completing 3 simple tasks</p>
+            <button class="btn" onclick="startProcess()">Start Key Process</button>
+        </div>
+
+        <!-- Tasks Screen -->
+        <div id="tasksScreen" class="hidden">
+            <div class="logo">FryzerX</div>
+            <div class="subtitle">Complete All Tasks</div>
             
-            <div class="checkpoint">
-                <div class="checkpoint-title">🚀 Get Your Access Key</div>
-                <div class="checkpoint-desc">Complete 3 simple tasks to generate your unique executor key</div>
-                <button class="btn" onclick="startKeyProcess()" id="startBtn">Start Key Process</button>
+            <div class="progress">
+                <div class="progress-bar" id="progressBar"></div>
+            </div>
+            <p id="progressText">Progress: 0/3 Tasks Completed</p>
+
+            <div class="checkpoint active" id="task1">
+                <h3>📋 Task 1: Complete Survey</h3>
+                <p>Answer a quick survey about your gaming preferences</p>
+                <button class="btn" id="btn1" onclick="startTask(1)">Start Task 1</button>
+                <button class="btn hidden" id="complete1" onclick="completeTask(1)">Task Completed!</button>
             </div>
 
-            <div style="margin-top: 2rem; color: #666; font-size: 0.8rem;">
-                ⏱️ Keys expire after 24 hours<br>
-                🔒 One-time use only<br>
-                🛡️ Anti-share protection
+            <div class="checkpoint" id="task2">
+                <h3>📺 Task 2: Watch Video</h3>
+                <p>Watch a short advertisement video</p>
+                <button class="btn" id="btn2" onclick="startTask(2)" disabled>Start Task 2</button>
+                <button class="btn hidden" id="complete2" onclick="completeTask(2)">Task Completed!</button>
             </div>
+
+            <div class="checkpoint" id="task3">
+                <h3>📱 Task 3: Install App</h3>
+                <p>Download and install a partner application</p>
+                <button class="btn" id="btn3" onclick="startTask(3)" disabled>Start Task 3</button>
+                <button class="btn hidden" id="complete3" onclick="completeTask(3)">Task Completed!</button>
+            </div>
+
+            <button class="btn hidden" id="generateBtn" onclick="generateKey()" style="background: linear-gradient(45deg, #4CAF50, #45a049); margin-top: 20px;">
+                🔑 Generate My Key
+            </button>
+
+            <button class="btn" onclick="goBack()" style="background: #666;">← Back to Start</button>
         </div>
 
-        <!-- Checkpoint Screen -->
-        <div id="checkpointScreen" class="hidden">
-            <div class="logo">FryzerX</div>
-            <div class="subtitle">Complete Tasks to Get Your Key</div>
-
-            <div class="progress-container">
-                <div class="progress-bar">
-                    <div class="progress-fill" id="progressFill"></div>
-                </div>
-                <div class="progress-text">Progress: <span id="progressText">0/3</span> Tasks Completed</div>
-            </div>
-
-            <div class="checkpoint-container">
-                <!-- Checkpoint 1 -->
-                <div class="checkpoint active" id="checkpoint1">
-                    <div class="checkpoint-title">
-                        <span class="status-icon" id="status1">⏳</span>
-                        Task 1: Complete Survey
-                    </div>
-                    <div class="checkpoint-desc">Complete a quick survey to support our development</div>
-                    <button class="btn" id="btn1" onclick="openCheckpoint(1)">Complete Task 1</button>
-                    <button class="btn-secondary btn hidden" id="verify1" onclick="verifyCheckpoint(1)">Verify Completion</button>
-                </div>
-
-                <!-- Checkpoint 2 -->
-                <div class="checkpoint" id="checkpoint2">
-                    <div class="checkpoint-title">
-                        <span class="status-icon" id="status2">⏳</span>
-                        Task 2: Watch Advertisement
-                    </div>
-                    <div class="checkpoint-desc">Watch a short advertisement to unlock next step</div>
-                    <button class="btn" id="btn2" onclick="openCheckpoint(2)" disabled>Complete Task 2</button>
-                    <button class="btn-secondary btn hidden" id="verify2" onclick="verifyCheckpoint(2)">Verify Completion</button>
-                </div>
-
-                <!-- Checkpoint 3 -->
-                <div class="checkpoint" id="checkpoint3">
-                    <div class="checkpoint-title">
-                        <span class="status-icon" id="status3">⏳</span>
-                        Task 3: Download App
-                    </div>
-                    <div class="checkpoint-desc">Install a partner app to complete verification</div>
-                    <button class="btn" id="btn3" onclick="openCheckpoint(3)" disabled>Complete Task 3</button>
-                    <button class="btn-secondary btn hidden" id="verify3" onclick="verifyCheckpoint(3)">Verify Completion</button>
-                </div>
-            </div>
-
-            <div id="generateKeySection" class="hidden">
-                <button class="btn" onclick="generateKey()" style="background: linear-gradient(45deg, #4CAF50, #45a049); margin-top: 1rem;">
-                    🔑 Generate My Key
-                </button>
-            </div>
-
-            <button class="btn-secondary btn" onclick="backToStart()" style="margin-top: 1rem;">← Back to Start</button>
-        </div>
-
-        <!-- Key Display Screen -->
+        <!-- Key Screen -->
         <div id="keyScreen" class="hidden">
             <div class="logo">FryzerX</div>
             <div class="subtitle">🎉 Your Key is Ready!</div>
-
+            
             <div class="key-display" id="keyDisplay">
-                Loading your key...
+                FRYZER-ABCDE-12345-FGHIJ
             </div>
 
-            <div class="timer" id="keyTimer">
-                Key expires in: 23:59:59
-            </div>
+            <div class="timer" id="keyTimer">Key expires in: 23:59:59</div>
 
             <button class="btn" onclick="copyKey()">📋 Copy Key</button>
-            <button class="btn-secondary btn" onclick="backToStart()">← Generate New Key</button>
-
-            <div style="margin-top: 1.5rem; color: #666; font-size: 0.8rem;">
-                ⚠️ This key is unique to you and cannot be shared<br>
-                💡 Paste this key into your executor to unlock features
-            </div>
+            <button class="btn" onclick="goBack()" style="background: #666;">← Generate New Key</button>
+            
+            <p style="margin-top: 20px; color: #ccc; font-size: 14px;">
+                ⚠️ This key is unique and cannot be shared<br>
+                💡 Paste it into your executor to unlock features
+            </p>
         </div>
     </div>
 
     <script>
-        let currentSession = null;
-        let completedCheckpoints = 0;
-        let keyExpireTimer = null;
-        let currentKeyData = null;
+        let completedTasks = 0;
+        let currentKey = null;
+        let keyTimer = null;
 
-        // Generate session ID
-        function generateSessionId() {
-            return 'sess_' + Math.random().toString(36).substr(2, 9) + Date.now().toString(36);
-        }
-
-        // Generate unique key
-        function generateUniqueKey() {
-            const prefix = 'FRYZER';
-            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-            let key = prefix + '-';
-            
-            for (let i = 0; i < 3; i++) {
-                let segment = '';
-                for (let j = 0; j < 5; j++) {
-                    segment += chars.charAt(Math.floor(Math.random() * chars.length));
-                }
-                key += segment;
-                if (i < 2) key += '-';
-            }
-            
-            return key;
-        }
-
-        function startKeyProcess() {
-            currentSession = {
-                id: generateSessionId(),
-                startTime: Date.now(),
-                checkpoints: [false, false, false],
-                links: generateCheckpointLinks()
-            };
-            
-            completedCheckpoints = 0;
-            showScreen('checkpointScreen');
-            updateProgress();
-        }
-
-        function generateCheckpointLinks() {
-            const baseUrl = 'https://linkvertise.com/';
-            const sessionId = currentSession.id;
-            
-            return [
-                baseUrl + '123456/survey?sid=' + sessionId + '&cp=1',
-                baseUrl + '789012/advertisement?sid=' + sessionId + '&cp=2', 
-                baseUrl + '345678/download?sid=' + sessionId + '&cp=3'
-            ];
-        }
-
-        function openCheckpoint(checkpointNum) {
-            const link = currentSession.links[checkpointNum - 1];
-            
-            // Open the Linkvertise link
-            window.open(link, '_blank');
-            
-            // Show verify button after opening link
-            document.getElementById(`btn${checkpointNum}`).style.display = 'none';
-            document.getElementById(`verify${checkpointNum}`).classList.remove('hidden');
-            
-            // Auto-verify after 10 seconds (simulating completion)
-            setTimeout(() => {
-                verifyCheckpoint(checkpointNum);
-            }, 10000);
-        }
-
-        function verifyCheckpoint(checkpointNum) {
-            const checkpoint = document.getElementById(`checkpoint${checkpointNum}`);
-            const status = document.getElementById(`status${checkpointNum}`);
-            const verifyBtn = document.getElementById(`verify${checkpointNum}`);
-            
-            // Mark as completed
-            currentSession.checkpoints[checkpointNum - 1] = true;
-            completedCheckpoints++;
-            
-            // Update UI
-            checkpoint.classList.remove('active');
-            checkpoint.classList.add('completed');
-            status.textContent = '✅';
-            verifyBtn.textContent = 'Completed!';
-            verifyBtn.disabled = true;
-            
-            // Activate next checkpoint
-            if (checkpointNum < 3) {
-                const nextCheckpoint = document.getElementById(`checkpoint${checkpointNum + 1}`);
-                const nextBtn = document.getElementById(`btn${checkpointNum + 1}`);
-                nextCheckpoint.classList.add('active');
-                nextBtn.disabled = false;
-            }
-            
+        function startProcess() {
+            // Reset everything
+            completedTasks = 0;
             updateProgress();
             
-            // Show generate key button if all completed
-            if (completedCheckpoints === 3) {
-                document.getElementById('generateKeySection').classList.remove('hidden');
+            // Reset all tasks
+            for (let i = 1; i <= 3; i++) {
+                document.getElementById('task' + i).classList.remove('completed', 'active');
+                document.getElementById('btn' + i).classList.remove('hidden');
+                document.getElementById('complete' + i).classList.add('hidden');
+                document.getElementById('btn' + i).disabled = (i !== 1);
+            }
+            
+            document.getElementById('task1').classList.add('active');
+            document.getElementById('generateBtn').classList.add('hidden');
+            
+            showScreen('tasksScreen');
+        }
+
+        function startTask(taskNum) {
+            // Hide start button, show completion button
+            document.getElementById('btn' + taskNum).classList.add('hidden');
+            document.getElementById('complete' + taskNum).classList.remove('hidden');
+            
+            // Auto-complete after 3 seconds for demo
+            setTimeout(function() {
+                completeTask(taskNum);
+            }, 3000);
+        }
+
+        function completeTask(taskNum) {
+            // Mark task as completed
+            document.getElementById('task' + taskNum).classList.remove('active');
+            document.getElementById('task' + taskNum).classList.add('completed');
+            document.getElementById('complete' + taskNum).textContent = '✅ Completed!';
+            document.getElementById('complete' + taskNum).disabled = true;
+            
+            completedTasks++;
+            updateProgress();
+            
+            // Enable next task
+            if (taskNum < 3) {
+                document.getElementById('task' + (taskNum + 1)).classList.add('active');
+                document.getElementById('btn' + (taskNum + 1)).disabled = false;
+            }
+            
+            // Show generate button if all tasks completed
+            if (completedTasks === 3) {
+                document.getElementById('generateBtn').classList.remove('hidden');
             }
         }
 
         function updateProgress() {
-            const progressFill = document.getElementById('progressFill');
-            const progressText = document.getElementById('progressText');
-            
-            const percentage = (completedCheckpoints / 3) * 100;
-            progressFill.style.width = percentage + '%';
-            progressText.textContent = `${completedCheckpoints}/3`;
+            let percentage = (completedTasks / 3) * 100;
+            document.getElementById('progressBar').style.width = percentage + '%';
+            document.getElementById('progressText').textContent = 'Progress: ' + completedTasks + '/3 Tasks Completed';
         }
 
         function generateKey() {
-            if (completedCheckpoints !== 3) return;
+            // Generate random key
+            let chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+            let key = 'FRYZER-';
             
-            const key = generateUniqueKey();
-            currentKeyData = {
+            for (let i = 0; i < 3; i++) {
+                for (let j = 0; j < 5; j++) {
+                    key += chars.charAt(Math.floor(Math.random() * chars.length));
+                }
+                if (i < 2) key += '-';
+            }
+            
+            currentKey = {
                 key: key,
-                generatedAt: Date.now(),
-                expiresAt: Date.now() + (24 * 60 * 60 * 1000), // 24 hours
-                used: false
+                expiresAt: Date.now() + (24 * 60 * 60 * 1000) // 24 hours
             };
             
-            // Show key
             document.getElementById('keyDisplay').textContent = key;
             showScreen('keyScreen');
             startKeyTimer();
         }
 
         function startKeyTimer() {
-            if (!currentKeyData) return;
-            
-            keyExpireTimer = setInterval(() => {
-                const now = Date.now();
-                const timeLeft = currentKeyData.expiresAt - now;
+            keyTimer = setInterval(function() {
+                let timeLeft = currentKey.expiresAt - Date.now();
                 
                 if (timeLeft <= 0) {
                     document.getElementById('keyTimer').textContent = 'Key expired!';
-                    clearInterval(keyExpireTimer);
+                    clearInterval(keyTimer);
                     return;
                 }
                 
-                const hours = Math.floor(timeLeft / (1000 * 60 * 60));
-                const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
-                const seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
+                let hours = Math.floor(timeLeft / (1000 * 60 * 60));
+                let minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
+                let seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
                 
                 document.getElementById('keyTimer').textContent = 
-                    `Key expires in: ${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+                    'Key expires in: ' + 
+                    hours.toString().padStart(2, '0') + ':' + 
+                    minutes.toString().padStart(2, '0') + ':' + 
+                    seconds.toString().padStart(2, '0');
             }, 1000);
         }
 
         function copyKey() {
-            const keyDisplay = document.getElementById('keyDisplay');
-            navigator.clipboard.writeText(keyDisplay.textContent).then(() => {
-                const originalText = keyDisplay.textContent;
-                keyDisplay.textContent = 'Copied to clipboard!';
-                keyDisplay.style.color = '#4CAF50';
+            let keyText = document.getElementById('keyDisplay').textContent;
+            navigator.clipboard.writeText(keyText).then(function() {
+                let originalText = document.getElementById('keyDisplay').textContent;
+                document.getElementById('keyDisplay').textContent = 'Copied to clipboard!';
+                document.getElementById('keyDisplay').style.color = '#4CAF50';
                 
-                setTimeout(() => {
-                    keyDisplay.textContent = originalText;
-                    keyDisplay.style.color = '#00d4ff';
+                setTimeout(function() {
+                    document.getElementById('keyDisplay').textContent = originalText;
+                    document.getElementById('keyDisplay').style.color = '#00d4ff';
                 }, 2000);
             });
         }
 
         function showScreen(screenId) {
-            const screens = ['startScreen', 'checkpointScreen', 'keyScreen'];
-            screens.forEach(screen => {
+            let screens = ['startScreen', 'tasksScreen', 'keyScreen'];
+            screens.forEach(function(screen) {
                 document.getElementById(screen).classList.add('hidden');
             });
             document.getElementById(screenId).classList.remove('hidden');
         }
 
-        function backToStart() {
-            if (keyExpireTimer) {
-                clearInterval(keyExpireTimer);
-                keyExpireTimer = null;
+        function goBack() {
+            if (keyTimer) {
+                clearInterval(keyTimer);
+                keyTimer = null;
             }
-            
-            // Reset all states
-            completedCheckpoints = 0;
-            currentKeyData = null;
-            
+            currentKey = null;
             showScreen('startScreen');
         }
-
-        // Create floating particles
-        function createParticles() {
-            for (let i = 0; i < 20; i++) {
-                const particle = document.createElement('div');
-                particle.classList.add('particle');
-                particle.style.left = Math.random() * 100 + 'vw';
-                particle.style.animationDelay = Math.random() * 6 + 's';
-                particle.style.animationDuration = (Math.random() * 3 + 3) + 's';
-                document.body.appendChild(particle);
-            }
-        }
-
-        // Initialize
-        createParticles();
     </script>
 </body>
 </html>
