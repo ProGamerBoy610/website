@@ -304,6 +304,7 @@
         let currentSession = null;
         let completedCheckpoints = 0;
         let keyExpireTimer = null;
+        let currentKeyData = null;
 
         // Generate session ID
         function generateSessionId() {
@@ -413,16 +414,13 @@
             if (completedCheckpoints !== 3) return;
             
             const key = generateUniqueKey();
-            const keyData = {
+            currentKeyData = {
                 key: key,
                 sessionId: currentSession.id,
                 generatedAt: Date.now(),
                 expiresAt: Date.now() + (24 * 60 * 60 * 1000), // 24 hours
                 used: false
             };
-            
-            // Store key (in real implementation, send to server)
-            localStorage.setItem('currentKey', JSON.stringify(keyData));
             
             // Show key
             document.getElementById('keyDisplay').textContent = key;
