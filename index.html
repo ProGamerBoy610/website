@@ -416,7 +416,6 @@
             const key = generateUniqueKey();
             currentKeyData = {
                 key: key,
-                sessionId: currentSession.id,
                 generatedAt: Date.now(),
                 expiresAt: Date.now() + (24 * 60 * 60 * 1000), // 24 hours
                 used: false
@@ -479,30 +478,8 @@
             }
             
             // Reset all states
-            currentSession = null;
             completedCheckpoints = 0;
             currentKeyData = null;
-            
-            // Reset UI
-            for (let i = 1; i <= 3; i++) {
-                const checkpoint = document.getElementById(`checkpoint${i}`);
-                const status = document.getElementById(`status${i}`);
-                const btn = document.getElementById(`btn${i}`);
-                const verify = document.getElementById(`verify${i}`);
-                
-                checkpoint.classList.remove('completed', 'active');
-                status.textContent = '⏳';
-                btn.style.display = 'inline-block';
-                btn.disabled = i !== 1;
-                verify.classList.add('hidden');
-                verify.disabled = false;
-                verify.textContent = 'Verify Completion';
-            }
-            
-            document.getElementById('checkpoint1').classList.add('active');
-            document.getElementById('generateKeySection').classList.add('hidden');
-            document.getElementById('progressFill').style.width = '0%';
-            document.getElementById('progressText').textContent = '0/3';
             
             showScreen('startScreen');
         }
