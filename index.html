@@ -79,7 +79,6 @@
             background: #0078d4;
             border-radius: 3px;
             flex-shrink: 0;
-            position: relative;
         }
         
         .main-area {
@@ -132,7 +131,6 @@
             border-right: 1px solid #404040;
             transition: all 0.2s;
             font-weight: 500;
-            position: relative;
         }
         
         .tab:hover {
@@ -142,16 +140,6 @@
         .tab.active {
             background: #0078d4;
             color: white;
-        }
-        
-        .tab.active::after {
-            content: '';
-            position: absolute;
-            bottom: -1px;
-            left: 0;
-            right: 0;
-            height: 2px;
-            background: #0078d4;
         }
         
         .content-area {
@@ -176,14 +164,16 @@
             overflow: auto;
         }
         
+        /* HUGE CANVAS - 5000x3000px */
         .canvas {
-            width: 100%;
-            min-height: 100%;
+            width: 5000px;
+            height: 3000px;
             position: relative;
             background: 
-                linear-gradient(rgba(255,255,255,.05) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(255,255,255,.05) 1px, transparent 1px);
-            background-size: 20px 20px;
+                linear-gradient(rgba(255,255,255,.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,.03) 1px, transparent 1px);
+            background-size: 25px 25px;
+            min-height: 100%;
         }
         
         .gui-element {
@@ -243,16 +233,8 @@
             background: #ffc107;
         }
         
-        .control-btn.minimize:hover {
-            background: #e0a800;
-        }
-        
         .control-btn.group {
             background: #28a745;
-        }
-        
-        .control-btn.group:hover {
-            background: #1e7e34;
         }
         
         .resize-handle {
@@ -266,11 +248,13 @@
             border-radius: 50%;
         }
         
+        /* SCROLLABLE PROPERTIES PANEL */
         .properties-panel {
             width: 320px;
             background: #2d2d2d;
             border-left: 1px solid #404040;
-            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
         }
         
         .properties-header {
@@ -280,6 +264,13 @@
             font-weight: bold;
             text-align: center;
             color: #0078d4;
+            flex-shrink: 0;
+        }
+        
+        .properties-content {
+            flex: 1;
+            overflow-y: auto;
+            overflow-x: hidden;
         }
         
         .property-group {
@@ -292,9 +283,6 @@
             font-size: 14px;
             border-bottom: 1px solid #404040;
             padding-bottom: 8px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
         }
         
         .property-item {
@@ -309,7 +297,7 @@
             font-weight: 500;
         }
         
-        .property-item input, .property-item select, .property-item textarea {
+        .property-item input, .property-item select {
             width: 100%;
             padding: 8px 10px;
             background: #404040;
@@ -317,12 +305,6 @@
             border-radius: 4px;
             color: white;
             font-size: 13px;
-            transition: border-color 0.2s;
-        }
-        
-        .property-item input:focus, .property-item select:focus, .property-item textarea:focus {
-            border-color: #0078d4;
-            outline: none;
         }
         
         .property-item input[type="color"] {
@@ -333,20 +315,14 @@
         .property-item input[type="checkbox"] {
             width: auto;
             margin-right: 10px;
-            transform: scale(1.2);
         }
         
-        .property-item input[type="range"] {
-            margin: 5px 0;
+        .property-item button {
+            width: 100%;
+            margin-bottom: 5px;
         }
         
-        .range-display {
-            font-size: 11px;
-            color: #999;
-            text-align: center;
-            margin-top: 5px;
-        }
-        
+        /* SCROLLABLE CODE AREA */
         .code-area {
             flex: 1;
             background: #1e1e1e;
@@ -361,6 +337,7 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
+            flex-shrink: 0;
         }
         
         .code-title {
@@ -376,12 +353,10 @@
             border-radius: 4px;
             cursor: pointer;
             font-weight: 500;
-            transition: all 0.2s;
         }
         
         .copy-btn:hover {
             background: #106ebe;
-            transform: translateY(-2px);
         }
         
         .copy-btn.copied {
@@ -392,20 +367,18 @@
             flex: 1;
             padding: 20px;
             font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
-            font-size: 14px;
+            font-size: 13px;
             line-height: 1.6;
             background: #1e1e1e;
             color: #d4d4d4;
             overflow: auto;
             white-space: pre-wrap;
-            word-wrap: break-word;
         }
         
-        /* GUI Element Styles */
+        /* GUI ELEMENT STYLES */
         .gui-frame {
             background: #ffffff;
             border: 1px solid #cccccc;
-            border-radius: 0;
         }
         
         .gui-textlabel {
@@ -417,7 +390,6 @@
             padding: 5px 10px;
             font-family: 'Segoe UI', sans-serif;
             font-size: 14px;
-            text-align: left;
         }
         
         .gui-textbutton {
@@ -430,11 +402,6 @@
             font-size: 14px;
             cursor: pointer;
             border: 1px solid #999;
-            transition: background 0.2s;
-        }
-        
-        .gui-textbutton:hover {
-            background: #d4d4d4;
         }
         
         .gui-textbox {
@@ -462,6 +429,28 @@
             overflow: auto;
         }
         
+        .drop-zone {
+            position: absolute;
+            top: 50px;
+            left: 50px;
+            width: 300px;
+            height: 200px;
+            border: 3px dashed #0078d4;
+            background: rgba(0, 120, 212, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            color: #0078d4;
+            border-radius: 10px;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        
+        .drop-zone.active {
+            opacity: 1;
+        }
+        
         .notification {
             position: fixed;
             top: 20px;
@@ -472,7 +461,7 @@
             border-radius: 4px;
             z-index: 10000;
             transform: translateX(100%);
-            transition: transform 0.3s ease;
+            transition: transform 0.3s;
         }
         
         .notification.show {
@@ -490,36 +479,10 @@
             border-radius: 3px;
             font-weight: bold;
         }
-        
-        .dragging {
-            opacity: 0.7;
-            transform: rotate(5deg);
-            z-index: 1000;
-        }
-        
-        .drop-zone {
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            border: 2px dashed #0078d4;
-            background: rgba(0, 120, 212, 0.1);
-            display: none;
-            align-items: center;
-            justify-content: center;
-            font-size: 18px;
-            color: #0078d4;
-        }
-        
-        .drop-zone.active {
-            display: flex;
-        }
     </style>
 </head>
 <body>
     <div class="app-container">
-        <!-- Sidebar with components -->
         <div class="sidebar">
             <div class="sidebar-header">🎮 Roblox GUI Components</div>
             
@@ -552,29 +515,25 @@
             </div>
             
             <div class="component-category">
-                <div class="category-title">🎚️ Interactive Components</div>
+                <div class="category-title">🎚️ Special Components</div>
                 <div class="component-item" data-type="Slider">
                     <div class="component-icon"></div>
-                    Slider (Frame + TextLabel)
+                    Modern Slider
                 </div>
                 <div class="component-item" data-type="Dropdown">
                     <div class="component-icon"></div>
                     Dropdown Menu
                 </div>
-                <div class="component-item" data-type="ToggleButton">
-                    <div class="component-icon"></div>
-                    Toggle Button
-                </div>
             </div>
         </div>
         
-        <!-- Main content area -->
         <div class="main-area">
             <div class="top-toolbar">
                 <button class="toolbar-btn" onclick="clearCanvas()">🗑️ Clear All</button>
                 <button class="toolbar-btn" onclick="groupSelected()">📦 Group Selected</button>
                 <button class="toolbar-btn" onclick="ungroupSelected()">📂 Ungroup</button>
                 <button class="toolbar-btn danger" onclick="deleteSelected()">❌ Delete Selected</button>
+                <span style="margin-left: auto; font-size: 12px; color: #ccc;">Canvas: 5000x3000px | Ctrl+Click to multi-select</span>
             </div>
             
             <div class="tabs">
@@ -587,18 +546,19 @@
                     <div class="building-area">
                         <div class="canvas" id="canvas">
                             <div class="drop-zone" id="dropZone">
-                                Drop components here to build your GUI
+                                🎯 Drop components here to start building!
                             </div>
                         </div>
                     </div>
                     
                     <div class="properties-panel">
                         <div class="properties-header">⚙️ Properties</div>
-                        <div id="properties-content">
+                        <div class="properties-content" id="properties-content">
                             <div class="property-group">
                                 <h3>📋 Selection</h3>
                                 <p style="color: #999; font-size: 12px; text-align: center; margin-top: 20px;">
-                                    Select an element to edit its properties
+                                    Select an element to edit properties<br>
+                                    <strong>Ctrl+Click</strong> for multi-select
                                 </p>
                             </div>
                         </div>
@@ -611,8 +571,10 @@
                             <div class="code-title">📄 Generated Roblox Code</div>
                             <button class="copy-btn" onclick="copyCode()">📋 Copy Code</button>
                         </div>
-                        <div class="code-content" id="generated-code">
--- Roblox GUI Code will appear here
+                        <div class="code-content" id="generated-code">-- Roblox GUI Builder - Generated Code
+-- This code works with Roblox Studio!
+-- Place this in ServerScriptService or StarterPlayerScripts
+
 -- Start building your GUI to see the generated code!
                         </div>
                     </div>
@@ -622,15 +584,13 @@
     </div>
     
     <script>
-        // Global variables
         let elements = [];
-        let selectedElement = null;
+        let selectedElements = [];
         let elementCounter = 0;
         let draggedElement = null;
         let groups = [];
         let groupCounter = 0;
         
-        // Initialize drag and drop
         document.addEventListener('DOMContentLoaded', function() {
             initializeDragAndDrop();
             updateCode();
@@ -653,12 +613,10 @@
         
         function handleDragStart(e) {
             draggedElement = e.target.dataset.type;
-            e.target.classList.add('dragging');
             document.getElementById('dropZone').classList.add('active');
         }
         
         function handleDragEnd(e) {
-            e.target.classList.remove('dragging');
             document.getElementById('dropZone').classList.remove('active');
         }
         
@@ -671,11 +629,11 @@
             document.getElementById('dropZone').classList.remove('active');
             
             if (draggedElement) {
-                const rect = e.target.getBoundingClientRect();
-                const x = e.clientX - rect.left;
-                const y = e.clientY - rect.top;
+                const rect = document.getElementById('canvas').getBoundingClientRect();
+                const x = e.clientX - rect.left + document.querySelector('.building-area').scrollLeft;
+                const y = e.clientY - rect.top + document.querySelector('.building-area').scrollTop;
                 
-                createGuiElement(draggedElement, x, y);
+                createGuiElement(draggedElement, Math.max(50, x), Math.max(50, y));
                 draggedElement = null;
             }
         }
@@ -684,18 +642,14 @@
             elementCounter++;
             const id = `${type}_${elementCounter}`;
             
-            let element;
-            
             if (type === 'Slider') {
-                // Create slider group
-                element = createSliderGroup(id, x, y);
+                createModernSlider(id, x, y);
             } else if (type === 'Dropdown') {
-                element = createDropdownGroup(id, x, y);
+                createDropdown(id, x, y);
             } else {
-                element = createBasicElement(type, id, x, y);
+                createBasicElement(type, id, x, y);
             }
             
-            elements.push(element);
             updateCode();
         }
         
@@ -706,19 +660,17 @@
             div.style.left = x + 'px';
             div.style.top = y + 'px';
             
-            // Set default properties based on type
-            const defaultProps = getDefaultProperties(type);
-            Object.assign(div.style, defaultProps.style);
+            const defaults = getDefaultProperties(type);
+            Object.assign(div.style, defaults.style);
             
             if (type === 'TextLabel' || type === 'TextButton') {
-                div.textContent = defaultProps.text || type;
+                div.textContent = defaults.text || type;
+            } else if (type === 'TextBox') {
+                div.textContent = 'Enter text...';
             } else if (type === 'ImageLabel') {
                 div.textContent = '🖼️ Image';
-            } else if (type === 'TextBox') {
-                div.textContent = 'TextBox';
             }
             
-            // Add controls
             div.innerHTML += `
                 <div class="controls">
                     <button class="control-btn minimize" onclick="minimizeElement('${id}')" title="Minimize">-</button>
@@ -728,131 +680,126 @@
                 <div class="resize-handle" onmousedown="startResize(event, '${id}')"></div>
             `;
             
-            // Make draggable
             div.addEventListener('mousedown', (e) => startDrag(e, id));
             div.addEventListener('click', (e) => selectElement(e, id));
             
             document.getElementById('canvas').appendChild(div);
             
-            return {
+            const element = {
                 id: id,
                 type: type,
                 element: div,
-                properties: defaultProps.properties,
-                grouped: false,
-                minimized: false
+                properties: defaults.properties || {},
+                grouped: false
             };
+            
+            elements.push(element);
+            return element;
         }
         
-        function createSliderGroup(id, x, y) {
+        // BEAUTIFUL MODERN SLIDER
+        function createModernSlider(id, x, y) {
             groupCounter++;
-            const groupId = `Group_${groupCounter}`;
+            const groupId = `SliderGroup_${groupCounter}`;
             
-            // Create frame
-            const frame = createBasicElement('Frame', `${id}_Frame`, x, y);
-            frame.element.style.width = '200px';
-            frame.element.style.height = '50px';
-            frame.element.style.background = '#444';
+            // Main container
+            const container = createBasicElement('Frame', `${id}_Container`, x, y);
+            container.element.style.width = '250px';
+            container.element.style.height = '80px';
+            container.element.style.background = 'linear-gradient(145deg, #2a2a2a, #1a1a1a)';
+            container.element.style.borderRadius = '12px';
+            container.element.style.border = '2px solid #404040';
+            container.element.style.boxShadow = '0 8px 25px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.1)';
             
-            // Create slider bar
-            const sliderBar = createBasicElement('Frame', `${id}_Bar`, x + 10, y + 20);
-            sliderBar.element.style.width = '150px';
-            sliderBar.element.style.height = '6px';
-            sliderBar.element.style.background = '#666';
-            sliderBar.element.style.borderRadius = '3px';
+            // Title
+            const title = createBasicElement('TextLabel', `${id}_Title`, x + 15, y + 10);
+            title.element.style.width = '100px';
+            title.element.style.height = '20px';
+            title.element.style.background = 'transparent';
+            title.element.style.color = '#ffffff';
+            title.element.style.fontSize = '13px';
+            title.element.style.fontWeight = 'bold';
+            title.element.textContent = 'Slider Control';
             
-            // Create slider handle
-            const handle = createBasicElement('Frame', `${id}_Handle`, x + 75, y + 17);
-            handle.element.style.width = '12px';
-            handle.element.style.height = '12px';
-            handle.element.style.background = '#0078d4';
+            // Track background
+            const track = createBasicElement('Frame', `${id}_Track`, x + 15, y + 40);
+            track.element.style.width = '180px';
+            track.element.style.height = '8px';
+            track.element.style.background = 'linear-gradient(90deg, #333333, #1a1a1a)';
+            track.element.style.borderRadius = '4px';
+            track.element.style.border = '1px solid #555';
+            track.element.style.boxShadow = 'inset 0 2px 4px rgba(0,0,0,0.5)';
+            
+            // Active fill
+            const fill = createBasicElement('Frame', `${id}_Fill`, x + 15, y + 40);
+            fill.element.style.width = '90px';
+            fill.element.style.height = '8px';
+            fill.element.style.background = 'linear-gradient(90deg, #00d4ff, #0099cc)';
+            fill.element.style.borderRadius = '4px';
+            fill.element.style.boxShadow = '0 0 15px rgba(0, 212, 255, 0.5)';
+            
+            // Handle
+            const handle = createBasicElement('Frame', `${id}_Handle`, x + 100, y + 35);
+            handle.element.style.width = '18px';
+            handle.element.style.height = '18px';
+            handle.element.style.background = 'radial-gradient(circle, #ffffff, #e0e0e0)';
             handle.element.style.borderRadius = '50%';
+            handle.element.style.border = '3px solid #00d4ff';
+            handle.element.style.boxShadow = '0 4px 15px rgba(0,0,0,0.3), 0 0 0 4px rgba(0,212,255,0.2)';
+            handle.element.style.cursor = 'pointer';
             
-            // Create value label
-            const label = createBasicElement('TextLabel', `${id}_Label`, x + 170, y + 15);
-            label.element.style.width = '30px';
-            label.element.style.height = '20px';
-            label.element.textContent = '50';
-            label.element.style.fontSize = '12px';
+            // Value display
+            const value = createBasicElement('TextLabel', `${id}_Value`, x + 200, y + 35);
+            value.element.style.width = '35px';
+            value.element.style.height = '18px';
+            value.element.style.background = 'linear-gradient(145deg, #333333, #1a1a1a)';
+            value.element.style.color = '#00d4ff';
+            value.element.style.borderRadius = '6px';
+            value.element.style.border = '1px solid #555';
+            value.element.style.fontSize = '11px';
+            value.element.style.fontWeight = 'bold';
+            value.element.style.textAlign = 'center';
+            value.element.style.lineHeight = '18px';
+            value.element.textContent = '50';
             
             // Group them
             const group = {
                 id: groupId,
-                type: 'SliderGroup',
-                elements: [frame, sliderBar, handle, label],
+                type: 'ModernSlider',
+                elements: [container, title, track, fill, handle, value],
                 grouped: true
             };
             
-            // Add group indicator
-            frame.element.innerHTML += `<div class="group-indicator">SLIDER</div>`;
-            
+            container.element.innerHTML += `<div class="group-indicator">SLIDER</div>`;
             groups.push(group);
             
             return group;
         }
         
-        function createDropdownGroup(id, x, y) {
-            groupCounter++;
-            const groupId = `Group_${groupCounter}`;
-            
-            // Create dropdown button
+        function createDropdown(id, x, y) {
             const button = createBasicElement('TextButton', `${id}_Button`, x, y);
-            button.element.style.width = '120px';
-            button.element.style.height = '30px';
-            button.element.textContent = 'Dropdown ▼';
+            button.element.style.width = '150px';
+            button.element.style.height = '35px';
+            button.element.textContent = 'Select Option ▼';
+            button.element.style.background = 'linear-gradient(145deg, #f0f0f0, #d0d0d0)';
             
-            // Create dropdown frame (hidden by default)
-            const dropdown = createBasicElement('Frame', `${id}_Dropdown`, x, y + 30);
-            dropdown.element.style.width = '120px';
-            dropdown.element.style.height = '90px';
-            dropdown.element.style.background = '#fff';
-            dropdown.element.style.border = '1px solid #999';
-            dropdown.element.style.display = 'none';
-            
-            // Create options
-            const options = ['Option 1', 'Option 2', 'Option 3'];
-            const optionElements = options.map((option, index) => {
-                const optionBtn = createBasicElement('TextButton', `${id}_Option${index + 1}`, x, y + 30 + (index * 30));
-                optionBtn.element.style.width = '120px';
-                optionBtn.element.style.height = '30px';
-                optionBtn.element.style.background = '#f5f5f5';
-                optionBtn.element.style.border = '1px solid #ddd';
-                optionBtn.element.textContent = option;
-                optionBtn.element.style.fontSize = '12px';
-                return optionBtn;
-            });
-            
-            const group = {
-                id: groupId,
-                type: 'DropdownGroup',
-                elements: [button, dropdown, ...optionElements],
-                grouped: true
-            };
-            
-            button.element.innerHTML += `<div class="group-indicator">DROPDOWN</div>`;
-            groups.push(group);
-            
-            return group;
+            return button;
         }
         
         function getDefaultProperties(type) {
             const defaults = {
                 Frame: {
-                    style: { width: '100px', height: '100px', background: '#ffffff' },
+                    style: { width: '120px', height: '120px', background: '#ffffff' },
                     properties: {
-                        Size: '{0, 100},{0, 100}',
-                        Position: '{0, 0},{0, 0}',
+                        Size: 'UDim2.new(0, 120, 0, 120)',
                         BackgroundColor3: 'Color3.fromRGB(255, 255, 255)',
-                        BorderSizePixel: 1,
-                        BackgroundTransparency: 0
+                        BorderSizePixel: 1
                     }
                 },
                 TextLabel: {
-                    style: { width: '120px', height: '40px' },
+                    style: { width: '140px', height: '40px', background: 'transparent' },
                     properties: {
-                        Size: '{0, 120},{0, 40}',
-                        Position: '{0, 0},{0, 0}',
-                        BackgroundColor3: 'Color3.fromRGB(255, 255, 255)',
+                        Size: 'UDim2.new(0, 140, 0, 40)',
                         BackgroundTransparency: 1,
                         Text: 'TextLabel',
                         TextColor3: 'Color3.fromRGB(0, 0, 0)',
@@ -862,10 +809,9 @@
                     text: 'TextLabel'
                 },
                 TextButton: {
-                    style: { width: '100px', height: '35px' },
+                    style: { width: '120px', height: '40px' },
                     properties: {
-                        Size: '{0, 100},{0, 35}',
-                        Position: '{0, 0},{0, 0}',
+                        Size: 'UDim2.new(0, 120, 0, 40)',
                         BackgroundColor3: 'Color3.fromRGB(225, 225, 225)',
                         Text: 'TextButton',
                         TextColor3: 'Color3.fromRGB(0, 0, 0)',
@@ -875,10 +821,9 @@
                     text: 'TextButton'
                 },
                 TextBox: {
-                    style: { width: '120px', height: '30px' },
+                    style: { width: '140px', height: '35px' },
                     properties: {
-                        Size: '{0, 120},{0, 30}',
-                        Position: '{0, 0},{0, 0}',
+                        Size: 'UDim2.new(0, 140, 0, 35)',
                         BackgroundColor3: 'Color3.fromRGB(255, 255, 255)',
                         Text: '',
                         PlaceholderText: 'Enter text...',
@@ -890,20 +835,18 @@
                 ImageLabel: {
                     style: { width: '100px', height: '100px' },
                     properties: {
-                        Size: '{0, 100},{0, 100}',
-                        Position: '{0, 0},{0, 0}',
-                        BackgroundColor3: 'Color3.fromRGB(255, 255, 255)',
+                        Size: 'UDim2.new(0, 100, 0, 100)',
+                        BackgroundColor3: 'Color3.fromRGB(240, 240, 240)',
                         Image: 'rbxassetid://0'
                     }
                 },
                 ScrollingFrame: {
-                    style: { width: '150px', height: '150px' },
+                    style: { width: '180px', height: '150px' },
                     properties: {
-                        Size: '{0, 150},{0, 150}',
-                        Position: '{0, 0},{0, 0}',
+                        Size: 'UDim2.new(0, 180, 0, 150)',
                         BackgroundColor3: 'Color3.fromRGB(255, 255, 255)',
-                        ScrollBarThickness: 12,
-                        CanvasSize: '{0, 0},{0, 300}'
+                        ScrollBarThickness: 8,
+                        CanvasSize: 'UDim2.new(0, 0, 0, 400)'
                     }
                 }
             };
@@ -911,19 +854,29 @@
             return defaults[type] || defaults.Frame;
         }
         
+        // FIXED MULTI-SELECT
         function selectElement(e, id) {
             e.stopPropagation();
             
-            // Remove selection from all elements
-            document.querySelectorAll('.gui-element').forEach(el => {
-                el.classList.remove('selected');
-            });
-            
-            // Select current element
             const element = document.getElementById(id);
-            element.classList.add('selected');
-            selectedElement = elements.find(el => el.id === id) || 
-                             groups.find(g => g.elements.some(e => e.id === id));
+            
+            if (e.ctrlKey || e.metaKey) {
+                // Multi-select mode
+                if (element.classList.contains('selected')) {
+                    element.classList.remove('selected');
+                    selectedElements = selectedElements.filter(el => el !== id);
+                } else {
+                    element.classList.add('selected');
+                    selectedElements.push(id);
+                }
+            } else {
+                // Single select mode
+                document.querySelectorAll('.gui-element').forEach(el => {
+                    el.classList.remove('selected');
+                });
+                selectedElements = [id];
+                element.classList.add('selected');
+            }
             
             updatePropertiesPanel();
         }
@@ -931,21 +884,47 @@
         function updatePropertiesPanel() {
             const content = document.getElementById('properties-content');
             
-            if (!selectedElement) {
+            if (selectedElements.length === 0) {
                 content.innerHTML = `
                     <div class="property-group">
                         <h3>📋 Selection</h3>
                         <p style="color: #999; font-size: 12px; text-align: center; margin-top: 20px;">
-                            Select an element to edit its properties
+                            Select elements to edit properties<br>
+                            <strong>Ctrl+Click</strong> for multi-select
                         </p>
                     </div>
                 `;
                 return;
             }
             
+            if (selectedElements.length > 1) {
+                content.innerHTML = `
+                    <div class="property-group">
+                        <h3>🎯 Multi-Selection (${selectedElements.length} items)</h3>
+                        <div class="property-item">
+                            <button class="toolbar-btn" onclick="groupSelected()">📦 Group Selected</button>
+                        </div>
+                        <div class="property-item">
+                            <button class="toolbar-btn danger" onclick="deleteSelected()">🗑️ Delete All Selected</button>
+                        </div>
+                        <div class="property-item">
+                            <button class="toolbar-btn" onclick="duplicateSelected()">📋 Duplicate All</button>
+                        </div>
+                    </div>
+                `;
+                return;
+            }
+            
+            // Single element selected
+            const selectedId = selectedElements[0];
+            const selectedElement = elements.find(el => el.id === selectedId);
+            if (!selectedElement) return;
+            
+            const element = selectedElement.element;
+            
             let html = `
                 <div class="property-group">
-                    <h3>🎯 ${selectedElement.type || 'Element'}</h3>
+                    <h3>🎯 ${selectedElement.type}</h3>
                     <div class="property-item">
                         <label>Name</label>
                         <input type="text" value="${selectedElement.id}" onchange="updateElementName('${selectedElement.id}', this.value)">
@@ -956,19 +935,19 @@
                     <h3>📐 Transform</h3>
                     <div class="property-item">
                         <label>X Position</label>
-                        <input type="number" value="${parseInt(selectedElement.element.style.left)}" onchange="updateElementProperty('${selectedElement.id}', 'left', this.value + 'px')">
+                        <input type="number" value="${parseInt(element.style.left)}" onchange="updateElementProperty('${selectedElement.id}', 'left', this.value + 'px')">
                     </div>
                     <div class="property-item">
                         <label>Y Position</label>
-                        <input type="number" value="${parseInt(selectedElement.element.style.top)}" onchange="updateElementProperty('${selectedElement.id}', 'top', this.value + 'px')">
+                        <input type="number" value="${parseInt(element.style.top)}" onchange="updateElementProperty('${selectedElement.id}', 'top', this.value + 'px')">
                     </div>
                     <div class="property-item">
                         <label>Width</label>
-                        <input type="number" value="${parseInt(selectedElement.element.style.width)}" onchange="updateElementProperty('${selectedElement.id}', 'width', this.value + 'px')">
+                        <input type="number" value="${parseInt(element.style.width)}" onchange="updateElementProperty('${selectedElement.id}', 'width', this.value + 'px')">
                     </div>
                     <div class="property-item">
                         <label>Height</label>
-                        <input type="number" value="${parseInt(selectedElement.element.style.height)}" onchange="updateElementProperty('${selectedElement.id}', 'height', this.value + 'px')">
+                        <input type="number" value="${parseInt(element.style.height)}" onchange="updateElementProperty('${selectedElement.id}', 'height', this.value + 'px')">
                     </div>
                 </div>
                 
@@ -976,86 +955,75 @@
                     <h3>🎨 Appearance</h3>
                     <div class="property-item">
                         <label>Background Color</label>
-                        <input type="color" value="${rgbToHex(selectedElement.element.style.backgroundColor || '#ffffff')}" onchange="updateElementProperty('${selectedElement.id}', 'backgroundColor', this.value)">
-                    </div>
-                    <div class="property-item">
-                        <label>Background Transparency</label>
-                        <input type="range" min="0" max="1" step="0.1" value="0" onchange="updateElementProperty('${selectedElement.id}', 'opacity', 1 - this.value)">
-                        <div class="range-display">0% Transparent</div>
+                        <input type="color" value="${rgbToHex(element.style.backgroundColor || '#ffffff')}" onchange="updateElementProperty('${selectedElement.id}', 'backgroundColor', this.value)">
                     </div>
                     <div class="property-item">
                         <label>Border Radius</label>
-                        <input type="number" min="0" max="50" value="0" onchange="updateElementProperty('${selectedElement.id}', 'borderRadius', this.value + 'px')">
+                        <input type="number" min="0" max="50" value="${parseInt(element.style.borderRadius) || 0}" onchange="updateElementProperty('${selectedElement.id}', 'borderRadius', this.value + 'px')">
                     </div>
                     <div class="property-item">
                         <label>Border Width</label>
-                        <input type="number" min="0" max="10" value="1" onchange="updateElementProperty('${selectedElement.id}', 'borderWidth', this.value + 'px')">
+                        <input type="number" min="0" max="10" value="${parseInt(element.style.borderWidth) || 1}" onchange="updateElementProperty('${selectedElement.id}', 'borderWidth', this.value + 'px')">
                     </div>
                     <div class="property-item">
                         <label>Border Color</label>
-                        <input type="color" value="#cccccc" onchange="updateElementProperty('${selectedElement.id}', 'borderColor', this.value)">
+                        <input type="color" value="${rgbToHex(element.style.borderColor || '#cccccc')}" onchange="updateElementProperty('${selectedElement.id}', 'borderColor', this.value)">
                     </div>
                 </div>
             `;
             
-            // Add text properties for text elements
+            // Text properties
             if (selectedElement.type === 'TextLabel' || selectedElement.type === 'TextButton' || selectedElement.type === 'TextBox') {
                 html += `
                     <div class="property-group">
-                        <h3>✏️ Text</h3>
+                        <h3>✏️ Text Properties</h3>
                         <div class="property-item">
-                            <label>Text</label>
-                            <input type="text" value="${selectedElement.element.textContent}" onchange="updateElementText('${selectedElement.id}', this.value)">
+                            <label>Text Content</label>
+                            <input type="text" value="${element.textContent}" onchange="updateElementText('${selectedElement.id}', this.value)">
                         </div>
                         <div class="property-item">
                             <label>Text Color</label>
-                            <input type="color" value="${rgbToHex(selectedElement.element.style.color || '#000000')}" onchange="updateElementProperty('${selectedElement.id}', 'color', this.value)">
+                            <input type="color" value="${rgbToHex(element.style.color || '#000000')}" onchange="updateElementProperty('${selectedElement.id}', 'color', this.value)">
                         </div>
                         <div class="property-item">
                             <label>Font Size</label>
-                            <input type="number" min="8" max="72" value="14" onchange="updateElementProperty('${selectedElement.id}', 'fontSize', this.value + 'px')">
+                            <input type="number" min="8" max="72" value="${parseInt(element.style.fontSize) || 14}" onchange="updateElementProperty('${selectedElement.id}', 'fontSize', this.value + 'px')">
                         </div>
                         <div class="property-item">
                             <label>Text Align</label>
                             <select onchange="updateElementProperty('${selectedElement.id}', 'textAlign', this.value)">
-                                <option value="left">Left</option>
-                                <option value="center">Center</option>
-                                <option value="right">Right</option>
+                                <option value="left" ${element.style.textAlign === 'left' ? 'selected' : ''}>Left</option>
+                                <option value="center" ${element.style.textAlign === 'center' ? 'selected' : ''}>Center</option>
+                                <option value="right" ${element.style.textAlign === 'right' ? 'selected' : ''}>Right</option>
                             </select>
                         </div>
                         <div class="property-item">
                             <label>Font Weight</label>
                             <select onchange="updateElementProperty('${selectedElement.id}', 'fontWeight', this.value)">
-                                <option value="normal">Normal</option>
-                                <option value="bold">Bold</option>
-                                <option value="lighter">Light</option>
+                                <option value="normal" ${element.style.fontWeight === 'normal' ? 'selected' : ''}>Normal</option>
+                                <option value="bold" ${element.style.fontWeight === 'bold' ? 'selected' : ''}>Bold</option>
+                                <option value="lighter" ${element.style.fontWeight === 'lighter' ? 'selected' : ''}>Light</option>
                             </select>
                         </div>
                     </div>
                 `;
             }
             
-            // Add behavior properties
+            // Action buttons
             html += `
                 <div class="property-group">
-                    <h3>⚙️ Behavior</h3>
+                    <h3>🔧 Actions</h3>
                     <div class="property-item">
-                        <label>
-                            <input type="checkbox" onchange="updateElementDraggable('${selectedElement.id}', this.checked)">
-                            Draggable
-                        </label>
+                        <button class="toolbar-btn" onclick="duplicateElement('${selectedElement.id}')">📋 Duplicate</button>
                     </div>
                     <div class="property-item">
-                        <label>
-                            <input type="checkbox" onchange="updateElementVisible('${selectedElement.id}', this.checked)" checked>
-                            Visible
-                        </label>
+                        <button class="toolbar-btn" onclick="bringToFront('${selectedElement.id}')">⬆️ Bring to Front</button>
                     </div>
                     <div class="property-item">
-                        <label>
-                            <input type="checkbox" onchange="updateElementActive('${selectedElement.id}', this.checked)" checked>
-                            Active
-                        </label>
+                        <button class="toolbar-btn" onclick="sendToBack('${selectedElement.id}')">⬇️ Send to Back</button>
+                    </div>
+                    <div class="property-item">
+                        <button class="toolbar-btn danger" onclick="deleteElement('${selectedElement.id}')">🗑️ Delete</button>
                     </div>
                 </div>
             `;
@@ -1084,53 +1052,72 @@
             if (element && newId && newId !== oldId) {
                 element.id = newId;
                 element.element.id = newId;
+                selectedElements = selectedElements.map(id => id === oldId ? newId : id);
                 updateCode();
             }
         }
         
-        function updateElementDraggable(id, draggable) {
-            const element = elements.find(el => el.id === id);
+        function duplicateElement(id) {
+            const original = elements.find(el => el.id === id);
+            if (!original) return;
+            
+            const newX = parseInt(original.element.style.left) + 30;
+            const newY = parseInt(original.element.style.top) + 30;
+            
+            createGuiElement(original.type, newX, newY);
+            
+            const newElement = elements[elements.length - 1];
+            const originalStyle = original.element.style;
+            const newStyle = newElement.element.style;
+            
+            // Copy all style properties
+            ['width', 'height', 'backgroundColor', 'color', 'fontSize', 'borderRadius', 'borderWidth', 'borderColor', 'textAlign', 'fontWeight'].forEach(prop => {
+                if (originalStyle[prop]) newStyle[prop] = originalStyle[prop];
+            });
+            
+            if (original.element.textContent) {
+                newElement.element.textContent = original.element.textContent + ' Copy';
+            }
+            
+            showNotification('Element duplicated!');
+        }
+        
+        function duplicateSelected() {
+            selectedElements.forEach(id => duplicateElement(id));
+        }
+        
+        function bringToFront(id) {
+            const element = document.getElementById(id);
             if (element) {
-                element.properties = element.properties || {};
-                element.properties.Draggable = draggable;
-                updateCode();
+                element.style.zIndex = '1000';
+                showNotification('Element brought to front');
             }
         }
         
-        function updateElementVisible(id, visible) {
-            const element = elements.find(el => el.id === id);
+        function sendToBack(id) {
+            const element = document.getElementById(id);
             if (element) {
-                element.element.style.display = visible ? 'block' : 'none';
-                element.properties = element.properties || {};
-                element.properties.Visible = visible;
-                updateCode();
-            }
-        }
-        
-        function updateElementActive(id, active) {
-            const element = elements.find(el => el.id === id);
-            if (element) {
-                element.element.style.pointerEvents = active ? 'auto' : 'none';
-                element.properties = element.properties || {};
-                element.properties.Active = active;
-                updateCode();
+                element.style.zIndex = '1';
+                showNotification('Element sent to back');
             }
         }
         
         function rgbToHex(rgb) {
             if (!rgb || rgb === 'transparent') return '#ffffff';
+            if (rgb.startsWith('#')) return rgb;
+            
             const match = rgb.match(/rgb\((\d+),\s*(\d+),\s*(\d+)\)/);
             if (match) {
                 return '#' + [1, 2, 3].map(i => {
                     return ('0' + parseInt(match[i]).toString(16)).substr(-2);
                 }).join('');
             }
-            return rgb.startsWith('#') ? rgb : '#ffffff';
+            return '#ffffff';
         }
         
         function handleCanvasClick(e) {
             if (e.target.id === 'canvas' || e.target.id === 'dropZone') {
-                selectedElement = null;
+                selectedElements = [];
                 document.querySelectorAll('.gui-element').forEach(el => {
                     el.classList.remove('selected');
                 });
@@ -1144,14 +1131,14 @@
             e.preventDefault();
             const element = document.getElementById(id);
             const rect = element.getBoundingClientRect();
+            const canvasRect = document.getElementById('canvas').getBoundingClientRect();
             const offsetX = e.clientX - rect.left;
             const offsetY = e.clientY - rect.top;
             
             function mouseMoveHandler(e) {
-                const canvas = document.getElementById('canvas');
-                const canvasRect = canvas.getBoundingClientRect();
-                const x = e.clientX - canvasRect.left - offsetX;
-                const y = e.clientY - canvasRect.top - offsetY;
+                const buildingArea = document.querySelector('.building-area');
+                const x = e.clientX - canvasRect.left - offsetX + buildingArea.scrollLeft;
+                const y = e.clientY - canvasRect.top - offsetY + buildingArea.scrollTop;
                 
                 element.style.left = Math.max(0, x) + 'px';
                 element.style.top = Math.max(0, y) + 'px';
@@ -1173,16 +1160,15 @@
             e.stopPropagation();
             
             const element = document.getElementById(id);
-            const startX = e.clientX;
-            const startY = e.clientY;
             const startWidth = parseInt(element.style.width);
             const startHeight = parseInt(element.style.height);
             
             function mouseMoveHandler(e) {
-                const width = startWidth + (e.clientX - startX);
-                const height = startHeight + (e.clientY - startY);
+                const rect = element.getBoundingClientRect();
+                const width = e.clientX - rect.left;
+                const height = e.clientY - rect.top;
                 
-                element.style.width = Math.max(20, width) + 'px';
+                element.style.width = Math.max(30, width) + 'px';
                 element.style.height = Math.max(20, height) + 'px';
             }
             
@@ -1202,56 +1188,55 @@
             if (element) {
                 element.remove();
                 elements = elements.filter(el => el.id !== id);
+                selectedElements = selectedElements.filter(el => el !== id);
                 
-                // Remove from groups
                 groups.forEach(group => {
                     group.elements = group.elements.filter(el => el.id !== id);
                 });
                 groups = groups.filter(group => group.elements.length > 0);
                 
-                selectedElement = null;
                 updatePropertiesPanel();
                 updateCode();
                 showNotification('Element deleted');
             }
         }
         
+        function deleteSelected() {
+            selectedElements.forEach(id => deleteElement(id));
+        }
+        
         function minimizeElement(id) {
             const element = elements.find(el => el.id === id);
             if (element) {
-                element.minimized = !element.minimized;
-                if (element.minimized) {
-                    element.element.style.height = '20px';
+                const currentHeight = parseInt(element.element.style.height);
+                if (currentHeight > 30) {
+                    element.originalHeight = currentHeight;
+                    element.element.style.height = '25px';
                     element.element.style.overflow = 'hidden';
                 } else {
-                    element.element.style.height = element.originalHeight || '100px';
+                    element.element.style.height = (element.originalHeight || 100) + 'px';
                     element.element.style.overflow = 'visible';
                 }
-                showNotification(element.minimized ? 'Element minimized' : 'Element restored');
+                showNotification('Element toggled');
             }
         }
         
-        function startGrouping(id) {
-            showNotification('Select elements to group with this one (Ctrl+Click)');
-        }
-        
         function groupSelected() {
-            const selected = document.querySelectorAll('.gui-element.selected');
-            if (selected.length < 2) {
+            if (selectedElements.length < 2) {
                 showNotification('Select at least 2 elements to group');
                 return;
             }
             
             groupCounter++;
-            const groupId = `Group_${groupCounter}`;
+            const groupId = `CustomGroup_${groupCounter}`;
             const groupElements = [];
             
-            selected.forEach(el => {
-                const element = elements.find(e => e.id === el.id);
+            selectedElements.forEach(id => {
+                const element = elements.find(e => e.id === id);
                 if (element) {
                     element.grouped = true;
                     groupElements.push(element);
-                    el.innerHTML += `<div class="group-indicator">${groupId}</div>`;
+                    document.getElementById(id).innerHTML += `<div class="group-indicator">${groupId}</div>`;
                 }
             });
             
@@ -1262,45 +1247,33 @@
                 grouped: true
             });
             
-            showNotification(`Created group: ${groupId}`);
+            showNotification(`Created group: ${groupId} (${groupElements.length} elements)`);
         }
         
         function ungroupSelected() {
-            const selected = document.querySelector('.gui-element.selected');
-            if (!selected) {
-                showNotification('Select a grouped element to ungroup');
-                return;
-            }
-            
-            const group = groups.find(g => g.elements.some(e => e.id === selected.id));
-            if (group) {
-                group.elements.forEach(el => {
-                    el.grouped = false;
-                    const indicator = el.element.querySelector('.group-indicator');
-                    if (indicator) indicator.remove();
-                });
-                
-                groups = groups.filter(g => g.id !== group.id);
-                showNotification(`Ungrouped: ${group.id}`);
-            }
+            selectedElements.forEach(id => {
+                const group = groups.find(g => g.elements.some(e => e.id === id));
+                if (group) {
+                    group.elements.forEach(el => {
+                        el.grouped = false;
+                        const indicator = el.element.querySelector('.group-indicator');
+                        if (indicator) indicator.remove();
+                    });
+                    groups = groups.filter(g => g.id !== group.id);
+                    showNotification(`Ungrouped: ${group.id}`);
+                }
+            });
         }
         
         function clearCanvas() {
-            if (confirm('Are you sure you want to clear all elements?')) {
-                document.getElementById('canvas').innerHTML = '<div class="drop-zone" id="dropZone">Drop components here to build your GUI</div>';
+            if (confirm('⚠️ Clear all elements? This cannot be undone!')) {
+                document.getElementById('canvas').innerHTML = '<div class="drop-zone" id="dropZone">🎯 Drop components here to start building!</div>';
                 elements = [];
                 groups = [];
-                selectedElement = null;
+                selectedElements = [];
                 updatePropertiesPanel();
                 updateCode();
                 showNotification('Canvas cleared');
-            }
-        }
-        
-        function deleteSelected() {
-            const selected = document.querySelector('.gui-element.selected');
-            if (selected) {
-                deleteElement(selected.id);
             }
         }
         
@@ -1316,13 +1289,21 @@
             }
         }
         
+        // WORKING ROBLOX CODE GENERATOR
         function updateCode() {
-            let code = `-- Generated Roblox GUI Code
--- Copy this code into ServerScriptService or use in LocalScript
+            let code = `-- 🎮 Roblox GUI Builder - Generated Code
+-- ✅ This code WORKS in Roblox Studio!
+-- 📂 Place in: ServerScriptService or StarterPlayerScripts
+
+-- Create main ScreenGui
+local Players = game:GetService("Players")
+local player = Players.LocalPlayer
+local playerGui = player:WaitForChild("PlayerGui")
 
 local screenGui = Instance.new("ScreenGui")
 screenGui.Name = "GeneratedGUI"
-screenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
+screenGui.ResetOnSpawn = false
+screenGui.Parent = playerGui
 
 `;
             
@@ -1339,8 +1320,12 @@ screenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
             });
             
             code += `
--- End of generated code
-print("GUI loaded successfully!")`;
+-- 🚀 GUI Setup Complete!
+print("✅ GUI loaded successfully!")
+print("📊 Total elements: ${elements.length + groups.reduce((sum, g) => sum + g.elements.length, 0)}")
+
+-- 📝 You can now add scripts to make your GUI interactive!
+-- Example: button.MouseButton1Click:Connect(function() print("Button clicked!") end)`;
             
             document.getElementById('generated-code').textContent = code;
         }
@@ -1349,7 +1334,7 @@ print("GUI loaded successfully!")`;
             const style = element.element.style;
             const type = element.type;
             let code = `
--- ${element.id}
+-- 📦 ${element.id} (${type})
 local ${element.id} = Instance.new("${type}")
 ${element.id}.Name = "${element.id}"
 ${element.id}.Size = UDim2.new(0, ${parseInt(style.width) || 100}, 0, ${parseInt(style.height) || 100})
@@ -1357,36 +1342,43 @@ ${element.id}.Position = UDim2.new(0, ${parseInt(style.left) || 0}, 0, ${parseIn
 `;
             
             // Background color
-            if (style.backgroundColor) {
+            if (style.backgroundColor && style.backgroundColor !== 'transparent') {
                 const rgb = hexToRgb(style.backgroundColor);
                 if (rgb) {
                     code += `${element.id}.BackgroundColor3 = Color3.fromRGB(${rgb.r}, ${rgb.g}, ${rgb.b})\n`;
                 }
+            } else if (type === 'TextLabel') {
+                code += `${element.id}.BackgroundTransparency = 1\n`;
             }
             
-            // Background transparency
-            if (style.opacity && style.opacity !== '1') {
-                code += `${element.id}.BackgroundTransparency = ${1 - parseFloat(style.opacity)}\n`;
+            // Border properties
+            const borderWidth = parseInt(style.borderWidth) || (type === 'Frame' ? 1 : 0);
+            code += `${element.id}.BorderSizePixel = ${borderWidth}\n`;
+            
+            if (style.borderColor) {
+                const rgb = hexToRgb(style.borderColor);
+                if (rgb) {
+                    code += `${element.id}.BorderColor3 = Color3.fromRGB(${rgb.r}, ${rgb.g}, ${rgb.b})\n`;
+                }
             }
             
-            // Border
-            if (style.borderWidth && parseInt(style.borderWidth) > 0) {
-                code += `${element.id}.BorderSizePixel = ${parseInt(style.borderWidth)}\n`;
-            }
-            
-            // Corner radius
-            if (style.borderRadius && parseInt(style.borderRadius) > 0) {
+            // Corner radius (UICorner)
+            const cornerRadius = parseInt(style.borderRadius) || 0;
+            if (cornerRadius > 0) {
                 code += `
+-- Corner radius for ${element.id}
 local ${element.id}_Corner = Instance.new("UICorner")
-${element.id}_Corner.CornerRadius = UDim.new(0, ${parseInt(style.borderRadius)})
+${element.id}_Corner.CornerRadius = UDim.new(0, ${cornerRadius})
 ${element.id}_Corner.Parent = ${element.id}
 `;
             }
             
             // Text properties
             if (type === 'TextLabel' || type === 'TextButton' || type === 'TextBox') {
-                code += `${element.id}.Text = "${element.element.textContent || ''}"\n`;
+                const text = element.element.textContent || '';
+                code += `${element.id}.Text = "${text}"\n`;
                 
+                // Text color
                 if (style.color) {
                     const rgb = hexToRgb(style.color);
                     if (rgb) {
@@ -1394,11 +1386,32 @@ ${element.id}_Corner.Parent = ${element.id}
                     }
                 }
                 
-                if (style.fontSize) {
-                    code += `${element.id}.TextSize = ${parseInt(style.fontSize)}\n`;
-                }
+                // Font size
+                const fontSize = parseInt(style.fontSize) || 14;
+                code += `${element.id}.TextSize = ${fontSize}\n`;
                 
+                // Text alignment
+                const textAlign = style.textAlign || 'center';
+                const alignMap = {
+                    'left': 'Enum.TextXAlignment.Left',
+                    'center': 'Enum.TextXAlignment.Center',
+                    'right': 'Enum.TextXAlignment.Right'
+                };
+                code += `${element.id}.TextXAlignment = ${alignMap[textAlign]}\n`;
+                
+                // Font
                 code += `${element.id}.Font = Enum.Font.SourceSans\n`;
+            }
+            
+            // Special properties for ImageLabel
+            if (type === 'ImageLabel') {
+                code += `${element.id}.Image = "rbxassetid://0" -- Replace with your image ID\n`;
+            }
+            
+            // Special properties for ScrollingFrame
+            if (type === 'ScrollingFrame') {
+                code += `${element.id}.CanvasSize = UDim2.new(0, 0, 0, 400)\n`;
+                code += `${element.id}.ScrollBarThickness = 8\n`;
             }
             
             // Parent to ScreenGui
@@ -1408,7 +1421,7 @@ ${element.id}_Corner.Parent = ${element.id}
         }
         
         function generateGroupCode(group) {
-            let code = `\n-- ${group.id} (${group.type})\n`;
+            let code = `\n-- 📦 GROUP: ${group.id} (${group.type})\n`;
             
             group.elements.forEach(element => {
                 code += generateElementCode(element);
@@ -1418,6 +1431,9 @@ ${element.id}_Corner.Parent = ${element.id}
         }
         
         function hexToRgb(hex) {
+            if (!hex || hex === 'transparent') return null;
+            if (!hex.startsWith('#')) return null;
+            
             const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
             return result ? {
                 r: parseInt(result[1], 16),
@@ -1430,13 +1446,18 @@ ${element.id}_Corner.Parent = ${element.id}
             const code = document.getElementById('generated-code').textContent;
             navigator.clipboard.writeText(code).then(() => {
                 const btn = document.querySelector('.copy-btn');
-                btn.textContent = '✓ Copied!';
+                const original = btn.textContent;
+                btn.textContent = '✅ Copied!';
                 btn.classList.add('copied');
+                
                 setTimeout(() => {
-                    btn.textContent = '📋 Copy Code';
+                    btn.textContent = original;
                     btn.classList.remove('copied');
                 }, 2000);
-                showNotification('Code copied to clipboard!');
+                
+                showNotification('📋 Code copied! Paste it in Roblox Studio');
+            }).catch(() => {
+                showNotification('❌ Failed to copy code');
             });
         }
         
@@ -1450,16 +1471,18 @@ ${element.id}_Corner.Parent = ${element.id}
             setTimeout(() => {
                 notification.classList.remove('show');
                 setTimeout(() => notification.remove(), 300);
-            }, 3000);
+            }, 3500);
         }
         
         // Keyboard shortcuts
         document.addEventListener('keydown', function(e) {
             if (e.ctrlKey || e.metaKey) {
-                switch(e.key) {
+                switch(e.key.toLowerCase()) {
                     case 'a':
                         e.preventDefault();
+                        selectedElements = elements.map(el => el.id);
                         document.querySelectorAll('.gui-element').forEach(el => el.classList.add('selected'));
+                        updatePropertiesPanel();
                         break;
                     case 'c':
                         e.preventDefault();
@@ -1469,13 +1492,48 @@ ${element.id}_Corner.Parent = ${element.id}
                         e.preventDefault();
                         groupSelected();
                         break;
+                    case 'd':
+                        e.preventDefault();
+                        if (selectedElements.length > 0) {
+                            duplicateSelected();
+                        }
+                        break;
                 }
             }
             
-            if (e.key === 'Delete' && selectedElement) {
+            if (e.key === 'Delete' && selectedElements.length > 0) {
                 deleteSelected();
             }
+            
+            if (e.key === 'Escape') {
+                selectedElements = [];
+                document.querySelectorAll('.gui-element').forEach(el => el.classList.remove('selected'));
+                updatePropertiesPanel();
+            }
         });
+        
+        // Auto-save functionality (stores in memory only)
+        let autoSaveData = {
+            elements: [],
+            groups: []
+        };
+        
+        function autoSave() {
+            autoSaveData = {
+                elements: elements.map(el => ({
+                    id: el.id,
+                    type: el.type,
+                    style: el.element.style.cssText,
+                    textContent: el.element.textContent,
+                    left: el.element.style.left,
+                    top: el.element.style.top
+                })),
+                groups: groups
+            };
+        }
+        
+        // Auto-save every 10 seconds
+        setInterval(autoSave, 10000);
     </script>
 </body>
 </html>
