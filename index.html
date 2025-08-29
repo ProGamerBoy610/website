@@ -3,511 +3,1479 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FryzerX - Key System</title>
+    <title>Roblox GUI Builder</title>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
-
+        
         body {
-            font-family: Arial, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            color: white;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .container {
-            background: rgba(0, 0, 0, 0.7);
-            padding: 40px;
-            border-radius: 15px;
-            text-align: center;
-            max-width: 500px;
-            width: 90%;
-        }
-
-        .logo {
-            font-size: 2.5rem;
-            font-weight: bold;
-            color: #00d4ff;
-            margin-bottom: 20px;
-        }
-
-        .subtitle {
-            color: #ccc;
-            margin-bottom: 30px;
-        }
-
-        .btn {
-            background: linear-gradient(45deg, #ff6b6b, #00d4ff);
-            border: none;
-            padding: 15px 30px;
-            border-radius: 10px;
-            color: white;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-            margin: 10px;
-            transition: transform 0.2s;
-        }
-
-        .btn:hover {
-            transform: translateY(-2px);
-        }
-
-        .btn:disabled {
-            background: #666;
-            cursor: not-allowed;
-            transform: none;
-        }
-
-        .checkpoint {
-            background: rgba(255, 255, 255, 0.1);
-            padding: 20px;
-            margin: 15px 0;
-            border-radius: 10px;
-            border-left: 4px solid #666;
-        }
-
-        .checkpoint.active {
-            border-left-color: #ff6b6b;
-            background: rgba(255, 107, 107, 0.1);
-        }
-
-        .checkpoint.completed {
-            border-left-color: #00d4ff;
-            background: rgba(0, 212, 255, 0.1);
-        }
-
-        .progress {
-            background: #333;
-            height: 10px;
-            border-radius: 5px;
-            margin: 20px 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #1e1e1e;
+            color: #ffffff;
+            height: 100vh;
             overflow: hidden;
         }
-
-        .progress-bar {
-            background: linear-gradient(90deg, #00d4ff, #ff6b6b);
-            height: 100%;
-            width: 0%;
-            transition: width 0.5s;
+        
+        .app-container {
+            display: flex;
+            height: 100vh;
         }
-
-        .key-display {
-            background: #000;
-            border: 2px solid #00d4ff;
+        
+        .sidebar {
+            width: 280px;
+            background: #2d2d2d;
+            border-right: 1px solid #404040;
+            overflow-y: auto;
+        }
+        
+        .sidebar-header {
             padding: 15px;
-            border-radius: 5px;
-            font-family: monospace;
-            font-size: 18px;
-            color: #00d4ff;
-            margin: 20px 0;
-            word-break: break-all;
+            background: #363636;
+            border-bottom: 1px solid #404040;
+            font-weight: bold;
+            text-align: center;
+            color: #0078d4;
         }
-
-        .hidden {
-            display: none;
-        }
-
-        .key-item {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 8px;
-            padding: 15px;
+        
+        .component-category {
             margin: 10px 0;
-            font-size: 12px;
         }
-
-        .key-item .key-text {
-            font-family: monospace;
-            color: #00d4ff;
-            word-break: break-all;
-            margin-bottom: 8px;
+        
+        .category-title {
+            padding: 10px 15px;
+            background: #363636;
+            font-size: 12px;
+            font-weight: bold;
+            color: #0078d4;
+            border-bottom: 1px solid #404040;
+        }
+        
+        .component-item {
+            padding: 12px 20px;
+            cursor: grab;
+            border-bottom: 1px solid #333;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            font-size: 13px;
+        }
+        
+        .component-item:hover {
+            background: #404040;
+            transform: translateX(5px);
+        }
+        
+        .component-item:active {
+            cursor: grabbing;
+        }
+        
+        .component-icon {
+            margin-right: 10px;
+            width: 18px;
+            height: 18px;
+            background: #0078d4;
+            border-radius: 3px;
+            flex-shrink: 0;
+            position: relative;
+        }
+        
+        .main-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .top-toolbar {
+            background: #363636;
+            padding: 10px 20px;
+            border-bottom: 1px solid #404040;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        
+        .toolbar-btn {
+            padding: 8px 15px;
+            background: #0078d4;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: background 0.2s;
+        }
+        
+        .toolbar-btn:hover {
+            background: #106ebe;
+        }
+        
+        .toolbar-btn.danger {
+            background: #dc3545;
+        }
+        
+        .toolbar-btn.danger:hover {
+            background: #c82333;
+        }
+        
+        .tabs {
+            display: flex;
+            background: #363636;
+            border-bottom: 1px solid #404040;
+        }
+        
+        .tab {
+            padding: 12px 24px;
+            cursor: pointer;
+            border-right: 1px solid #404040;
+            transition: all 0.2s;
+            font-weight: 500;
+            position: relative;
+        }
+        
+        .tab:hover {
+            background: #404040;
+        }
+        
+        .tab.active {
+            background: #0078d4;
+            color: white;
+        }
+        
+        .tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: #0078d4;
+        }
+        
+        .content-area {
+            flex: 1;
+            display: flex;
+            position: relative;
+        }
+        
+        .tab-content {
+            display: none;
+            width: 100%;
+        }
+        
+        .tab-content.active {
+            display: flex;
+        }
+        
+        .building-area {
+            flex: 1;
+            background: #252525;
+            position: relative;
+            overflow: auto;
+        }
+        
+        .canvas {
+            width: 100%;
+            min-height: 100%;
+            position: relative;
+            background: 
+                linear-gradient(rgba(255,255,255,.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,.05) 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+        
+        .gui-element {
+            position: absolute;
+            border: 2px solid transparent;
+            cursor: move;
+            min-width: 50px;
+            min-height: 30px;
+            transition: all 0.1s;
+            user-select: none;
+        }
+        
+        .gui-element:hover {
+            border-color: #0078d4;
+            box-shadow: 0 0 10px rgba(0, 120, 212, 0.3);
+        }
+        
+        .gui-element.selected {
+            border-color: #ff6b35;
+            box-shadow: 0 0 15px rgba(255, 107, 53, 0.5);
+        }
+        
+        .gui-element .controls {
+            position: absolute;
+            top: -30px;
+            right: 0;
+            display: none;
+            gap: 3px;
+            z-index: 1000;
+        }
+        
+        .gui-element.selected .controls {
+            display: flex;
+        }
+        
+        .control-btn {
+            width: 24px;
+            height: 24px;
+            background: #ff6b35;
+            color: white;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 11px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+        
+        .control-btn:hover {
+            background: #e55a2b;
+            transform: scale(1.1);
+        }
+        
+        .control-btn.minimize {
+            background: #ffc107;
+        }
+        
+        .control-btn.minimize:hover {
+            background: #e0a800;
+        }
+        
+        .control-btn.group {
+            background: #28a745;
+        }
+        
+        .control-btn.group:hover {
+            background: #1e7e34;
+        }
+        
+        .resize-handle {
+            position: absolute;
+            bottom: -5px;
+            right: -5px;
+            width: 10px;
+            height: 10px;
+            background: #ff6b35;
+            cursor: se-resize;
+            border-radius: 50%;
+        }
+        
+        .properties-panel {
+            width: 320px;
+            background: #2d2d2d;
+            border-left: 1px solid #404040;
+            overflow-y: auto;
+        }
+        
+        .properties-header {
+            padding: 15px;
+            background: #363636;
+            border-bottom: 1px solid #404040;
+            font-weight: bold;
+            text-align: center;
+            color: #0078d4;
+        }
+        
+        .property-group {
+            margin: 20px 15px;
+        }
+        
+        .property-group h3 {
+            margin-bottom: 15px;
+            color: #0078d4;
+            font-size: 14px;
+            border-bottom: 1px solid #404040;
+            padding-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .property-item {
+            margin-bottom: 15px;
+        }
+        
+        .property-item label {
+            display: block;
+            margin-bottom: 6px;
+            font-size: 12px;
+            color: #cccccc;
+            font-weight: 500;
+        }
+        
+        .property-item input, .property-item select, .property-item textarea {
+            width: 100%;
+            padding: 8px 10px;
+            background: #404040;
+            border: 1px solid #555;
+            border-radius: 4px;
+            color: white;
+            font-size: 13px;
+            transition: border-color 0.2s;
+        }
+        
+        .property-item input:focus, .property-item select:focus, .property-item textarea:focus {
+            border-color: #0078d4;
+            outline: none;
+        }
+        
+        .property-item input[type="color"] {
+            height: 35px;
+            padding: 3px;
+        }
+        
+        .property-item input[type="checkbox"] {
+            width: auto;
+            margin-right: 10px;
+            transform: scale(1.2);
+        }
+        
+        .property-item input[type="range"] {
+            margin: 5px 0;
+        }
+        
+        .range-display {
+            font-size: 11px;
+            color: #999;
+            text-align: center;
+            margin-top: 5px;
+        }
+        
+        .code-area {
+            flex: 1;
+            background: #1e1e1e;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .code-header {
+            padding: 15px 20px;
+            background: #363636;
+            border-bottom: 1px solid #404040;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .code-title {
+            font-weight: bold;
+            color: #0078d4;
+        }
+        
+        .copy-btn {
+            padding: 10px 20px;
+            background: #0078d4;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        
+        .copy-btn:hover {
+            background: #106ebe;
+            transform: translateY(-2px);
+        }
+        
+        .copy-btn.copied {
+            background: #28a745;
+        }
+        
+        .code-content {
+            flex: 1;
+            padding: 20px;
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            font-size: 14px;
+            line-height: 1.6;
+            background: #1e1e1e;
+            color: #d4d4d4;
+            overflow: auto;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+        
+        /* GUI Element Styles */
+        .gui-frame {
+            background: #ffffff;
+            border: 1px solid #cccccc;
+            border-radius: 0;
+        }
+        
+        .gui-textlabel {
+            background: transparent;
+            color: #000000;
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            padding: 5px 10px;
+            font-family: 'Segoe UI', sans-serif;
+            font-size: 14px;
+            text-align: left;
+        }
+        
+        .gui-textbutton {
+            background: #e1e1e1;
+            color: #000000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Segoe UI', sans-serif;
+            font-size: 14px;
+            cursor: pointer;
+            border: 1px solid #999;
+            transition: background 0.2s;
+        }
+        
+        .gui-textbutton:hover {
+            background: #d4d4d4;
+        }
+        
+        .gui-textbox {
+            background: #ffffff;
+            color: #000000;
+            border: 1px solid #999;
+            padding: 5px 8px;
+            font-family: 'Segoe UI', sans-serif;
             font-size: 14px;
         }
-
-        .key-item .key-info {
-            color: #ccc;
-            font-size: 11px;
+        
+        .gui-imagelabel {
+            background: #f0f0f0;
+            border: 1px solid #ccc;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #666;
+            font-size: 12px;
         }
-
-        .key-item.expired {
-            border-left: 4px solid #ff6b6b;
+        
+        .gui-scrollingframe {
+            background: #ffffff;
+            border: 2px inset #e1e1e1;
+            overflow: auto;
+        }
+        
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #28a745;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 4px;
+            z-index: 10000;
+            transform: translateX(100%);
+            transition: transform 0.3s ease;
+        }
+        
+        .notification.show {
+            transform: translateX(0);
+        }
+        
+        .group-indicator {
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            background: #28a745;
+            color: white;
+            padding: 2px 6px;
+            font-size: 10px;
+            border-radius: 3px;
+            font-weight: bold;
+        }
+        
+        .dragging {
             opacity: 0.7;
+            transform: rotate(5deg);
+            z-index: 1000;
         }
-
-        .key-item.active {
-            border-left: 4px solid #4CAF50;
+        
+        .drop-zone {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            border: 2px dashed #0078d4;
+            background: rgba(0, 120, 212, 0.1);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            color: #0078d4;
+        }
+        
+        .drop-zone.active {
+            display: flex;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <!-- Start Screen -->
-        <div id="startScreen">
-            <div class="logo">FryzerX</div>
-            <div class="subtitle">Roblox Executor Key System</div>
-            <p>Get your unique access key by completing 3 simple tasks</p>
-            <button class="btn" onclick="startProcess()">Start Key Process</button>
-            <!-- Key Storage Screen -->
-        <div id="storageScreen" class="hidden">
-            <div class="logo">FryzerX</div>
-            <div class="subtitle">📊 Generated Keys Database</div>
+    <div class="app-container">
+        <!-- Sidebar with components -->
+        <div class="sidebar">
+            <div class="sidebar-header">🎮 Roblox GUI Components</div>
             
-            <div id="keysList" style="text-align: left; max-height: 400px; overflow-y: auto; margin: 20px 0;">
-                <!-- Keys will be displayed here -->
+            <div class="component-category">
+                <div class="category-title">📦 Basic Components</div>
+                <div class="component-item" data-type="Frame">
+                    <div class="component-icon"></div>
+                    Frame
+                </div>
+                <div class="component-item" data-type="TextLabel">
+                    <div class="component-icon"></div>
+                    TextLabel
+                </div>
+                <div class="component-item" data-type="TextButton">
+                    <div class="component-icon"></div>
+                    TextButton
+                </div>
+                <div class="component-item" data-type="TextBox">
+                    <div class="component-icon"></div>
+                    TextBox
+                </div>
+                <div class="component-item" data-type="ImageLabel">
+                    <div class="component-icon"></div>
+                    ImageLabel
+                </div>
+                <div class="component-item" data-type="ScrollingFrame">
+                    <div class="component-icon"></div>
+                    ScrollingFrame
+                </div>
             </div>
             
-            <div style="margin: 20px 0;">
-                <button class="btn" onclick="exportKeys()">💾 Export Keys</button>
-                <button class="btn" onclick="clearAllKeys()" style="background: #ff4444;">🗑️ Clear All</button>
+            <div class="component-category">
+                <div class="category-title">🎚️ Interactive Components</div>
+                <div class="component-item" data-type="Slider">
+                    <div class="component-icon"></div>
+                    Slider (Frame + TextLabel)
+                </div>
+                <div class="component-item" data-type="Dropdown">
+                    <div class="component-icon"></div>
+                    Dropdown Menu
+                </div>
+                <div class="component-item" data-type="ToggleButton">
+                    <div class="component-icon"></div>
+                    Toggle Button
+                </div>
+            </div>
+        </div>
+        
+        <!-- Main content area -->
+        <div class="main-area">
+            <div class="top-toolbar">
+                <button class="toolbar-btn" onclick="clearCanvas()">🗑️ Clear All</button>
+                <button class="toolbar-btn" onclick="groupSelected()">📦 Group Selected</button>
+                <button class="toolbar-btn" onclick="ungroupSelected()">📂 Ungroup</button>
+                <button class="toolbar-btn danger" onclick="deleteSelected()">❌ Delete Selected</button>
             </div>
             
-            <button class="btn" onclick="goBack()" style="background: #666;">← Back to Start</button>
+            <div class="tabs">
+                <div class="tab active" onclick="switchTab('building')">🔨 Building</div>
+                <div class="tab" onclick="switchTab('code')">💻 Code</div>
+            </div>
+            
+            <div class="content-area">
+                <div class="tab-content active" id="building-content">
+                    <div class="building-area">
+                        <div class="canvas" id="canvas">
+                            <div class="drop-zone" id="dropZone">
+                                Drop components here to build your GUI
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="properties-panel">
+                        <div class="properties-header">⚙️ Properties</div>
+                        <div id="properties-content">
+                            <div class="property-group">
+                                <h3>📋 Selection</h3>
+                                <p style="color: #999; font-size: 12px; text-align: center; margin-top: 20px;">
+                                    Select an element to edit its properties
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="tab-content" id="code-content">
+                    <div class="code-area">
+                        <div class="code-header">
+                            <div class="code-title">📄 Generated Roblox Code</div>
+                            <button class="copy-btn" onclick="copyCode()">📋 Copy Code</button>
+                        </div>
+                        <div class="code-content" id="generated-code">
+-- Roblox GUI Code will appear here
+-- Start building your GUI to see the generated code!
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
-
-        <!-- Tasks Screen -->
-        <div id="tasksScreen" class="hidden">
-            <div class="logo">FryzerX</div>
-            <div class="subtitle">Complete All Tasks</div>
-            
-            <div class="progress">
-                <div class="progress-bar" id="progressBar"></div>
-            </div>
-            <p id="progressText">Progress: 0/3 Tasks Completed</p>
-
-            <div class="checkpoint active" id="task1">
-                <h3>📋 Task 1: Complete Survey</h3>
-                <p>Answer a quick survey about your gaming preferences</p>
-                <button class="btn" id="btn1" onclick="startTask(1)">Start Task 1</button>
-                <button class="btn hidden" id="complete1" onclick="completeTask(1)">Task Completed!</button>
-            </div>
-
-            <div class="checkpoint" id="task2">
-                <h3>📺 Task 2: Watch Video</h3>
-                <p>Watch a short advertisement video</p>
-                <button class="btn" id="btn2" onclick="startTask(2)" disabled>Start Task 2</button>
-                <button class="btn hidden" id="complete2" onclick="completeTask(2)">Task Completed!</button>
-            </div>
-
-            <div class="checkpoint" id="task3">
-                <h3>📱 Task 3: Install App</h3>
-                <p>Download and install a partner application</p>
-                <button class="btn" id="btn3" onclick="startTask(3)" disabled>Start Task 3</button>
-                <button class="btn hidden" id="complete3" onclick="completeTask(3)">Task Completed!</button>
-            </div>
-
-            <button class="btn hidden" id="generateBtn" onclick="generateKey()" style="background: linear-gradient(45deg, #4CAF50, #45a049); margin-top: 20px;">
-                🔑 Generate My Key
-            </button>
-
-            <button class="btn" onclick="goBack()" style="background: #666;">← Back to Start</button>
-        </div>
-
-        <!-- Key Screen -->
-        <div id="keyScreen" class="hidden">
-            <div class="logo">FryzerX</div>
-            <div class="subtitle">🎉 Your Key is Ready!</div>
-            
-            <div class="key-display" id="keyDisplay">
-                FRYZER-ABCDE-12345-FGHIJ
-            </div>
-
-            <div class="timer" id="keyTimer">Key expires in: 23:59:59</div>
-
-            <button class="btn" onclick="copyKey()">📋 Copy Key</button>
-            <button class="btn" onclick="showKeyStorage()">📊 View All Keys</button>
-            <button class="btn" onclick="goBack()" style="background: #666;">← Generate New Key</button>
-            
-            <p style="margin-top: 20px; color: #ccc; font-size: 14px;">
-                ⚠️ This key is unique and cannot be shared<br>
-                💡 Paste it into your executor to unlock features
-            </p>
-        </div>
-    </div>
-
+    
     <script>
-        let completedTasks = 0;
-        let currentKey = null;
-        let keyTimer = null;
-
-        function startProcess() {
-            // Reset everything
-            completedTasks = 0;
-            updateProgress();
+        // Global variables
+        let elements = [];
+        let selectedElement = null;
+        let elementCounter = 0;
+        let draggedElement = null;
+        let groups = [];
+        let groupCounter = 0;
+        
+        // Initialize drag and drop
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeDragAndDrop();
+            updateCode();
+        });
+        
+        function initializeDragAndDrop() {
+            const componentItems = document.querySelectorAll('.component-item');
+            const canvas = document.getElementById('canvas');
             
-            // Reset all tasks
-            for (let i = 1; i <= 3; i++) {
-                document.getElementById('task' + i).classList.remove('completed', 'active');
-                document.getElementById('btn' + i).classList.remove('hidden');
-                document.getElementById('complete' + i).classList.add('hidden');
-                document.getElementById('btn' + i).disabled = (i !== 1);
+            componentItems.forEach(item => {
+                item.addEventListener('dragstart', handleDragStart);
+                item.addEventListener('dragend', handleDragEnd);
+                item.draggable = true;
+            });
+            
+            canvas.addEventListener('dragover', handleDragOver);
+            canvas.addEventListener('drop', handleDrop);
+            canvas.addEventListener('click', handleCanvasClick);
+        }
+        
+        function handleDragStart(e) {
+            draggedElement = e.target.dataset.type;
+            e.target.classList.add('dragging');
+            document.getElementById('dropZone').classList.add('active');
+        }
+        
+        function handleDragEnd(e) {
+            e.target.classList.remove('dragging');
+            document.getElementById('dropZone').classList.remove('active');
+        }
+        
+        function handleDragOver(e) {
+            e.preventDefault();
+        }
+        
+        function handleDrop(e) {
+            e.preventDefault();
+            document.getElementById('dropZone').classList.remove('active');
+            
+            if (draggedElement) {
+                const rect = e.target.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                
+                createGuiElement(draggedElement, x, y);
+                draggedElement = null;
+            }
+        }
+        
+        function createGuiElement(type, x, y) {
+            elementCounter++;
+            const id = `${type}_${elementCounter}`;
+            
+            let element;
+            
+            if (type === 'Slider') {
+                // Create slider group
+                element = createSliderGroup(id, x, y);
+            } else if (type === 'Dropdown') {
+                element = createDropdownGroup(id, x, y);
+            } else {
+                element = createBasicElement(type, id, x, y);
             }
             
-            document.getElementById('task1').classList.add('active');
-            document.getElementById('generateBtn').classList.add('hidden');
-            
-            showScreen('tasksScreen');
+            elements.push(element);
+            updateCode();
         }
-
-        function startTask(taskNum) {
-            // Hide start button, show completion button
-            document.getElementById('btn' + taskNum).classList.add('hidden');
-            document.getElementById('complete' + taskNum).classList.remove('hidden');
+        
+        function createBasicElement(type, id, x, y) {
+            const div = document.createElement('div');
+            div.className = `gui-element gui-${type.toLowerCase()}`;
+            div.id = id;
+            div.style.left = x + 'px';
+            div.style.top = y + 'px';
             
-            // Auto-complete after 3 seconds for demo
-            setTimeout(function() {
-                completeTask(taskNum);
-            }, 3000);
-        }
-
-        function completeTask(taskNum) {
-            // Mark task as completed
-            document.getElementById('task' + taskNum).classList.remove('active');
-            document.getElementById('task' + taskNum).classList.add('completed');
-            document.getElementById('complete' + taskNum).textContent = '✅ Completed!';
-            document.getElementById('complete' + taskNum).disabled = true;
+            // Set default properties based on type
+            const defaultProps = getDefaultProperties(type);
+            Object.assign(div.style, defaultProps.style);
             
-            completedTasks++;
-            updateProgress();
-            
-            // Enable next task
-            if (taskNum < 3) {
-                document.getElementById('task' + (taskNum + 1)).classList.add('active');
-                document.getElementById('btn' + (taskNum + 1)).disabled = false;
+            if (type === 'TextLabel' || type === 'TextButton') {
+                div.textContent = defaultProps.text || type;
+            } else if (type === 'ImageLabel') {
+                div.textContent = '🖼️ Image';
+            } else if (type === 'TextBox') {
+                div.textContent = 'TextBox';
             }
             
-            // Show generate button if all tasks completed
-            if (completedTasks === 3) {
-                document.getElementById('generateBtn').classList.remove('hidden');
-            }
+            // Add controls
+            div.innerHTML += `
+                <div class="controls">
+                    <button class="control-btn minimize" onclick="minimizeElement('${id}')" title="Minimize">-</button>
+                    <button class="control-btn group" onclick="startGrouping('${id}')" title="Group">G</button>
+                    <button class="control-btn" onclick="deleteElement('${id}')" title="Delete">×</button>
+                </div>
+                <div class="resize-handle" onmousedown="startResize(event, '${id}')"></div>
+            `;
+            
+            // Make draggable
+            div.addEventListener('mousedown', (e) => startDrag(e, id));
+            div.addEventListener('click', (e) => selectElement(e, id));
+            
+            document.getElementById('canvas').appendChild(div);
+            
+            return {
+                id: id,
+                type: type,
+                element: div,
+                properties: defaultProps.properties,
+                grouped: false,
+                minimized: false
+            };
         }
-
-        function updateProgress() {
-            let percentage = (completedTasks / 3) * 100;
-            document.getElementById('progressBar').style.width = percentage + '%';
-            document.getElementById('progressText').textContent = 'Progress: ' + completedTasks + '/3 Tasks Completed';
-        }
-
-        function generateKey() {
-            // Generate very long, complex key
-            let chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-            let specialChars = '!@#$%^&*';
+        
+        function createSliderGroup(id, x, y) {
+            groupCounter++;
+            const groupId = `Group_${groupCounter}`;
             
-            // Create a much longer key format: FRYZER-XXXXX-XXXXX-XXXXX-XXXXX-XXXXX-XXXXX
-            let key = 'FRYZER-';
+            // Create frame
+            const frame = createBasicElement('Frame', `${id}_Frame`, x, y);
+            frame.element.style.width = '200px';
+            frame.element.style.height = '50px';
+            frame.element.style.background = '#444';
             
-            for (let i = 0; i < 6; i++) {
-                for (let j = 0; j < 8; j++) {
-                    if (j === 3 || j === 6) {
-                        // Add special characters in specific positions
-                        key += specialChars.charAt(Math.floor(Math.random() * specialChars.length));
-                    } else {
-                        key += chars.charAt(Math.floor(Math.random() * chars.length));
-                    }
-                }
-                if (i < 5) key += '-';
-            }
+            // Create slider bar
+            const sliderBar = createBasicElement('Frame', `${id}_Bar`, x + 10, y + 20);
+            sliderBar.element.style.width = '150px';
+            sliderBar.element.style.height = '6px';
+            sliderBar.element.style.background = '#666';
+            sliderBar.element.style.borderRadius = '3px';
             
-            // Add timestamp and random suffix for uniqueness
-            let timestamp = Date.now().toString(36).toUpperCase();
-            let randomSuffix = Math.random().toString(36).substring(2, 8).toUpperCase();
-            key += '-' + timestamp + '-' + randomSuffix;
+            // Create slider handle
+            const handle = createBasicElement('Frame', `${id}_Handle`, x + 75, y + 17);
+            handle.element.style.width = '12px';
+            handle.element.style.height = '12px';
+            handle.element.style.background = '#0078d4';
+            handle.element.style.borderRadius = '50%';
             
-            currentKey = {
-                key: key,
-                generatedAt: new Date().toISOString(),
-                expiresAt: Date.now() + (24 * 60 * 60 * 1000), // 24 hours
-                used: false,
-                ip: 'DEMO-IP', // In real app, get actual IP
-                userAgent: navigator.userAgent.substring(0, 50) + '...'
+            // Create value label
+            const label = createBasicElement('TextLabel', `${id}_Label`, x + 170, y + 15);
+            label.element.style.width = '30px';
+            label.element.style.height = '20px';
+            label.element.textContent = '50';
+            label.element.style.fontSize = '12px';
+            
+            // Group them
+            const group = {
+                id: groupId,
+                type: 'SliderGroup',
+                elements: [frame, sliderBar, handle, label],
+                grouped: true
             };
             
-            // Store the key
-            storeKey(currentKey);
+            // Add group indicator
+            frame.element.innerHTML += `<div class="group-indicator">SLIDER</div>`;
             
-            document.getElementById('keyDisplay').textContent = key;
-            showScreen('keyScreen');
-            startKeyTimer();
-            updateKeyStorage();
+            groups.push(group);
+            
+            return group;
         }
         
-        function storeKey(keyData) {
-            // Get existing keys or create empty array
-            let storedKeys = JSON.parse(getStoredData('fryzer_keys') || '[]');
+        function createDropdownGroup(id, x, y) {
+            groupCounter++;
+            const groupId = `Group_${groupCounter}`;
             
-            // Add new key to the beginning of array
-            storedKeys.unshift(keyData);
+            // Create dropdown button
+            const button = createBasicElement('TextButton', `${id}_Button`, x, y);
+            button.element.style.width = '120px';
+            button.element.style.height = '30px';
+            button.element.textContent = 'Dropdown ▼';
             
-            // Keep only last 50 keys to prevent memory issues
-            if (storedKeys.length > 50) {
-                storedKeys = storedKeys.slice(0, 50);
-            }
+            // Create dropdown frame (hidden by default)
+            const dropdown = createBasicElement('Frame', `${id}_Dropdown`, x, y + 30);
+            dropdown.element.style.width = '120px';
+            dropdown.element.style.height = '90px';
+            dropdown.element.style.background = '#fff';
+            dropdown.element.style.border = '1px solid #999';
+            dropdown.element.style.display = 'none';
             
-            // Store updated keys
-            setStoredData('fryzer_keys', JSON.stringify(storedKeys));
+            // Create options
+            const options = ['Option 1', 'Option 2', 'Option 3'];
+            const optionElements = options.map((option, index) => {
+                const optionBtn = createBasicElement('TextButton', `${id}_Option${index + 1}`, x, y + 30 + (index * 30));
+                optionBtn.element.style.width = '120px';
+                optionBtn.element.style.height = '30px';
+                optionBtn.element.style.background = '#f5f5f5';
+                optionBtn.element.style.border = '1px solid #ddd';
+                optionBtn.element.textContent = option;
+                optionBtn.element.style.fontSize = '12px';
+                return optionBtn;
+            });
             
-            console.log('Key stored successfully:', keyData.key);
+            const group = {
+                id: groupId,
+                type: 'DropdownGroup',
+                elements: [button, dropdown, ...optionElements],
+                grouped: true
+            };
+            
+            button.element.innerHTML += `<div class="group-indicator">DROPDOWN</div>`;
+            groups.push(group);
+            
+            return group;
         }
         
-        // Simple storage functions (using variables instead of localStorage for demo)
-        let keyStorage = {};
-        
-        function getStoredData(key) {
-            return keyStorage[key] || null;
-        }
-        
-        function setStoredData(key, value) {
-            keyStorage[key] = value;
-        }
-        
-        function getAllStoredKeys() {
-            return JSON.parse(getStoredData('fryzer_keys') || '[]');
-        }
-
-        function startKeyTimer() {
-            keyTimer = setInterval(function() {
-                let timeLeft = currentKey.expiresAt - Date.now();
-                
-                if (timeLeft <= 0) {
-                    document.getElementById('keyTimer').textContent = 'Key expired!';
-                    clearInterval(keyTimer);
-                    return;
+        function getDefaultProperties(type) {
+            const defaults = {
+                Frame: {
+                    style: { width: '100px', height: '100px', background: '#ffffff' },
+                    properties: {
+                        Size: '{0, 100},{0, 100}',
+                        Position: '{0, 0},{0, 0}',
+                        BackgroundColor3: 'Color3.fromRGB(255, 255, 255)',
+                        BorderSizePixel: 1,
+                        BackgroundTransparency: 0
+                    }
+                },
+                TextLabel: {
+                    style: { width: '120px', height: '40px' },
+                    properties: {
+                        Size: '{0, 120},{0, 40}',
+                        Position: '{0, 0},{0, 0}',
+                        BackgroundColor3: 'Color3.fromRGB(255, 255, 255)',
+                        BackgroundTransparency: 1,
+                        Text: 'TextLabel',
+                        TextColor3: 'Color3.fromRGB(0, 0, 0)',
+                        Font: 'Enum.Font.SourceSans',
+                        TextSize: 14
+                    },
+                    text: 'TextLabel'
+                },
+                TextButton: {
+                    style: { width: '100px', height: '35px' },
+                    properties: {
+                        Size: '{0, 100},{0, 35}',
+                        Position: '{0, 0},{0, 0}',
+                        BackgroundColor3: 'Color3.fromRGB(225, 225, 225)',
+                        Text: 'TextButton',
+                        TextColor3: 'Color3.fromRGB(0, 0, 0)',
+                        Font: 'Enum.Font.SourceSans',
+                        TextSize: 14
+                    },
+                    text: 'TextButton'
+                },
+                TextBox: {
+                    style: { width: '120px', height: '30px' },
+                    properties: {
+                        Size: '{0, 120},{0, 30}',
+                        Position: '{0, 0},{0, 0}',
+                        BackgroundColor3: 'Color3.fromRGB(255, 255, 255)',
+                        Text: '',
+                        PlaceholderText: 'Enter text...',
+                        TextColor3: 'Color3.fromRGB(0, 0, 0)',
+                        Font: 'Enum.Font.SourceSans',
+                        TextSize: 14
+                    }
+                },
+                ImageLabel: {
+                    style: { width: '100px', height: '100px' },
+                    properties: {
+                        Size: '{0, 100},{0, 100}',
+                        Position: '{0, 0},{0, 0}',
+                        BackgroundColor3: 'Color3.fromRGB(255, 255, 255)',
+                        Image: 'rbxassetid://0'
+                    }
+                },
+                ScrollingFrame: {
+                    style: { width: '150px', height: '150px' },
+                    properties: {
+                        Size: '{0, 150},{0, 150}',
+                        Position: '{0, 0},{0, 0}',
+                        BackgroundColor3: 'Color3.fromRGB(255, 255, 255)',
+                        ScrollBarThickness: 12,
+                        CanvasSize: '{0, 0},{0, 300}'
+                    }
                 }
-                
-                let hours = Math.floor(timeLeft / (1000 * 60 * 60));
-                let minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
-                let seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
-                
-                document.getElementById('keyTimer').textContent = 
-                    'Key expires in: ' + 
-                    hours.toString().padStart(2, '0') + ':' + 
-                    minutes.toString().padStart(2, '0') + ':' + 
-                    seconds.toString().padStart(2, '0');
-            }, 1000);
-        }
-
-        function copyKey() {
-            let keyText = document.getElementById('keyDisplay').textContent;
-            navigator.clipboard.writeText(keyText).then(function() {
-                let originalText = document.getElementById('keyDisplay').textContent;
-                document.getElementById('keyDisplay').textContent = 'Copied to clipboard!';
-                document.getElementById('keyDisplay').style.color = '#4CAF50';
-                
-                setTimeout(function() {
-                    document.getElementById('keyDisplay').textContent = originalText;
-                    document.getElementById('keyDisplay').style.color = '#00d4ff';
-                }, 2000);
-            });
-        }
-
-        function showScreen(screenId) {
-            let screens = ['startScreen', 'tasksScreen', 'keyScreen', 'storageScreen'];
-            screens.forEach(function(screen) {
-                document.getElementById(screen).classList.add('hidden');
-            });
-            document.getElementById(screenId).classList.remove('hidden');
-        }
-        
-        function showKeyStorage() {
-            updateKeyStorage();
-            showScreen('storageScreen');
-        }
-        
-        function updateKeyStorage() {
-            let keys = getAllStoredKeys();
-            let keysList = document.getElementById('keysList');
+            };
             
-            if (keys.length === 0) {
-                keysList.innerHTML = '<p style="color: #ccc; text-align: center;">No keys generated yet.</p>';
+            return defaults[type] || defaults.Frame;
+        }
+        
+        function selectElement(e, id) {
+            e.stopPropagation();
+            
+            // Remove selection from all elements
+            document.querySelectorAll('.gui-element').forEach(el => {
+                el.classList.remove('selected');
+            });
+            
+            // Select current element
+            const element = document.getElementById(id);
+            element.classList.add('selected');
+            selectedElement = elements.find(el => el.id === id) || 
+                             groups.find(g => g.elements.some(e => e.id === id));
+            
+            updatePropertiesPanel();
+        }
+        
+        function updatePropertiesPanel() {
+            const content = document.getElementById('properties-content');
+            
+            if (!selectedElement) {
+                content.innerHTML = `
+                    <div class="property-group">
+                        <h3>📋 Selection</h3>
+                        <p style="color: #999; font-size: 12px; text-align: center; margin-top: 20px;">
+                            Select an element to edit its properties
+                        </p>
+                    </div>
+                `;
                 return;
             }
             
-            let html = '<h3 style="color: #00d4ff; margin-bottom: 15px;">Total Keys: ' + keys.length + '</h3>';
-            
-            keys.forEach(function(keyData, index) {
-                let isExpired = Date.now() > keyData.expiresAt;
-                let timeLeft = keyData.expiresAt - Date.now();
-                let status = isExpired ? 'EXPIRED' : 'ACTIVE';
-                let statusClass = isExpired ? 'expired' : 'active';
+            let html = `
+                <div class="property-group">
+                    <h3>🎯 ${selectedElement.type || 'Element'}</h3>
+                    <div class="property-item">
+                        <label>Name</label>
+                        <input type="text" value="${selectedElement.id}" onchange="updateElementName('${selectedElement.id}', this.value)">
+                    </div>
+                </div>
                 
-                let timeString = '';
-                if (!isExpired) {
-                    let hours = Math.floor(timeLeft / (1000 * 60 * 60));
-                    let minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
-                    timeString = hours + 'h ' + minutes + 'm remaining';
+                <div class="property-group">
+                    <h3>📐 Transform</h3>
+                    <div class="property-item">
+                        <label>X Position</label>
+                        <input type="number" value="${parseInt(selectedElement.element.style.left)}" onchange="updateElementProperty('${selectedElement.id}', 'left', this.value + 'px')">
+                    </div>
+                    <div class="property-item">
+                        <label>Y Position</label>
+                        <input type="number" value="${parseInt(selectedElement.element.style.top)}" onchange="updateElementProperty('${selectedElement.id}', 'top', this.value + 'px')">
+                    </div>
+                    <div class="property-item">
+                        <label>Width</label>
+                        <input type="number" value="${parseInt(selectedElement.element.style.width)}" onchange="updateElementProperty('${selectedElement.id}', 'width', this.value + 'px')">
+                    </div>
+                    <div class="property-item">
+                        <label>Height</label>
+                        <input type="number" value="${parseInt(selectedElement.element.style.height)}" onchange="updateElementProperty('${selectedElement.id}', 'height', this.value + 'px')">
+                    </div>
+                </div>
+                
+                <div class="property-group">
+                    <h3>🎨 Appearance</h3>
+                    <div class="property-item">
+                        <label>Background Color</label>
+                        <input type="color" value="${rgbToHex(selectedElement.element.style.backgroundColor || '#ffffff')}" onchange="updateElementProperty('${selectedElement.id}', 'backgroundColor', this.value)">
+                    </div>
+                    <div class="property-item">
+                        <label>Background Transparency</label>
+                        <input type="range" min="0" max="1" step="0.1" value="0" onchange="updateElementProperty('${selectedElement.id}', 'opacity', 1 - this.value)">
+                        <div class="range-display">0% Transparent</div>
+                    </div>
+                    <div class="property-item">
+                        <label>Border Radius</label>
+                        <input type="number" min="0" max="50" value="0" onchange="updateElementProperty('${selectedElement.id}', 'borderRadius', this.value + 'px')">
+                    </div>
+                    <div class="property-item">
+                        <label>Border Width</label>
+                        <input type="number" min="0" max="10" value="1" onchange="updateElementProperty('${selectedElement.id}', 'borderWidth', this.value + 'px')">
+                    </div>
+                    <div class="property-item">
+                        <label>Border Color</label>
+                        <input type="color" value="#cccccc" onchange="updateElementProperty('${selectedElement.id}', 'borderColor', this.value)">
+                    </div>
+                </div>
+            `;
+            
+            // Add text properties for text elements
+            if (selectedElement.type === 'TextLabel' || selectedElement.type === 'TextButton' || selectedElement.type === 'TextBox') {
+                html += `
+                    <div class="property-group">
+                        <h3>✏️ Text</h3>
+                        <div class="property-item">
+                            <label>Text</label>
+                            <input type="text" value="${selectedElement.element.textContent}" onchange="updateElementText('${selectedElement.id}', this.value)">
+                        </div>
+                        <div class="property-item">
+                            <label>Text Color</label>
+                            <input type="color" value="${rgbToHex(selectedElement.element.style.color || '#000000')}" onchange="updateElementProperty('${selectedElement.id}', 'color', this.value)">
+                        </div>
+                        <div class="property-item">
+                            <label>Font Size</label>
+                            <input type="number" min="8" max="72" value="14" onchange="updateElementProperty('${selectedElement.id}', 'fontSize', this.value + 'px')">
+                        </div>
+                        <div class="property-item">
+                            <label>Text Align</label>
+                            <select onchange="updateElementProperty('${selectedElement.id}', 'textAlign', this.value)">
+                                <option value="left">Left</option>
+                                <option value="center">Center</option>
+                                <option value="right">Right</option>
+                            </select>
+                        </div>
+                        <div class="property-item">
+                            <label>Font Weight</label>
+                            <select onchange="updateElementProperty('${selectedElement.id}', 'fontWeight', this.value)">
+                                <option value="normal">Normal</option>
+                                <option value="bold">Bold</option>
+                                <option value="lighter">Light</option>
+                            </select>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            // Add behavior properties
+            html += `
+                <div class="property-group">
+                    <h3>⚙️ Behavior</h3>
+                    <div class="property-item">
+                        <label>
+                            <input type="checkbox" onchange="updateElementDraggable('${selectedElement.id}', this.checked)">
+                            Draggable
+                        </label>
+                    </div>
+                    <div class="property-item">
+                        <label>
+                            <input type="checkbox" onchange="updateElementVisible('${selectedElement.id}', this.checked)" checked>
+                            Visible
+                        </label>
+                    </div>
+                    <div class="property-item">
+                        <label>
+                            <input type="checkbox" onchange="updateElementActive('${selectedElement.id}', this.checked)" checked>
+                            Active
+                        </label>
+                    </div>
+                </div>
+            `;
+            
+            content.innerHTML = html;
+        }
+        
+        function updateElementProperty(id, property, value) {
+            const element = elements.find(el => el.id === id);
+            if (element) {
+                element.element.style[property] = value;
+                updateCode();
+            }
+        }
+        
+        function updateElementText(id, text) {
+            const element = elements.find(el => el.id === id);
+            if (element) {
+                element.element.textContent = text;
+                updateCode();
+            }
+        }
+        
+        function updateElementName(oldId, newId) {
+            const element = elements.find(el => el.id === oldId);
+            if (element && newId && newId !== oldId) {
+                element.id = newId;
+                element.element.id = newId;
+                updateCode();
+            }
+        }
+        
+        function updateElementDraggable(id, draggable) {
+            const element = elements.find(el => el.id === id);
+            if (element) {
+                element.properties = element.properties || {};
+                element.properties.Draggable = draggable;
+                updateCode();
+            }
+        }
+        
+        function updateElementVisible(id, visible) {
+            const element = elements.find(el => el.id === id);
+            if (element) {
+                element.element.style.display = visible ? 'block' : 'none';
+                element.properties = element.properties || {};
+                element.properties.Visible = visible;
+                updateCode();
+            }
+        }
+        
+        function updateElementActive(id, active) {
+            const element = elements.find(el => el.id === id);
+            if (element) {
+                element.element.style.pointerEvents = active ? 'auto' : 'none';
+                element.properties = element.properties || {};
+                element.properties.Active = active;
+                updateCode();
+            }
+        }
+        
+        function rgbToHex(rgb) {
+            if (!rgb || rgb === 'transparent') return '#ffffff';
+            const match = rgb.match(/rgb\((\d+),\s*(\d+),\s*(\d+)\)/);
+            if (match) {
+                return '#' + [1, 2, 3].map(i => {
+                    return ('0' + parseInt(match[i]).toString(16)).substr(-2);
+                }).join('');
+            }
+            return rgb.startsWith('#') ? rgb : '#ffffff';
+        }
+        
+        function handleCanvasClick(e) {
+            if (e.target.id === 'canvas' || e.target.id === 'dropZone') {
+                selectedElement = null;
+                document.querySelectorAll('.gui-element').forEach(el => {
+                    el.classList.remove('selected');
+                });
+                updatePropertiesPanel();
+            }
+        }
+        
+        function startDrag(e, id) {
+            if (e.target.classList.contains('control-btn') || e.target.classList.contains('resize-handle')) return;
+            
+            e.preventDefault();
+            const element = document.getElementById(id);
+            const rect = element.getBoundingClientRect();
+            const offsetX = e.clientX - rect.left;
+            const offsetY = e.clientY - rect.top;
+            
+            function mouseMoveHandler(e) {
+                const canvas = document.getElementById('canvas');
+                const canvasRect = canvas.getBoundingClientRect();
+                const x = e.clientX - canvasRect.left - offsetX;
+                const y = e.clientY - canvasRect.top - offsetY;
+                
+                element.style.left = Math.max(0, x) + 'px';
+                element.style.top = Math.max(0, y) + 'px';
+            }
+            
+            function mouseUpHandler() {
+                document.removeEventListener('mousemove', mouseMoveHandler);
+                document.removeEventListener('mouseup', mouseUpHandler);
+                updateCode();
+                updatePropertiesPanel();
+            }
+            
+            document.addEventListener('mousemove', mouseMoveHandler);
+            document.addEventListener('mouseup', mouseUpHandler);
+        }
+        
+        function startResize(e, id) {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            const element = document.getElementById(id);
+            const startX = e.clientX;
+            const startY = e.clientY;
+            const startWidth = parseInt(element.style.width);
+            const startHeight = parseInt(element.style.height);
+            
+            function mouseMoveHandler(e) {
+                const width = startWidth + (e.clientX - startX);
+                const height = startHeight + (e.clientY - startY);
+                
+                element.style.width = Math.max(20, width) + 'px';
+                element.style.height = Math.max(20, height) + 'px';
+            }
+            
+            function mouseUpHandler() {
+                document.removeEventListener('mousemove', mouseMoveHandler);
+                document.removeEventListener('mouseup', mouseUpHandler);
+                updateCode();
+                updatePropertiesPanel();
+            }
+            
+            document.addEventListener('mousemove', mouseMoveHandler);
+            document.addEventListener('mouseup', mouseUpHandler);
+        }
+        
+        function deleteElement(id) {
+            const element = document.getElementById(id);
+            if (element) {
+                element.remove();
+                elements = elements.filter(el => el.id !== id);
+                
+                // Remove from groups
+                groups.forEach(group => {
+                    group.elements = group.elements.filter(el => el.id !== id);
+                });
+                groups = groups.filter(group => group.elements.length > 0);
+                
+                selectedElement = null;
+                updatePropertiesPanel();
+                updateCode();
+                showNotification('Element deleted');
+            }
+        }
+        
+        function minimizeElement(id) {
+            const element = elements.find(el => el.id === id);
+            if (element) {
+                element.minimized = !element.minimized;
+                if (element.minimized) {
+                    element.element.style.height = '20px';
+                    element.element.style.overflow = 'hidden';
                 } else {
-                    timeString = 'Expired';
+                    element.element.style.height = element.originalHeight || '100px';
+                    element.element.style.overflow = 'visible';
                 }
-                
-                html += '<div class="key-item ' + statusClass + '">';
-                html += '<div class="key-text">' + keyData.key + '</div>';
-                html += '<div class="key-info">';
-                html += '<strong>Status:</strong> ' + status + ' | ';
-                html += '<strong>Time:</strong> ' + timeString + '<br>';
-                html += '<strong>Generated:</strong> ' + new Date(keyData.generatedAt).toLocaleString() + '<br>';
-                html += '<strong>Used:</strong> ' + (keyData.used ? 'Yes' : 'No');
-                html += '</div>';
-                html += '</div>';
-            });
-            
-            keysList.innerHTML = html;
+                showNotification(element.minimized ? 'Element minimized' : 'Element restored');
+            }
         }
         
-        function exportKeys() {
-            let keys = getAllStoredKeys();
-            if (keys.length === 0) {
-                alert('No keys to export!');
+        function startGrouping(id) {
+            showNotification('Select elements to group with this one (Ctrl+Click)');
+        }
+        
+        function groupSelected() {
+            const selected = document.querySelectorAll('.gui-element.selected');
+            if (selected.length < 2) {
+                showNotification('Select at least 2 elements to group');
                 return;
             }
             
-            // Create downloadable text file
-            let content = 'FryzerX Key Export - ' + new Date().toISOString() + '\n';
-            content += '='.repeat(50) + '\n\n';
+            groupCounter++;
+            const groupId = `Group_${groupCounter}`;
+            const groupElements = [];
             
-            keys.forEach(function(keyData, index) {
-                content += 'Key #' + (index + 1) + ':\n';
-                content += 'Value: ' + keyData.key + '\n';
-                content += 'Generated: ' + keyData.generatedAt + '\n';
-                content += 'Status: ' + (Date.now() > keyData.expiresAt ? 'EXPIRED' : 'ACTIVE') + '\n';
-                content += 'Used: ' + (keyData.used ? 'Yes' : 'No') + '\n';
-                content += '-'.repeat(30) + '\n\n';
+            selected.forEach(el => {
+                const element = elements.find(e => e.id === el.id);
+                if (element) {
+                    element.grouped = true;
+                    groupElements.push(element);
+                    el.innerHTML += `<div class="group-indicator">${groupId}</div>`;
+                }
             });
             
-            // Create and download file
-            let blob = new Blob([content], { type: 'text/plain' });
-            let url = window.URL.createObjectURL(blob);
-            let a = document.createElement('a');
-            a.href = url;
-            a.download = 'fryzer_keys_' + new Date().toISOString().split('T')[0] + '.txt';
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            window.URL.revokeObjectURL(url);
+            groups.push({
+                id: groupId,
+                type: 'CustomGroup',
+                elements: groupElements,
+                grouped: true
+            });
+            
+            showNotification(`Created group: ${groupId}`);
         }
         
-        function clearAllKeys() {
-            if (confirm('Are you sure you want to delete all stored keys? This cannot be undone!')) {
-                keyStorage = {};
-                updateKeyStorage();
-                alert('All keys have been cleared!');
+        function ungroupSelected() {
+            const selected = document.querySelector('.gui-element.selected');
+            if (!selected) {
+                showNotification('Select a grouped element to ungroup');
+                return;
+            }
+            
+            const group = groups.find(g => g.elements.some(e => e.id === selected.id));
+            if (group) {
+                group.elements.forEach(el => {
+                    el.grouped = false;
+                    const indicator = el.element.querySelector('.group-indicator');
+                    if (indicator) indicator.remove();
+                });
+                
+                groups = groups.filter(g => g.id !== group.id);
+                showNotification(`Ungrouped: ${group.id}`);
             }
         }
+        
+        function clearCanvas() {
+            if (confirm('Are you sure you want to clear all elements?')) {
+                document.getElementById('canvas').innerHTML = '<div class="drop-zone" id="dropZone">Drop components here to build your GUI</div>';
+                elements = [];
+                groups = [];
+                selectedElement = null;
+                updatePropertiesPanel();
+                updateCode();
+                showNotification('Canvas cleared');
+            }
+        }
+        
+        function deleteSelected() {
+            const selected = document.querySelector('.gui-element.selected');
+            if (selected) {
+                deleteElement(selected.id);
+            }
+        }
+        
+        function switchTab(tab) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(tc => tc.classList.remove('active'));
+            
+            document.querySelector(`[onclick="switchTab('${tab}')"]`).classList.add('active');
+            document.getElementById(`${tab}-content`).classList.add('active');
+            
+            if (tab === 'code') {
+                updateCode();
+            }
+        }
+        
+        function updateCode() {
+            let code = `-- Generated Roblox GUI Code
+-- Copy this code into ServerScriptService or use in LocalScript
 
-        function goBack() {
-            if (keyTimer) {
-                clearInterval(keyTimer);
-                keyTimer = null;
-            }
-            currentKey = null;
-            showScreen('startScreen');
+local screenGui = Instance.new("ScreenGui")
+screenGui.Name = "GeneratedGUI"
+screenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
+
+`;
+            
+            // Generate code for individual elements
+            elements.forEach(element => {
+                if (!element.grouped) {
+                    code += generateElementCode(element);
+                }
+            });
+            
+            // Generate code for groups
+            groups.forEach(group => {
+                code += generateGroupCode(group);
+            });
+            
+            code += `
+-- End of generated code
+print("GUI loaded successfully!")`;
+            
+            document.getElementById('generated-code').textContent = code;
         }
+        
+        function generateElementCode(element) {
+            const style = element.element.style;
+            const type = element.type;
+            let code = `
+-- ${element.id}
+local ${element.id} = Instance.new("${type}")
+${element.id}.Name = "${element.id}"
+${element.id}.Size = UDim2.new(0, ${parseInt(style.width) || 100}, 0, ${parseInt(style.height) || 100})
+${element.id}.Position = UDim2.new(0, ${parseInt(style.left) || 0}, 0, ${parseInt(style.top) || 0})
+`;
+            
+            // Background color
+            if (style.backgroundColor) {
+                const rgb = hexToRgb(style.backgroundColor);
+                if (rgb) {
+                    code += `${element.id}.BackgroundColor3 = Color3.fromRGB(${rgb.r}, ${rgb.g}, ${rgb.b})\n`;
+                }
+            }
+            
+            // Background transparency
+            if (style.opacity && style.opacity !== '1') {
+                code += `${element.id}.BackgroundTransparency = ${1 - parseFloat(style.opacity)}\n`;
+            }
+            
+            // Border
+            if (style.borderWidth && parseInt(style.borderWidth) > 0) {
+                code += `${element.id}.BorderSizePixel = ${parseInt(style.borderWidth)}\n`;
+            }
+            
+            // Corner radius
+            if (style.borderRadius && parseInt(style.borderRadius) > 0) {
+                code += `
+local ${element.id}_Corner = Instance.new("UICorner")
+${element.id}_Corner.CornerRadius = UDim.new(0, ${parseInt(style.borderRadius)})
+${element.id}_Corner.Parent = ${element.id}
+`;
+            }
+            
+            // Text properties
+            if (type === 'TextLabel' || type === 'TextButton' || type === 'TextBox') {
+                code += `${element.id}.Text = "${element.element.textContent || ''}"\n`;
+                
+                if (style.color) {
+                    const rgb = hexToRgb(style.color);
+                    if (rgb) {
+                        code += `${element.id}.TextColor3 = Color3.fromRGB(${rgb.r}, ${rgb.g}, ${rgb.b})\n`;
+                    }
+                }
+                
+                if (style.fontSize) {
+                    code += `${element.id}.TextSize = ${parseInt(style.fontSize)}\n`;
+                }
+                
+                code += `${element.id}.Font = Enum.Font.SourceSans\n`;
+            }
+            
+            // Parent to ScreenGui
+            code += `${element.id}.Parent = screenGui\n`;
+            
+            return code;
+        }
+        
+        function generateGroupCode(group) {
+            let code = `\n-- ${group.id} (${group.type})\n`;
+            
+            group.elements.forEach(element => {
+                code += generateElementCode(element);
+            });
+            
+            return code;
+        }
+        
+        function hexToRgb(hex) {
+            const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+            return result ? {
+                r: parseInt(result[1], 16),
+                g: parseInt(result[2], 16),
+                b: parseInt(result[3], 16)
+            } : null;
+        }
+        
+        function copyCode() {
+            const code = document.getElementById('generated-code').textContent;
+            navigator.clipboard.writeText(code).then(() => {
+                const btn = document.querySelector('.copy-btn');
+                btn.textContent = '✓ Copied!';
+                btn.classList.add('copied');
+                setTimeout(() => {
+                    btn.textContent = '📋 Copy Code';
+                    btn.classList.remove('copied');
+                }, 2000);
+                showNotification('Code copied to clipboard!');
+            });
+        }
+        
+        function showNotification(message) {
+            const notification = document.createElement('div');
+            notification.className = 'notification';
+            notification.textContent = message;
+            document.body.appendChild(notification);
+            
+            setTimeout(() => notification.classList.add('show'), 100);
+            setTimeout(() => {
+                notification.classList.remove('show');
+                setTimeout(() => notification.remove(), 300);
+            }, 3000);
+        }
+        
+        // Keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            if (e.ctrlKey || e.metaKey) {
+                switch(e.key) {
+                    case 'a':
+                        e.preventDefault();
+                        document.querySelectorAll('.gui-element').forEach(el => el.classList.add('selected'));
+                        break;
+                    case 'c':
+                        e.preventDefault();
+                        copyCode();
+                        break;
+                    case 'g':
+                        e.preventDefault();
+                        groupSelected();
+                        break;
+                }
+            }
+            
+            if (e.key === 'Delete' && selectedElement) {
+                deleteSelected();
+            }
+        });
     </script>
 </body>
 </html>
