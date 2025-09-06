@@ -1,4 +1,738 @@
-<!DOCTYPE html>
+// Initialize the application
+        function init() {
+            checkAuthentication();
+            if (isAuthenticated) {
+                loadSavedData();
+                setupNavigation();
+                setupEventListeners();
+                updateAllDisplays();
+            } else {
+                setupLoginListeners();
+            }
+        }
+
+        // Authentication functions
+        function checkAuthentication() {
+            const savedAuth = localStorage.getItem('dashboard_auth');
+            const savedTimestamp = localStorage.getItem('dashboard_auth_timestamp');
+            const currentTime = Date.now();
+            
+            // Check if authentication is valid (expires after 24 hours)
+            if (savedAuth === 'true' && savedTimestamp && (currentTime - parseInt(savedTimestamp)) < 86400000) {
+                isAuthenticated = true;
+                showDashboard();
+            } else {
+                // Clear expired auth
+                localStorage.removeItem('dashboard_auth');
+                localStorage.removeItem('dashboard_auth_timestamp');
+                showLogin();
+            }
+        }
+
+        function setupLoginListeners() {
+            const keyInput = document.getElementById('keyInput');
+            keyInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    authenticate();
+                }
+            });
+            keyInput.addEventListener('input', function() {
+                this.classList.remove('error');
+                document.getElementById('errorMessage').classList.remove('show');
+            });
+        }
+
+        function authenticate() {
+            const enteredKey = document.getElementById('keyInput').value;
+            const keyInput = document.getElementById('keyInput');
+            const errorMessage = document.getElementById('errorMessage');
+
+            if (enteredKey === ACCESS_KEY) {
+                isAuthenticated = true;
+                localStorage.setItem('dashboard_auth', 'true');
+                localStorage.setItem('dashboard_auth_timestamp', Date.now().toString());
+                
+                showDashboard();
+                loadSavedData();
+                setupNavigation();
+                setupEventListeners();
+                updateAllDisplays();
+                
+                showNotification('Welcome to your dashboard!', 'success');
+            } else {
+                keyInput.classList.add('error');
+                errorMessage.classList.add('show');
+                keyInput.value = '';
+                keyInput.focus();
+            }
+        }
+
+        function logout() {
+            if (confirm('Are you sure you want to logout?')) {
+                isAuthenticated = false;
+                localStorage.removeItem('dashboard_auth');
+                localStorage.removeItem('dashboard_auth_timestamp');
+                showLogin();
+                
+                // Reset all data
+                currentTab = 'dashboard';
+                document.querySelectorAll('.nav-item').forEach(item => {
+                    item.classList.remove('active');
+                });
+                document.querySelector('[data-tab="dashboard"]').classList.add('active');
+                document.querySelectorAll('.tab-content').forEach(content => {
+                    content.classList.remove('active');
+                });
+                document.getElementById('dashboard').classList.add('active');
+            }
+        }
+
+        function showLogin() {
+            document.getElementById('loginContainer').style.display = 'flex';
+            document.getElementById('dashboardContainer').classList.remove('authenticated');
+            document.getElementById('keyInput').focus();
+        }
+
+        function showDashboard() {
+            document.getElementById('loginContainer').style.display = 'none';
+            document.getElementById('dashboardContainer').classList.add('authenticated');
+        }
+
+        // Data persistence functions
+        function saveData() {
+            if (!isAuthenticated) return;
+            
+            const data = {
+                currentBalance,
+                transactions,
+                links,
+                todos,
+                images: images.map(img => ({
+                    ...img,
+                    // Keep only essential data for images to avoid localStorage size limits
+                    src: img.src.length > 50000 ? '[Large Image Data]' : img.src
+                })),
+                lastSaved: Date.now()
+            };
+            
+            try {
+                localStorage.setItem('dashboard_data', JSON.stringify(data));
+                showSaveStatus();
+            } catch (error) {
+                console.error('Error saving data:', error);
+                showNotification('Error saving data - storage might be full', 'error');
+            }
+        }
+
+        function loadSavedData() {
+            if (!isAuthenticated) return;
+            
+            try {
+                const savedData = localStorage.getItem('dashboard_data');
+                if (savedData) {
+                    const data = JSON.parse(savedData);
+                    
+                    currentBalance = data.currentBalance || 0;
+                    transactions = data.transactions || [];
+                    links = data.links || [];
+                    todos = data.todos || [];
+                    images = data.images || [];
+                    
+                    // Convert date strings back to Date objects
+                    transactions.forEach(t => {
+                        if (t.date) t.date = new Date(t.date);
+                    });
+                    
+                    todos.forEach(t => {
+                        if (t.createdAt) t.createdAt = new Date(t.createdAt);
+                        if (t.dueDate) t.dueDate = new Date(t.dueDate);
+                    });
+                    
+                    links.forEach(l => {
+                        if (l.dateAdded) l.dateAdded = new Date(l.dateAdded);
+                    });
+                    
+                    images.forEach(i => {
+                        if (i.uploadDate) i.uploadDate = new Date(i.uploadDate);
+                    });
+                    
+                    console.log('Data loaded successfully');
+                }
+            } catch (error) {
+                console.error('Error loading data:', error);
+                showNotification('Error loading saved data', 'error');
+            }
+        }
+
+        function showSaveStatus() {
+            const saveStatus = document.getElementById('saveStatus');
+            saveStatus.classList.add('show');
+            setTimeout(() => {
+                saveStatus.classList.remove('show');
+            }, 2000);
+        }
+
+        // Navigation setup
+        function setupNavigation() {
+            const navItems = document.querySelectorAll('.nav-item');
+            navItems.forEach(item => {
+                item.addEventListener('click', function() {
+                    const tabId = this.getAttribute('data-tab');
+                    switchTab(tabId);
+                });
+            });
+        }
+
+        function switchTab(tabId) {
+            // Update navigation
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            document.querySelector(`[data-tab="${tabId}"]`).classList.add('active');
+
+            // Update content
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            document.getElementById(tabId).classList.add('active');
+
+            currentTab = tabId;
+        }
+
+        // Event listeners setup
+        function setupEventListeners() {
+            // Period selector buttons
+            document.querySelectorAll('.period-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    document.querySelectorAll('.period-btn').forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    updateRevenueStats();
+                });
+            });
+
+            // Enter key handlers
+            document.getElementById('revenueAmount').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') addRevenue();
+            });
+            
+            document.getElementById('expenseAmount').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') addExpense();
+            });
+            
+            document.getElementById('linkUrl').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') addLink();
+            });
+
+            document.getElementById('todoTitle').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') addTodo();
+            });
+
+            // Image upload setup
+            const uploadArea = document.getElementById('uploadArea');
+            const imageUpload = document.getElementById('imageUpload');
+
+            uploadArea.addEventListener('click', () => imageUpload.click());
+            uploadArea.addEventListener('dragover', handleDragOver);
+            uploadArea.addEventListener('drop', handleDrop);
+            uploadArea.addEventListener('dragleave', handleDragLeave);
+            imageUpload.addEventListener('change', handleFileSelect);
+
+            // Modal setup
+            document.getElementById('imageModal').addEventListener('click', closeModal);
+        }
+
+        // Revenue functions
+        function addRevenue() {
+            if (!isAuthenticated) return;
+            
+            const amount = parseFloat(document.getElementById('revenueAmount').value);
+            const description = document.getElementById('revenueDescription').value;
+            const category = document.getElementById('revenueCategory').value;
+
+            if (!amount || amount <= 0) {
+                showNotification('Please enter a valid amount', 'error');
+                return;
+            }
+
+            const transaction = {
+                id: Date.now(),
+                type: 'income',
+                amount: amount,
+                description: description || 'Revenue',
+                category: category,
+                date: new Date(),
+                timestamp: Date.now()
+            };
+
+            transactions.unshift(transaction);
+            currentBalance += amount;
+
+            // Clear inputs
+            document.getElementById('revenueAmount').value = '';
+            document.getElementById('revenueDescription').value = '';
+
+            updateAllDisplays();
+            saveData();
+            showNotification(`Added ${amount.toFixed(2)} revenue!`, 'success');
+        }
+
+        function addExpense() {
+            if (!isAuthenticated) return;
+            
+            const amount = parseFloat(document.getElementById('expenseAmount').value);
+            const description = document.getElementById('expenseDescription').value;
+            const category = document.getElementById('expenseCategory').value;
+
+            if (!amount || amount <= 0) {
+                showNotification('Please enter a valid amount', 'error');
+                return;
+            }
+
+            if (amount > currentBalance) {
+                if (!confirm(`This expense (${amount.toFixed(2)}) exceeds your current balance (${currentBalance.toFixed(2)}). Continue?`)) {
+                    return;
+                }
+            }
+
+            const transaction = {
+                id: Date.now(),
+                type: 'expense',
+                amount: amount,
+                description: description || 'Expense',
+                category: category,
+                date: new Date(),
+                timestamp: Date.now()
+            };
+
+            transactions.unshift(transaction);
+            currentBalance -= amount;
+
+            // Clear inputs
+            document.getElementById('expenseAmount').value = '';
+            document.getElementById('expenseDescription').value = '';
+
+            updateAllDisplays();
+            saveData();
+            showNotification(`Added ${amount.toFixed(2)} expense!`, 'expense');
+        }
+
+        function deleteTransaction(id) {
+            if (!isAuthenticated) return;
+            
+            const transaction = transactions.find(t => t.id === id);
+            if (transaction) {
+                if (transaction.type === 'income') {
+                    currentBalance -= transaction.amount;
+                } else {
+                    currentBalance += transaction.amount;
+                }
+                transactions = transactions.filter(t => t.id !== id);
+                updateAllDisplays();
+                saveData();
+                showNotification('Transaction deleted!', 'info');
+            }
+        }
+
+        // Links functions
+        function addLink() {
+            if (!isAuthenticated) return;
+            
+            const title = document.getElementById('linkTitle').value;
+            const url = document.getElementById('linkUrl').value;
+            const category = document.getElementById('linkCategory').value;
+
+            if (!title || !url) {
+                showNotification('Please enter both title and URL', 'error');
+                return;
+            }
+
+            // Add protocol if missing
+            let formattedUrl = url;
+            if (!url.startsWith('http://') && !url.startsWith('https://')) {
+                formattedUrl = 'https://' + url;
+            }
+
+            const link = {
+                id: Date.now(),
+                title: title,
+                url: formattedUrl,
+                category: category || 'General',
+                dateAdded: new Date()
+            };
+
+            links.unshift(link);
+
+            // Clear inputs
+            document.getElementById('linkTitle').value = '';
+            document.getElementById('linkUrl').value = '';
+            document.getElementById('linkCategory').value = '';
+
+            updateLinksDisplay();
+            updateDashboardStats();
+            saveData();
+            showNotification('Link added successfully!', 'success');
+        }
+
+        function deleteLink(id) {
+            if (!isAuthenticated) return;
+            
+            links = links.filter(l => l.id !== id);
+            updateLinksDisplay();
+            updateDashboardStats();
+            saveData();
+            showNotification('Link deleted!', 'info');
+        }
+
+        // Todo functions
+        function addTodo() {
+            if (!isAuthenticated) return;
+            
+            const title = document.getElementById('todoTitle').value;
+            const description = document.getElementById('todoDescription').value;
+            const priority = document.getElementById('todoPriority').value;
+            const dueDate = document.getElementById('todoDueDate').value;
+
+            if (!title.trim()) {
+                showNotification('Please enter a task title', 'error');
+                return;
+            }
+
+            const todo = {
+                id: Date.now(),
+                title: title.trim(),
+                description: description.trim(),
+                priority: priority,
+                dueDate: dueDate ? new Date(dueDate) : null,
+                completed: false,
+                createdAt: new Date()
+            };
+
+            todos.unshift(todo);
+
+            // Clear inputs
+            document.getElementById('todoTitle').value = '';
+            document.getElementById('todoDescription').value = '';
+            document.getElementById('todoDueDate').value = '';
+
+            updateTodosDisplay();
+            updateDashboardStats();
+            saveData();
+            showNotification('Task added successfully!', 'success');
+        }
+
+        function toggleTodo(id) {
+            if (!isAuthenticated) return;
+            
+            const todo = todos.find(t => t.id === id);
+            if (todo) {
+                todo.completed = !todo.completed;
+                updateTodosDisplay();
+                updateDashboardStats();
+                saveData();
+                showNotification(todo.completed ? 'Task completed!' : 'Task reopened!', 'info');
+            }
+        }
+
+        function deleteTodo(id) {
+            if (!isAuthenticated) return;
+            
+            todos = todos.filter(t => t.id !== id);
+            updateTodosDisplay();
+            updateDashboardStats();
+            saveData();
+            showNotification('Task deleted!', 'info');
+        }
+
+        // Image gallery functions
+        function handleDragOver(e) {
+            e.preventDefault();
+            e.currentTarget.classList.add('dragover');
+        }
+
+        function handleDragLeave(e) {
+            e.currentTarget.classList.remove('dragover');
+        }
+
+        function handleDrop(e) {
+            e.preventDefault();
+            e.currentTarget.classList.remove('dragover');
+            const files = e.dataTransfer.files;
+            handleFiles(files);
+        }
+
+        function handleFileSelect(e) {
+            const files = e.target.files;
+            handleFiles(files);
+        }
+
+        function handleFiles(files) {
+            if (!isAuthenticated) return;
+            
+            for (let file of files) {
+                if (file.type.startsWith('image/')) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        addImageToGallery(e.target.result, file.name);
+                    };
+                    reader.readAsDataURL(file);
+                }
+            }
+        }
+
+        function addImageToGallery(imageSrc, fileName) {
+            if (!isAuthenticated) return;
+            
+            const title = document.getElementById('imageTitle').value || fileName;
+            const category = document.getElementById('imageCategory').value || 'General';
+
+            const image = {
+                id: Date.now() + Math.random(),
+                src: imageSrc,
+                title: title,
+                category: category,
+                fileName: fileName,
+                uploadDate: new Date()
+            };
+
+            images.unshift(image);
+
+            // Clear inputs
+            document.getElementById('imageTitle').value = '';
+            document.getElementById('imageCategory').value = '';
+
+            updateGalleryDisplay();
+            updateDashboardStats();
+            saveData();
+            showNotification('Image uploaded successfully!', 'success');
+        }
+
+        function deleteImage(id) {
+            if (!isAuthenticated) return;
+            
+            images = images.filter(img => img.id !== id);
+            updateGalleryDisplay();
+            updateDashboardStats();
+            saveData();
+            showNotification('Image deleted!', 'info');
+        }
+
+        function openImageModal(imageSrc) {
+            document.getElementById('modalImage').src = imageSrc;
+            document.getElementById('imageModal').classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('imageModal').classList.remove('active');
+        }
+
+        // Display update functions
+        function updateAllDisplays() {
+            updateBalance();
+            updateRevenueStats();
+            updateTransactionsList();
+            updateLinksDisplay();
+            updateTodosDisplay();
+            updateGalleryDisplay();
+            updateDashboardStats();
+        }
+
+        function updateBalance() {
+            document.getElementById('currentBalance').textContent = `${currentBalance.toFixed(2)}`;
+            document.getElementById('dashboardBalance').textContent = `${currentBalance.toFixed(2)}`;
+        }
+
+        function updateRevenueStats() {
+            const today = new Date();
+            const startOfToday = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+            const startOfWeek = new Date(today.getFullYear(), today.getMonth(), today.getDate() - today.getDay());
+            const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+
+            const todayRevenue = transactions
+                .filter(t => t.type === 'income' && t.date >= startOfToday)
+                .reduce((sum, t) => sum + t.amount, 0);
+
+            const weekRevenue = transactions
+                .filter(t => t.type === 'income' && t.date >= startOfWeek)
+                .reduce((sum, t) => sum + t.amount, 0);
+
+            const monthRevenue = transactions
+                .filter(t => t.type === 'income' && t.date >= startOfMonth)
+                .reduce((sum, t) => sum + t.amount, 0);
+
+            const totalExpenses = transactions
+                .filter(t => t.type === 'expense')
+                .reduce((sum, t) => sum + t.amount, 0);
+
+            document.getElementById('todayRevenue').textContent = `${todayRevenue.toFixed(2)}`;
+            document.getElementById('weekRevenue').textContent = `${weekRevenue.toFixed(2)}`;
+            document.getElementById('monthRevenue').textContent = `${monthRevenue.toFixed(2)}`;
+            document.getElementById('totalExpenses').textContent = `${totalExpenses.toFixed(2)}`;
+            document.getElementById('dashboardTodayRevenue').textContent = `${todayRevenue.toFixed(2)}`;
+        }
+
+        function updateTransactionsList() {
+            const listElement = document.getElementById('transactionList');
+            
+            if (transactions.length === 0) {
+                listElement.innerHTML = `
+                    <div style="text-align: center; color: #666; padding: 40px;">
+                        No transactions yet. Add some revenue or expenses to get started!
+                    </div>
+                `;
+                return;
+            }
+
+            const recentTransactions = transactions.slice(0, 10);
+            
+            listElement.innerHTML = recentTransactions.map(transaction => `
+                <div class="transaction-item">
+                    <div class="transaction-details">
+                        <strong>${transaction.description}</strong>
+                        <div class="transaction-category">${transaction.category}</div>
+                        <div style="font-size: 0.8em; color: #666; margin-top: 3px;">
+                            ${transaction.date.toLocaleDateString()} ${transaction.date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
+                        </div>
+                    </div>
+                    <div class="transaction-amount ${transaction.type}">
+                        ${transaction.type === 'income' ? '+' : '-'}${transaction.amount.toFixed(2)}
+                    </div>
+                    <button class="delete-btn" onclick="deleteTransaction(${transaction.id})">×</button>
+                </div>
+            `).join('');
+        }
+
+        function updateLinksDisplay() {
+            const gridElement = document.getElementById('linksGrid');
+            
+            if (links.length === 0) {
+                gridElement.innerHTML = `
+                    <div style="text-align: center; color: #666; padding: 40px; grid-column: 1/-1;">
+                        No links added yet. Add your favorite websites above!
+                    </div>
+                `;
+                return;
+            }
+
+            gridElement.innerHTML = links.map(link => `
+                <div class="link-item" style="position: relative;">
+                    <a href="${link.url}" target="_blank" style="color: inherit; text-decoration: none;">
+                        <div class="link-title">${link.title}</div>
+                        <div class="link-url">${link.url}</div>
+                        <div class="link-category">${link.category}</div>
+                    </a>
+                    <button class="delete-btn" style="position: absolute; top: 15px; right: 15px;" 
+                            onclick="event.preventDefault(); deleteLink(${link.id})">×</button>
+                </div>
+            `).join('');
+        }
+
+        function updateTodosDisplay() {
+            const todosElement = document.getElementById('todosList');
+            
+            if (todos.length === 0) {
+                todosElement.innerHTML = `
+                    <div style="text-align: center; color: #666; padding: 40px;">
+                        No tasks yet. Add some tasks to get started!
+                    </div>
+                `;
+                return;
+            }
+
+            // Sort todos: incomplete first, then by priority
+            const sortedTodos = [...todos].sort((a, b) => {
+                if (a.completed !== b.completed) {
+                    return a.completed - b.completed;
+                }
+                const priorityOrder = { high: 3, medium: 2, low: 1 };
+                return priorityOrder[b.priority] - priorityOrder[a.priority];
+            });
+
+            todosElement.innerHTML = sortedTodos.map(todo => `
+                <div class="todo-item ${todo.completed ? 'completed' : ''}">
+                    <input type="checkbox" class="todo-checkbox" ${todo.completed ? 'checked' : ''} 
+                           onchange="toggleTodo(${todo.id})">
+                    <div class="todo-content">
+                        <div class="todo-title">${todo.title}</div>
+                        ${todo.description ? `<div class="todo-description">${todo.description}</div>` : ''}
+                        <div style="margin-top: 8px;">
+                            <span class="todo-priority priority-${todo.priority}">${todo.priority.toUpperCase()}</span>
+                            ${todo.dueDate ? `<span style="font-size: 0.8em; color: #666; margin-left: 10px;">Due: ${todo.dueDate.toLocaleDateString()}</span>` : ''}
+                        </div>
+                    </div>
+                    <button class="delete-btn" onclick="deleteTodo(${todo.id})">×</button>
+                </div>
+            `).join('');
+        }
+
+        function updateGalleryDisplay() {
+            const galleryElement = document.getElementById('galleryGrid');
+            
+            if (images.length === 0) {
+                galleryElement.innerHTML = `
+                    <div style="text-align: center; color: #666; padding: 40px; grid-column: 1/-1;">
+                        No images yet. Upload some images to get started!
+                    </div>
+                `;
+                return;
+            }
+
+            galleryElement.innerHTML = images.map(image => `
+                <div class="gallery-item">
+                    <img src="${image.src}" alt="${image.title}" class="gallery-image" 
+                         onclick="openImageModal('${image.src}')">
+                    <div class="gallery-info">
+                        <div class="gallery-title">${image.title}</div>
+                        <div class="gallery-category">${image.category}</div>
+                        <button class="delete-btn" style="margin-top: 10px;" onclick="deleteImage(${image.id})">Delete</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function updateDashboardStats() {
+            const activeTodos = todos.filter(t => !t.completed).length;
+            document.getElementById('dashboardTotalTodos').textContent = activeTodos;
+            document.getElementById('dashboardTotalLinks').textContent = links.length;
+            document.getElementById('dashboardTotalImages').textContent = images.length;
+        }
+
+        function showNotification(message, type) {
+            const notification = document.createElement('div');
+            const colors = {
+                success: '#27ae60',
+                error: '#e74c3c',
+                expense: '#e74c3c',
+                info: '#3498db'
+            };
+            
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                padding: 15px 25px;
+                background: ${colors[type] || colors.info};
+                color: white;
+                border-radius: 10px;
+                box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+                z-index: 1000;
+                transform: translateX(400px);
+                transition: transform 0.3s ease;
+                font-weight: 500;
+            `;
+            notification.textContent = message;
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => notification.style.transform = 'translateX(0)', 100);
+            setTimeout(() => notification.style.transform = 'translateX(400px)', 3000);
+            setTimeout(() => document.body.removeChild(notification), 3300);
+        }
+
+        // Initialize the app
+        init();
+    </script>
+</body>
+</html><!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -18,10 +752,112 @@
             color: #333;
         }
 
-        .dashboard-container {
+        /* Login Screen Styles */
+        .login-container {
             display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .login-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+            border: 1px solid rgba(255,255,255,0.3);
+            text-align: center;
+            max-width: 400px;
+            width: 100%;
+        }
+
+        .login-title {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .login-subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 1.1em;
+        }
+
+        .key-input {
+            width: 100%;
+            padding: 15px;
+            font-size: 1.2em;
+            text-align: center;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            letter-spacing: 2px;
+            font-family: monospace;
+            transition: all 0.3s ease;
+        }
+
+        .key-input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 10px rgba(102, 126, 234, 0.3);
+        }
+
+        .key-input.error {
+            border-color: #e74c3c;
+            animation: shake 0.5s ease-in-out;
+        }
+
+        @keyframes shake {
+            0%, 20%, 40%, 60%, 80% { transform: translateX(-5px); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(5px); }
+            100% { transform: translateX(0); }
+        }
+
+        .login-btn {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 1.1em;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            width: 100%;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .login-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        .error-message {
+            color: #e74c3c;
+            margin-top: 15px;
+            font-size: 0.9em;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .error-message.show {
+            opacity: 1;
+        }
+
+        /* Dashboard Styles (unchanged from original) */
+        .dashboard-container {
+            display: none;
             height: 100vh;
             overflow: hidden;
+        }
+
+        .dashboard-container.authenticated {
+            display: flex;
         }
 
         /* Sidebar Styles */
@@ -81,6 +917,22 @@
             margin-right: 15px;
             width: 20px;
             text-align: center;
+        }
+
+        .logout-btn {
+            margin: 20px 25px 0;
+            background: rgba(231, 76, 60, 0.2);
+            border: 1px solid rgba(231, 76, 60, 0.5);
+            color: white;
+            padding: 10px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .logout-btn:hover {
+            background: rgba(231, 76, 60, 0.4);
         }
 
         /* Main Content */
@@ -612,10 +1464,46 @@
         ::-webkit-scrollbar-thumb:hover {
             background: rgba(255, 255, 255, 0.5);
         }
+
+        /* Save Status Indicator */
+        .save-status {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(39, 174, 96, 0.9);
+            color: white;
+            padding: 10px 15px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            z-index: 100;
+        }
+
+        .save-status.show {
+            opacity: 1;
+        }
     </style>
 </head>
 <body>
-    <div class="dashboard-container">
+    <!-- Login Screen -->
+    <div class="login-container" id="loginContainer">
+        <div class="login-card">
+            <div class="login-title">🔐 Dashboard</div>
+            <div class="login-subtitle">Enter access key to continue</div>
+            <input type="password" 
+                   id="keyInput" 
+                   class="key-input" 
+                   placeholder="Enter Key" 
+                   maxlength="9"
+                   autocomplete="off">
+            <button class="login-btn" onclick="authenticate()">LOGIN</button>
+            <div class="error-message" id="errorMessage">Invalid access key. Please try again.</div>
+        </div>
+    </div>
+
+    <!-- Dashboard -->
+    <div class="dashboard-container" id="dashboardContainer">
         <!-- Sidebar Navigation -->
         <nav class="sidebar">
             <div class="logo">
@@ -646,6 +1534,10 @@
             <div class="nav-item" data-tab="gallery">
                 <span class="nav-icon">🖼️</span>
                 <span>Gallery</span>
+            </div>
+
+            <div class="logout-btn" onclick="logout()">
+                🔐 Logout
             </div>
         </nav>
 
@@ -790,657 +1682,4 @@
                     <div class="card">
                         <h2>📋 Recent Transactions</h2>
                         <div class="transaction-list" id="transactionList">
-                            <div style="text-align: center; color: #666; padding: 40px;">
-                                No transactions yet. Add some revenue or expenses to get started!
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Links Tab -->
-            <div id="links" class="tab-content">
-                <div class="page-header">
-                    <h1>🔗 Link Management</h1>
-                    <p>Organize your important websites</p>
-                </div>
-
-                <div class="card">
-                    <h2>➕ Add New Link</h2>
-                    <div class="input-group">
-                        <input type="text" id="linkTitle" placeholder="Website Title">
-                        <input type="url" id="linkUrl" placeholder="Website URL">
-                        <input type="text" id="linkCategory" placeholder="Category">
-                        <button class="btn" onclick="addLink()">Add Link</button>
-                    </div>
-                </div>
-
-                <div class="card">
-                    <h2>🌐 Your Links</h2>
-                    <div class="links-grid" id="linksGrid">
-                        <div style="text-align: center; color: #666; padding: 40px; grid-column: 1/-1;">
-                            No links added yet. Add your favorite websites above!
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- To-Do List Tab -->
-            <div id="todos" class="tab-content">
-                <div class="page-header">
-                    <h1>✅ To-Do List</h1>
-                    <p>Manage your tasks and stay productive</p>
-                </div>
-
-                <div class="card">
-                    <h2>➕ Add New Task</h2>
-                    <div class="input-group">
-                        <input type="text" id="todoTitle" placeholder="Task title">
-                        <textarea id="todoDescription" placeholder="Task description (optional)"></textarea>
-                    </div>
-                    <div class="input-group">
-                        <select id="todoPriority">
-                            <option value="low">Low Priority</option>
-                            <option value="medium" selected>Medium Priority</option>
-                            <option value="high">High Priority</option>
-                        </select>
-                        <input type="date" id="todoDueDate">
-                        <button class="btn btn-success" onclick="addTodo()">Add Task</button>
-                    </div>
-                </div>
-
-                <div class="card">
-                    <h2>📝 Your Tasks</h2>
-                    <div id="todosList">
-                        <div style="text-align: center; color: #666; padding: 40px;">
-                            No tasks yet. Add some tasks to get started!
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Gallery Tab -->
-            <div id="gallery" class="tab-content">
-                <div class="page-header">
-                    <h1>🖼️ Image Gallery</h1>
-                    <p>Organize and view your images</p>
-                </div>
-
-                <div class="card">
-                    <h2>📁 Upload Images</h2>
-                    <div class="upload-area" id="uploadArea">
-                        <div style="font-size: 3em; margin-bottom: 20px;">📸</div>
-                        <h3>Drop images here or click to upload</h3>
-                        <p>Supports JPG, PNG, GIF files</p>
-                        <input type="file" id="imageUpload" multiple accept="image/*" style="display: none;">
-                    </div>
-                    <div class="input-group mt-20">
-                        <input type="text" id="imageTitle" placeholder="Image title (optional)">
-                        <input type="text" id="imageCategory" placeholder="Category (optional)">
-                    </div>
-                </div>
-
-                <div class="card">
-                    <h2>🎨 Your Gallery</h2>
-                    <div class="gallery-grid" id="galleryGrid">
-                        <div style="text-align: center; color: #666; padding: 40px; grid-column: 1/-1;">
-                            No images yet. Upload some images to get started!
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </main>
-    </div>
-
-    <!-- Image Modal -->
-    <div class="modal" id="imageModal">
-        <div class="modal-content">
-            <img id="modalImage" alt="Full size image">
-        </div>
-    </div>
-
-    <script>
-        // Global data storage
-        let currentBalance = 0;
-        let transactions = [];
-        let links = [];
-        let todos = [];
-        let images = [];
-        let currentTab = 'dashboard';
-
-        // Initialize the application
-        function init() {
-            setupNavigation();
-            setupEventListeners();
-            updateAllDisplays();
-        }
-
-        // Navigation setup
-        function setupNavigation() {
-            const navItems = document.querySelectorAll('.nav-item');
-            navItems.forEach(item => {
-                item.addEventListener('click', function() {
-                    const tabId = this.getAttribute('data-tab');
-                    switchTab(tabId);
-                });
-            });
-        }
-
-        function switchTab(tabId) {
-            // Update navigation
-            document.querySelectorAll('.nav-item').forEach(item => {
-                item.classList.remove('active');
-            });
-            document.querySelector(`[data-tab="${tabId}"]`).classList.add('active');
-
-            // Update content
-            document.querySelectorAll('.tab-content').forEach(content => {
-                content.classList.remove('active');
-            });
-            document.getElementById(tabId).classList.add('active');
-
-            currentTab = tabId;
-        }
-
-        // Event listeners setup
-        function setupEventListeners() {
-            // Period selector buttons
-            document.querySelectorAll('.period-btn').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    document.querySelectorAll('.period-btn').forEach(b => b.classList.remove('active'));
-                    this.classList.add('active');
-                    updateRevenueStats();
-                });
-            });
-
-            // Enter key handlers
-            document.getElementById('revenueAmount').addEventListener('keypress', function(e) {
-                if (e.key === 'Enter') addRevenue();
-            });
-            
-            document.getElementById('expenseAmount').addEventListener('keypress', function(e) {
-                if (e.key === 'Enter') addExpense();
-            });
-            
-            document.getElementById('linkUrl').addEventListener('keypress', function(e) {
-                if (e.key === 'Enter') addLink();
-            });
-
-            document.getElementById('todoTitle').addEventListener('keypress', function(e) {
-                if (e.key === 'Enter') addTodo();
-            });
-
-            // Image upload setup
-            const uploadArea = document.getElementById('uploadArea');
-            const imageUpload = document.getElementById('imageUpload');
-
-            uploadArea.addEventListener('click', () => imageUpload.click());
-            uploadArea.addEventListener('dragover', handleDragOver);
-            uploadArea.addEventListener('drop', handleDrop);
-            uploadArea.addEventListener('dragleave', handleDragLeave);
-            imageUpload.addEventListener('change', handleFileSelect);
-
-            // Modal setup
-            document.getElementById('imageModal').addEventListener('click', closeModal);
-        }
-
-        // Revenue functions
-        function addRevenue() {
-            const amount = parseFloat(document.getElementById('revenueAmount').value);
-            const description = document.getElementById('revenueDescription').value;
-            const category = document.getElementById('revenueCategory').value;
-
-            if (!amount || amount <= 0) {
-                showNotification('Please enter a valid amount', 'error');
-                return;
-            }
-
-            const transaction = {
-                id: Date.now(),
-                type: 'income',
-                amount: amount,
-                description: description || 'Revenue',
-                category: category,
-                date: new Date(),
-                timestamp: Date.now()
-            };
-
-            transactions.unshift(transaction);
-            currentBalance += amount;
-
-            // Clear inputs
-            document.getElementById('revenueAmount').value = '';
-            document.getElementById('revenueDescription').value = '';
-
-            updateAllDisplays();
-            showNotification(`Added $${amount.toFixed(2)} revenue!`, 'success');
-        }
-
-        function addExpense() {
-            const amount = parseFloat(document.getElementById('expenseAmount').value);
-            const description = document.getElementById('expenseDescription').value;
-            const category = document.getElementById('expenseCategory').value;
-
-            if (!amount || amount <= 0) {
-                showNotification('Please enter a valid amount', 'error');
-                return;
-            }
-
-            if (amount > currentBalance) {
-                if (!confirm(`This expense ($${amount.toFixed(2)}) exceeds your current balance ($${currentBalance.toFixed(2)}). Continue?`)) {
-                    return;
-                }
-            }
-
-            const transaction = {
-                id: Date.now(),
-                type: 'expense',
-                amount: amount,
-                description: description || 'Expense',
-                category: category,
-                date: new Date(),
-                timestamp: Date.now()
-            };
-
-            transactions.unshift(transaction);
-            currentBalance -= amount;
-
-            // Clear inputs
-            document.getElementById('expenseAmount').value = '';
-            document.getElementById('expenseDescription').value = '';
-
-            updateAllDisplays();
-            showNotification(`Added $${amount.toFixed(2)} expense!`, 'expense');
-        }
-
-        function deleteTransaction(id) {
-            const transaction = transactions.find(t => t.id === id);
-            if (transaction) {
-                if (transaction.type === 'income') {
-                    currentBalance -= transaction.amount;
-                } else {
-                    currentBalance += transaction.amount;
-                }
-                transactions = transactions.filter(t => t.id !== id);
-                updateAllDisplays();
-                showNotification('Transaction deleted!', 'info');
-            }
-        }
-
-        // Links functions
-        function addLink() {
-            const title = document.getElementById('linkTitle').value;
-            const url = document.getElementById('linkUrl').value;
-            const category = document.getElementById('linkCategory').value;
-
-            if (!title || !url) {
-                showNotification('Please enter both title and URL', 'error');
-                return;
-            }
-
-            // Add protocol if missing
-            let formattedUrl = url;
-            if (!url.startsWith('http://') && !url.startsWith('https://')) {
-                formattedUrl = 'https://' + url;
-            }
-
-            const link = {
-                id: Date.now(),
-                title: title,
-                url: formattedUrl,
-                category: category || 'General',
-                dateAdded: new Date()
-            };
-
-            links.unshift(link);
-
-            // Clear inputs
-            document.getElementById('linkTitle').value = '';
-            document.getElementById('linkUrl').value = '';
-            document.getElementById('linkCategory').value = '';
-
-            updateLinksDisplay();
-            updateDashboardStats();
-            showNotification('Link added successfully!', 'success');
-        }
-
-        function deleteLink(id) {
-            links = links.filter(l => l.id !== id);
-            updateLinksDisplay();
-            updateDashboardStats();
-            showNotification('Link deleted!', 'info');
-        }
-
-        // Todo functions
-        function addTodo() {
-            const title = document.getElementById('todoTitle').value;
-            const description = document.getElementById('todoDescription').value;
-            const priority = document.getElementById('todoPriority').value;
-            const dueDate = document.getElementById('todoDueDate').value;
-
-            if (!title.trim()) {
-                showNotification('Please enter a task title', 'error');
-                return;
-            }
-
-            const todo = {
-                id: Date.now(),
-                title: title.trim(),
-                description: description.trim(),
-                priority: priority,
-                dueDate: dueDate ? new Date(dueDate) : null,
-                completed: false,
-                createdAt: new Date()
-            };
-
-            todos.unshift(todo);
-
-            // Clear inputs
-            document.getElementById('todoTitle').value = '';
-            document.getElementById('todoDescription').value = '';
-            document.getElementById('todoDueDate').value = '';
-
-            updateTodosDisplay();
-            updateDashboardStats();
-            showNotification('Task added successfully!', 'success');
-        }
-
-        function toggleTodo(id) {
-            const todo = todos.find(t => t.id === id);
-            if (todo) {
-                todo.completed = !todo.completed;
-                updateTodosDisplay();
-                updateDashboardStats();
-                showNotification(todo.completed ? 'Task completed!' : 'Task reopened!', 'info');
-            }
-        }
-
-        function deleteTodo(id) {
-            todos = todos.filter(t => t.id !== id);
-            updateTodosDisplay();
-            updateDashboardStats();
-            showNotification('Task deleted!', 'info');
-        }
-
-        // Image gallery functions
-        function handleDragOver(e) {
-            e.preventDefault();
-            e.currentTarget.classList.add('dragover');
-        }
-
-        function handleDragLeave(e) {
-            e.currentTarget.classList.remove('dragover');
-        }
-
-        function handleDrop(e) {
-            e.preventDefault();
-            e.currentTarget.classList.remove('dragover');
-            const files = e.dataTransfer.files;
-            handleFiles(files);
-        }
-
-        function handleFileSelect(e) {
-            const files = e.target.files;
-            handleFiles(files);
-        }
-
-        function handleFiles(files) {
-            for (let file of files) {
-                if (file.type.startsWith('image/')) {
-                    const reader = new FileReader();
-                    reader.onload = function(e) {
-                        addImageToGallery(e.target.result, file.name);
-                    };
-                    reader.readAsDataURL(file);
-                }
-            }
-        }
-
-        function addImageToGallery(imageSrc, fileName) {
-            const title = document.getElementById('imageTitle').value || fileName;
-            const category = document.getElementById('imageCategory').value || 'General';
-
-            const image = {
-                id: Date.now() + Math.random(),
-                src: imageSrc,
-                title: title,
-                category: category,
-                fileName: fileName,
-                uploadDate: new Date()
-            };
-
-            images.unshift(image);
-
-            // Clear inputs
-            document.getElementById('imageTitle').value = '';
-            document.getElementById('imageCategory').value = '';
-
-            updateGalleryDisplay();
-            updateDashboardStats();
-            showNotification('Image uploaded successfully!', 'success');
-        }
-
-        function deleteImage(id) {
-            images = images.filter(img => img.id !== id);
-            updateGalleryDisplay();
-            updateDashboardStats();
-            showNotification('Image deleted!', 'info');
-        }
-
-        function openImageModal(imageSrc) {
-            document.getElementById('modalImage').src = imageSrc;
-            document.getElementById('imageModal').classList.add('active');
-        }
-
-        function closeModal() {
-            document.getElementById('imageModal').classList.remove('active');
-        }
-
-        // Display update functions
-        function updateAllDisplays() {
-            updateBalance();
-            updateRevenueStats();
-            updateTransactionsList();
-            updateLinksDisplay();
-            updateTodosDisplay();
-            updateGalleryDisplay();
-            updateDashboardStats();
-        }
-
-        function updateBalance() {
-            document.getElementById('currentBalance').textContent = `$${currentBalance.toFixed(2)}`;
-            document.getElementById('dashboardBalance').textContent = `$${currentBalance.toFixed(2)}`;
-        }
-
-        function updateRevenueStats() {
-            const today = new Date();
-            const startOfToday = new Date(today.getFullYear(), today.getMonth(), today.getDate());
-            const startOfWeek = new Date(today.getFullYear(), today.getMonth(), today.getDate() - today.getDay());
-            const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
-
-            const todayRevenue = transactions
-                .filter(t => t.type === 'income' && t.date >= startOfToday)
-                .reduce((sum, t) => sum + t.amount, 0);
-
-            const weekRevenue = transactions
-                .filter(t => t.type === 'income' && t.date >= startOfWeek)
-                .reduce((sum, t) => sum + t.amount, 0);
-
-            const monthRevenue = transactions
-                .filter(t => t.type === 'income' && t.date >= startOfMonth)
-                .reduce((sum, t) => sum + t.amount, 0);
-
-            const totalExpenses = transactions
-                .filter(t => t.type === 'expense')
-                .reduce((sum, t) => sum + t.amount, 0);
-
-            document.getElementById('todayRevenue').textContent = `$${todayRevenue.toFixed(2)}`;
-            document.getElementById('weekRevenue').textContent = `$${weekRevenue.toFixed(2)}`;
-            document.getElementById('monthRevenue').textContent = `$${monthRevenue.toFixed(2)}`;
-            document.getElementById('totalExpenses').textContent = `$${totalExpenses.toFixed(2)}`;
-            document.getElementById('dashboardTodayRevenue').textContent = `$${todayRevenue.toFixed(2)}`;
-        }
-
-        function updateTransactionsList() {
-            const listElement = document.getElementById('transactionList');
-            
-            if (transactions.length === 0) {
-                listElement.innerHTML = `
-                    <div style="text-align: center; color: #666; padding: 40px;">
-                        No transactions yet. Add some revenue or expenses to get started!
-                    </div>
-                `;
-                return;
-            }
-
-            const recentTransactions = transactions.slice(0, 10);
-            
-            listElement.innerHTML = recentTransactions.map(transaction => `
-                <div class="transaction-item">
-                    <div class="transaction-details">
-                        <strong>${transaction.description}</strong>
-                        <div class="transaction-category">${transaction.category}</div>
-                        <div style="font-size: 0.8em; color: #666; margin-top: 3px;">
-                            ${transaction.date.toLocaleDateString()} ${transaction.date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
-                        </div>
-                    </div>
-                    <div class="transaction-amount ${transaction.type}">
-                        ${transaction.type === 'income' ? '+' : '-'}$${transaction.amount.toFixed(2)}
-                    </div>
-                    <button class="delete-btn" onclick="deleteTransaction(${transaction.id})">×</button>
-                </div>
-            `).join('');
-        }
-
-        function updateLinksDisplay() {
-            const gridElement = document.getElementById('linksGrid');
-            
-            if (links.length === 0) {
-                gridElement.innerHTML = `
-                    <div style="text-align: center; color: #666; padding: 40px; grid-column: 1/-1;">
-                        No links added yet. Add your favorite websites above!
-                    </div>
-                `;
-                return;
-            }
-
-            gridElement.innerHTML = links.map(link => `
-                <div class="link-item" style="position: relative;">
-                    <a href="${link.url}" target="_blank" style="color: inherit; text-decoration: none;">
-                        <div class="link-title">${link.title}</div>
-                        <div class="link-url">${link.url}</div>
-                        <div class="link-category">${link.category}</div>
-                    </a>
-                    <button class="delete-btn" style="position: absolute; top: 15px; right: 15px;" 
-                            onclick="event.preventDefault(); deleteLink(${link.id})">×</button>
-                </div>
-            `).join('');
-        }
-
-        function updateTodosDisplay() {
-            const todosElement = document.getElementById('todosList');
-            
-            if (todos.length === 0) {
-                todosElement.innerHTML = `
-                    <div style="text-align: center; color: #666; padding: 40px;">
-                        No tasks yet. Add some tasks to get started!
-                    </div>
-                `;
-                return;
-            }
-
-            // Sort todos: incomplete first, then by priority
-            const sortedTodos = [...todos].sort((a, b) => {
-                if (a.completed !== b.completed) {
-                    return a.completed - b.completed;
-                }
-                const priorityOrder = { high: 3, medium: 2, low: 1 };
-                return priorityOrder[b.priority] - priorityOrder[a.priority];
-            });
-
-            todosElement.innerHTML = sortedTodos.map(todo => `
-                <div class="todo-item ${todo.completed ? 'completed' : ''}">
-                    <input type="checkbox" class="todo-checkbox" ${todo.completed ? 'checked' : ''} 
-                           onchange="toggleTodo(${todo.id})">
-                    <div class="todo-content">
-                        <div class="todo-title">${todo.title}</div>
-                        ${todo.description ? `<div class="todo-description">${todo.description}</div>` : ''}
-                        <div style="margin-top: 8px;">
-                            <span class="todo-priority priority-${todo.priority}">${todo.priority.toUpperCase()}</span>
-                            ${todo.dueDate ? `<span style="font-size: 0.8em; color: #666; margin-left: 10px;">Due: ${todo.dueDate.toLocaleDateString()}</span>` : ''}
-                        </div>
-                    </div>
-                    <button class="delete-btn" onclick="deleteTodo(${todo.id})">×</button>
-                </div>
-            `).join('');
-        }
-
-        function updateGalleryDisplay() {
-            const galleryElement = document.getElementById('galleryGrid');
-            
-            if (images.length === 0) {
-                galleryElement.innerHTML = `
-                    <div style="text-align: center; color: #666; padding: 40px; grid-column: 1/-1;">
-                        No images yet. Upload some images to get started!
-                    </div>
-                `;
-                return;
-            }
-
-            galleryElement.innerHTML = images.map(image => `
-                <div class="gallery-item">
-                    <img src="${image.src}" alt="${image.title}" class="gallery-image" 
-                         onclick="openImageModal('${image.src}')">
-                    <div class="gallery-info">
-                        <div class="gallery-title">${image.title}</div>
-                        <div class="gallery-category">${image.category}</div>
-                        <button class="delete-btn" style="margin-top: 10px;" onclick="deleteImage(${image.id})">Delete</button>
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        function updateDashboardStats() {
-            const activeTodos = todos.filter(t => !t.completed).length;
-            document.getElementById('dashboardTotalTodos').textContent = activeTodos;
-            document.getElementById('dashboardTotalLinks').textContent = links.length;
-            document.getElementById('dashboardTotalImages').textContent = images.length;
-        }
-
-        function showNotification(message, type) {
-            const notification = document.createElement('div');
-            const colors = {
-                success: '#27ae60',
-                error: '#e74c3c',
-                expense: '#e74c3c',
-                info: '#3498db'
-            };
-            
-            notification.style.cssText = `
-                position: fixed;
-                top: 20px;
-                right: 20px;
-                padding: 15px 25px;
-                background: ${colors[type] || colors.info};
-                color: white;
-                border-radius: 10px;
-                box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-                z-index: 1000;
-                transform: translateX(400px);
-                transition: transform 0.3s ease;
-                font-weight: 500;
-            `;
-            notification.textContent = message;
-            
-            document.body.appendChild(notification);
-            
-            setTimeout(() => notification.style.transform = 'translateX(0)', 100);
-            setTimeout(() => notification.style.transform = 'translateX(400px)', 3000);
-            setTimeout(() => document.body.removeChild(notification), 3300);
-        }
-
-        // Initialize the app
-        init();
-    </script>
-</body>
-  </html>
+                            <div style="
