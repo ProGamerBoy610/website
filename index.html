@@ -1,1587 +1,309 @@
+// ===== FILE 1: package.json =====
+{
+  "name": "discord-bot-website",
+  "version": "1.0.0",
+  "description": "Discord Bot with Website",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "discord.js": "^14.14.1",
+    "express": "^4.18.2"
+  },
+  "engines": {
+    "node": "18.x"
+  }
+}
+
+// ===== FILE 2: server.js =====
+const express = require('express');
+const { Client, GatewayIntentBits } = require('discord.js');
+const path = require('path');
+
+const app = express();
+const PORT = process.env.PORT || 3000;
+
+// Serve static files (HTML, CSS)
+app.use(express.static('public'));
+
+// Discord Bot Setup
+const client = new Client({
+    intents: [
+        GatewayIntentBits.Guilds,
+        GatewayIntentBits.GuildMessages,
+        GatewayIntentBits.MessageContent,
+        GatewayIntentBits.GuildMembers
+    ]
+});
+
+// ===== PASTE YOUR BOT CODE HERE =====
+// Replace this section with your actual bot code
+client.on('ready', () => {
+    console.log(`Bot is online as ${client.user.tag}!`);
+});
+
+client.on('messageCreate', (message) => {
+    if (message.author.bot) return;
+    
+    // Example command - replace with your bot's commands
+    if (message.content === '!ping') {
+        message.reply('Pong! 🏓');
+    }
+    
+    if (message.content === '!hello') {
+        message.reply('Hello there! 👋');
+    }
+});
+// ===== END BOT CODE SECTION =====
+
+// Login bot (you'll need to add your token)
+const BOT_TOKEN = process.env.BOT_TOKEN || 'YOUR_BOT_TOKEN_HERE';
+client.login(BOT_TOKEN);
+
+// Website Routes
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
+
+app.get('/status', (req, res) => {
+    res.json({
+        status: 'online',
+        botName: client.user ? client.user.tag : 'Starting...',
+        servers: client.guilds.cache.size || 0,
+        uptime: process.uptime()
+    });
+});
+
+// Keep the server alive
+app.listen(PORT, () => {
+    console.log(`Website running on port ${PORT}`);
+});
+
+// ===== FILE 3: public/index.html =====
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>All-in-One Dashboard</title>
+    <title>Discord Bot - Online 24/7</title>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
-
+        
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Arial', sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             color: #333;
         }
-
-        .dashboard-container {
-            display: flex;
-            height: 100vh;
-            overflow: hidden;
-        }
-
-        /* Sidebar Styles */
-        .sidebar {
-            width: 280px;
-            background: rgba(0, 0, 0, 0.9);
-            backdrop-filter: blur(20px);
-            color: white;
-            padding: 20px 0;
-            overflow-y: auto;
-            transition: all 0.3s ease;
-            border-right: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .logo {
+        
+        .container {
+            background: white;
+            padding: 3rem;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
             text-align: center;
-            padding: 0 20px 30px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            margin-bottom: 30px;
+            max-width: 600px;
+            width: 90%;
+            animation: fadeIn 0.8s ease-out;
         }
-
-        .logo h1 {
-            font-size: 1.8em;
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            margin-bottom: 5px;
-        }
-
-        .logo p {
-            font-size: 0.9em;
-            opacity: 0.7;
-        }
-
-        .nav-item {
-            display: flex;
-            align-items: center;
-            padding: 15px 25px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            border-left: 3px solid transparent;
-            margin: 5px 0;
-        }
-
-        .nav-item:hover {
-            background: rgba(255, 255, 255, 0.1);
-            border-left-color: #667eea;
-        }
-
-        .nav-item.active {
-            background: rgba(102, 126, 234, 0.2);
-            border-left-color: #667eea;
-        }
-
-        .nav-icon {
-            font-size: 1.2em;
-            margin-right: 15px;
-            width: 20px;
-            text-align: center;
-        }
-
-        /* Main Content */
-        .main-content {
-            flex: 1;
-            overflow-y: auto;
-            padding: 30px;
-            background: rgba(255, 255, 255, 0.05);
-        }
-
-        .tab-content {
-            display: none;
-            animation: fadeIn 0.3s ease-in;
-        }
-
-        .tab-content.active {
-            display: block;
-        }
-
+        
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
+            from { opacity: 0; transform: translateY(30px); }
             to { opacity: 1; transform: translateY(0); }
         }
-
-        .page-header {
-            text-align: center;
-            margin-bottom: 40px;
-            color: white;
-        }
-
-        .page-header h1 {
-            font-size: 2.5em;
-            margin-bottom: 10px;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
-        }
-
-        .page-header p {
-            font-size: 1.1em;
-            opacity: 0.9;
-        }
-
-        /* Card Styles */
-        .card {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            border-radius: 20px;
-            padding: 25px;
-            margin-bottom: 25px;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
-            border: 1px solid rgba(255,255,255,0.2);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-        }
-
-        .card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 12px 40px rgba(0,0,0,0.15);
-        }
-
-        .card h2 {
-            color: #2c3e50;
-            margin-bottom: 20px;
-            font-size: 1.5em;
-            border-bottom: 2px solid #3498db;
-            padding-bottom: 10px;
+        
+        .bot-avatar {
+            width: 80px;
+            height: 80px;
+            background: #5865f2;
+            border-radius: 50%;
+            margin: 0 auto 1rem;
             display: flex;
             align-items: center;
-        }
-
-        .card h2::before {
-            margin-right: 10px;
-        }
-
-        /* Dashboard Grid */
-        .dashboard-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-            gap: 25px;
-        }
-
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 15px;
-            margin-bottom: 20px;
-        }
-
-        .stat-item {
-            background: linear-gradient(135deg, #3498db, #2980b9);
+            justify-content: center;
+            font-size: 2rem;
             color: white;
-            padding: 20px;
-            border-radius: 15px;
-            text-align: center;
-            box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3);
         }
-
-        .stat-value {
-            font-size: 2em;
-            font-weight: bold;
-            margin-bottom: 5px;
+        
+        h1 {
+            color: #5865f2;
+            margin-bottom: 0.5rem;
+            font-size: 2.5rem;
         }
-
-        .stat-label {
-            font-size: 0.9em;
-            opacity: 0.9;
-        }
-
-        .balance-card {
-            background: linear-gradient(135deg, #27ae60, #229954);
+        
+        .status {
+            display: inline-block;
+            background: #43a047;
             color: white;
-            text-align: center;
-            padding: 30px;
-            border-radius: 15px;
-            margin-bottom: 20px;
-        }
-
-        .balance-amount {
-            font-size: 3em;
+            padding: 0.5rem 1rem;
+            border-radius: 25px;
+            margin: 1rem 0;
             font-weight: bold;
-            margin-bottom: 10px;
+            animation: pulse 2s infinite;
         }
-
-        /* Form Styles */
-        .input-group {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 15px;
-            flex-wrap: wrap;
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
         }
-
-        .input-group input, .input-group select, .input-group textarea {
-            flex: 1;
-            padding: 12px;
-            border: 2px solid #ddd;
+        
+        .info {
+            background: #f5f5f5;
+            padding: 1.5rem;
             border-radius: 10px;
-            font-size: 14px;
-            min-width: 120px;
-            transition: border-color 0.3s ease;
-            font-family: inherit;
+            margin: 2rem 0;
         }
-
-        .input-group textarea {
-            min-height: 100px;
-            resize: vertical;
+        
+        .info h3 {
+            color: #666;
+            margin-bottom: 1rem;
         }
-
-        .input-group input:focus, .input-group select:focus, .input-group textarea:focus {
-            outline: none;
-            border-color: #3498db;
+        
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
         }
-
-        .btn {
-            background: linear-gradient(135deg, #3498db, #2980b9);
+        
+        .stat {
+            background: white;
+            padding: 1rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .stat-number {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #5865f2;
+        }
+        
+        .footer {
+            margin-top: 2rem;
+            color: #888;
+            font-size: 0.9rem;
+        }
+        
+        .refresh-btn {
+            background: #5865f2;
             color: white;
             border: none;
-            padding: 12px 25px;
-            border-radius: 10px;
+            padding: 0.75rem 1.5rem;
+            border-radius: 25px;
             cursor: pointer;
-            font-size: 14px;
-            font-weight: 600;
+            margin-top: 1rem;
+            font-size: 1rem;
             transition: all 0.3s ease;
-            text-transform: uppercase;
-            letter-spacing: 1px;
         }
-
-        .btn:hover {
+        
+        .refresh-btn:hover {
+            background: #4752c4;
             transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(52, 152, 219, 0.4);
-        }
-
-        .btn-expense {
-            background: linear-gradient(135deg, #e74c3c, #c0392b);
-        }
-
-        .btn-success {
-            background: linear-gradient(135deg, #27ae60, #229954);
-        }
-
-        .btn-warning {
-            background: linear-gradient(135deg, #f39c12, #e67e22);
-        }
-
-        /* To-Do List Styles */
-        .todo-item {
-            display: flex;
-            align-items: center;
-            padding: 15px;
-            background: #f8f9fa;
-            border-radius: 10px;
-            margin-bottom: 10px;
-            transition: all 0.3s ease;
-        }
-
-        .todo-item:hover {
-            background: #e9ecef;
-        }
-
-        .todo-item.completed {
-            opacity: 0.6;
-            text-decoration: line-through;
-        }
-
-        .todo-checkbox {
-            margin-right: 15px;
-            transform: scale(1.2);
-            cursor: pointer;
-        }
-
-        .todo-content {
-            flex-grow: 1;
-        }
-
-        .todo-title {
-            font-weight: bold;
-            margin-bottom: 5px;
-        }
-
-        .todo-description {
-            font-size: 0.9em;
-            color: #666;
-        }
-
-        .todo-priority {
-            padding: 4px 8px;
-            border-radius: 15px;
-            font-size: 0.8em;
-            margin-right: 10px;
-        }
-
-        .priority-high { background: #ffebee; color: #c62828; }
-        .priority-medium { background: #fff3e0; color: #ef6c00; }
-        .priority-low { background: #e8f5e8; color: #2e7d32; }
-
-        /* Image Gallery Styles */
-        .gallery-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-            gap: 20px;
-            margin-top: 20px;
-        }
-
-        .gallery-item {
-            background: white;
-            border-radius: 15px;
-            overflow: hidden;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-            transition: transform 0.3s ease;
-            cursor: pointer;
-        }
-
-        .gallery-item:hover {
-            transform: scale(1.05);
-        }
-
-        .gallery-image {
-            width: 100%;
-            height: 150px;
-            object-fit: cover;
-        }
-
-        .gallery-info {
-            padding: 15px;
-        }
-
-        .gallery-title {
-            font-weight: bold;
-            margin-bottom: 5px;
-            color: #2c3e50;
-        }
-
-        .gallery-category {
-            font-size: 0.8em;
-            color: #7f8c8d;
-            background: #ecf0f1;
-            padding: 3px 8px;
-            border-radius: 15px;
-            display: inline-block;
-        }
-
-        .upload-area {
-            border: 2px dashed #3498db;
-            border-radius: 15px;
-            padding: 40px;
-            text-align: center;
-            background: rgba(52, 152, 219, 0.05);
-            transition: all 0.3s ease;
-            cursor: pointer;
-        }
-
-        .upload-area:hover {
-            background: rgba(52, 152, 219, 0.1);
-        }
-
-        .upload-area.dragover {
-            border-color: #2ecc71;
-            background: rgba(46, 204, 113, 0.1);
-        }
-
-        /* Links Grid */
-        .links-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 20px;
-            margin-top: 20px;
-        }
-
-        .link-item {
-            background: linear-gradient(135deg, #8e44ad, #9b59b6);
-            color: white;
-            padding: 25px;
-            border-radius: 15px;
-            text-decoration: none;
-            transition: all 0.3s ease;
-            display: block;
-            box-shadow: 0 4px 15px rgba(142, 68, 173, 0.3);
-            position: relative;
-        }
-
-        .link-item:hover {
-            transform: translateY(-5px) scale(1.02);
-            box-shadow: 0 8px 25px rgba(142, 68, 173, 0.4);
-            text-decoration: none;
-            color: white;
-        }
-
-        .link-title {
-            font-weight: bold;
-            font-size: 1.2em;
-            margin-bottom: 8px;
-        }
-
-        .link-url {
-            font-size: 0.9em;
-            opacity: 0.8;
-            word-break: break-all;
-            margin-bottom: 10px;
-        }
-
-        .link-category {
-            font-size: 0.8em;
-            opacity: 0.9;
-            background: rgba(255, 255, 255, 0.2);
-            padding: 5px 10px;
-            border-radius: 15px;
-            display: inline-block;
-        }
-
-        /* Transaction List */
-        .transaction-list {
-            max-height: 400px;
-            overflow-y: auto;
-        }
-
-        .transaction-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 15px;
-            border-bottom: 1px solid #eee;
-            border-radius: 8px;
-            margin-bottom: 5px;
-            transition: background-color 0.3s ease;
-        }
-
-        .transaction-item:hover {
-            background-color: #f8f9fa;
-        }
-
-        .transaction-amount {
-            font-weight: bold;
-            font-size: 1.1em;
-        }
-
-        .transaction-amount.income { color: #27ae60; }
-        .transaction-amount.expense { color: #e74c3c; }
-
-        .transaction-details {
-            flex-grow: 1;
-            margin-left: 15px;
-        }
-
-        .transaction-category {
-            font-size: 0.8em;
-            color: #666;
-            background: #ecf0f1;
-            padding: 3px 8px;
-            border-radius: 15px;
-            display: inline-block;
-            margin-top: 3px;
-        }
-
-        .delete-btn {
-            background: #e74c3c;
-            color: white;
-            border: none;
-            padding: 8px 12px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 12px;
-            transition: all 0.3s ease;
-        }
-
-        .delete-btn:hover {
-            background: #c0392b;
-            transform: scale(1.1);
-        }
-
-        /* Period Selector */
-        .period-selector {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
-        }
-
-        .period-btn {
-            background: #ecf0f1;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 20px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-weight: 500;
-        }
-
-        .period-btn.active {
-            background: linear-gradient(135deg, #3498db, #2980b9);
-            color: white;
-        }
-
-        /* Mobile Responsiveness */
-        @media (max-width: 768px) {
-            .sidebar {
-                width: 60px;
-                padding: 20px 10px;
-            }
-            
-            .nav-item span {
-                display: none;
-            }
-            
-            .logo h1 {
-                font-size: 1.2em;
-            }
-            
-            .logo p {
-                display: none;
-            }
-            
-            .main-content {
-                padding: 15px;
-            }
-            
-            .dashboard-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            .stats-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            .input-group {
-                flex-direction: column;
-            }
-            
-            .page-header h1 {
-                font-size: 2em;
-            }
-            
-            .gallery-grid {
-                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-            }
-            
-            .links-grid {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        /* Modal Styles */
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.8);
-            z-index: 1000;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .modal.active {
-            display: flex;
-        }
-
-        .modal-content {
-            max-width: 90%;
-            max-height: 90%;
-            border-radius: 15px;
-            overflow: hidden;
-        }
-
-        .modal img {
-            max-width: 100%;
-            max-height: 100%;
-            object-fit: contain;
-        }
-
-        /* Key Login Modal */
-        .login-modal {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.9);
-            z-index: 2000;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .login-content {
-            background: white;
-            padding: 40px;
-            border-radius: 15px;
-            text-align: center;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
-        }
-
-        .login-content h2 {
-            margin-bottom: 20px;
-            color: #2c3e50;
-        }
-
-        .login-content input {
-            width: 100%;
-            padding: 12px;
-            margin-bottom: 20px;
-            border: 2px solid #ddd;
-            border-radius: 10px;
-            font-size: 16px;
-        }
-
-        .login-content button {
-            width: 100%;
-        }
-
-        /* Utility Classes */
-        .text-center { text-align: center; }
-        .mb-20 { margin-bottom: 20px; }
-        .mt-20 { margin-top: 20px; }
-        
-        /* Custom Scrollbar */
-        ::-webkit-scrollbar {
-            width: 8px;
-        }
-        
-        ::-webkit-scrollbar-track {
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 4px;
-        }
-        
-        ::-webkit-scrollbar-thumb {
-            background: rgba(255, 255, 255, 0.3);
-            border-radius: 4px;
-        }
-        
-        ::-webkit-scrollbar-thumb:hover {
-            background: rgba(255, 255, 255, 0.5);
-        }
-
-        /* Hide dashboard initially */
-        .dashboard-container.hidden {
-            display: none;
         }
     </style>
 </head>
 <body>
-    <!-- Login Modal -->
-    <div class="login-modal" id="loginModal">
-        <div class="login-content">
-            <h2>Enter Access Key</h2>
-            <input type="password" id="accessKey" placeholder="Enter key...">
-            <button class="btn" onclick="checkKey()">Login</button>
+    <div class="container">
+        <div class="bot-avatar">🤖</div>
+        <h1>My Discord Bot</h1>
+        <div class="status" id="status">🟢 Bot is Online</div>
+        
+        <div class="info">
+            <h3>Bot Information</h3>
+            <p>Your Discord bot is running 24/7 and ready to serve your community!</p>
+            
+            <div class="stats">
+                <div class="stat">
+                    <div class="stat-number" id="servers">Loading...</div>
+                    <div>Servers</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-number" id="uptime">Loading...</div>
+                    <div>Uptime</div>
+                </div>
+            </div>
         </div>
-    </div>
-
-    <div class="dashboard-container hidden" id="dashboardContainer">
-        <!-- Sidebar Navigation -->
-        <nav class="sidebar">
-            <div class="logo">
-                <h1>🚀 Dashboard</h1>
-                <p>All-in-One System</p>
-            </div>
-            
-            <div class="nav-item active" data-tab="dashboard">
-                <span class="nav-icon">📊</span>
-                <span>Dashboard</span>
-            </div>
-            
-            <div class="nav-item" data-tab="revenue">
-                <span class="nav-icon">💰</span>
-                <span>Revenue</span>
-            </div>
-            
-            <div class="nav-item" data-tab="links">
-                <span class="nav-icon">🔗</span>
-                <span>Links</span>
-            </div>
-            
-            <div class="nav-item" data-tab="todos">
-                <span class="nav-icon">✅</span>
-                <span>To-Do List</span>
-            </div>
-            
-            <div class="nav-item" data-tab="gallery">
-                <span class="nav-icon">🖼️</span>
-                <span>Gallery</span>
-            </div>
-        </nav>
-
-        <!-- Main Content Area -->
-        <main class="main-content">
-            <!-- Dashboard Tab -->
-            <div id="dashboard" class="tab-content active">
-                <div class="page-header">
-                    <h1>📊 Dashboard Overview</h1>
-                    <p>Your complete system overview</p>
-                </div>
-
-                <div class="dashboard-grid">
-                    <!-- Current Balance -->
-                    <div class="card">
-                        <div class="balance-card">
-                            <h2>Current Balance</h2>
-                            <div class="balance-amount" id="dashboardBalance">$0.00</div>
-                        </div>
-                    </div>
-
-                    <!-- Quick Stats -->
-                    <div class="card">
-                        <h2>📈 Quick Stats</h2>
-                        <div class="stats-grid">
-                            <div class="stat-item">
-                                <div class="stat-value" id="dashboardTodayRevenue">$0.00</div>
-                                <div class="stat-label">Today's Revenue</div>
-                            </div>
-                            <div class="stat-item">
-                                <div class="stat-value" id="dashboardTotalTodos">0</div>
-                                <div class="stat-label">Active Tasks</div>
-                            </div>
-                            <div class="stat-item">
-                                <div class="stat-value" id="dashboardTotalLinks">0</div>
-                                <div class="stat-label">Saved Links</div>
-                            </div>
-                            <div class="stat-item">
-                                <div class="stat-value" id="dashboardTotalImages">0</div>
-                                <div class="stat-label">Gallery Items</div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Recent Activity -->
-                    <div class="card">
-                        <h2>🕒 Recent Activity</h2>
-                        <div id="recentActivity">
-                            <div style="text-align: center; color: #666; padding: 30px;">
-                                No recent activity yet!
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Revenue Tab -->
-            <div id="revenue" class="tab-content">
-                <div class="page-header">
-                    <h1>💰 Revenue Management</h1>
-                    <p>Track your income and expenses</p>
-                </div>
-
-                <div class="dashboard-grid">
-                    <!-- Balance Card -->
-                    <div class="card">
-                        <div class="balance-card">
-                            <h2>Current Balance</h2>
-                            <div class="balance-amount" id="currentBalance">$0.00</div>
-                        </div>
-                    </div>
-
-                    <!-- Revenue Stats -->
-                    <div class="card">
-                        <h2>📈 Revenue Overview</h2>
-                        <div class="period-selector">
-                            <button class="period-btn active" data-period="today">Today</button>
-                            <button class="period-btn" data-period="week">This Week</button>
-                            <button class="period-btn" data-period="month">This Month</button>
-                        </div>
-                        <div class="stats-grid">
-                            <div class="stat-item">
-                                <div class="stat-value" id="todayRevenue">$0.00</div>
-                                <div class="stat-label">Today</div>
-                            </div>
-                            <div class="stat-item">
-                                <div class="stat-value" id="weekRevenue">$0.00</div>
-                                <div class="stat-label">This Week</div>
-                            </div>
-                            <div class="stat-item">
-                                <div class="stat-value" id="monthRevenue">$0.00</div>
-                                <div class="stat-label">This Month</div>
-                            </div>
-                            <div class="stat-item">
-                                <div class="stat-value" id="totalExpenses">$0.00</div>
-                                <div class="stat-label">Total Expenses</div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Add Revenue -->
-                    <div class="card">
-                        <h2>💵 Add Revenue</h2>
-                        <div class="input-group">
-                            <input type="number" id="revenueAmount" placeholder="Amount ($)" step="0.01">
-                            <input type="text" id="revenueDescription" placeholder="Description">
-                        </div>
-                        <div class="input-group">
-                            <select id="revenueCategory">
-                                <option value="sales">Sales</option>
-                                <option value="services">Services</option>
-                                <option value="consulting">Consulting</option>
-                                <option value="investment">Investment</option>
-                                <option value="other">Other</option>
-                            </select>
-                            <button class="btn" onclick="addRevenue()">Add Revenue</button>
-                        </div>
-                    </div>
-
-                    <!-- Add Expense -->
-                    <div class="card">
-                        <h2>💸 Add Expense</h2>
-                        <div class="input-group">
-                            <input type="number" id="expenseAmount" placeholder="Amount ($)" step="0.01">
-                            <input type="text" id="expenseDescription" placeholder="Description">
-                        </div>
-                        <div class="input-group">
-                            <select id="expenseCategory">
-                                <option value="marketing">Marketing</option>
-                                <option value="office">Office</option>
-                                <option value="software">Software</option>
-                                <option value="travel">Travel</option>
-                                <option value="meals">Meals</option>
-                                <option value="utilities">Utilities</option>
-                                <option value="other">Other</option>
-                            </select>
-                            <button class="btn btn-expense" onclick="addExpense()">Add Expense</button>
-                        </div>
-                    </div>
-
-                    <!-- Recent Transactions -->
-                    <div class="card">
-                        <h2>📋 Recent Transactions</h2>
-                        <div class="transaction-list" id="transactionList">
-                            <div style="text-align: center; color: #666; padding: 40px;">
-                                No transactions yet. Add some revenue or expenses to get started!
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Links Tab -->
-            <div id="links" class="tab-content">
-                <div class="page-header">
-                    <h1>🔗 Link Management</h1>
-                    <p>Organize your important websites</p>
-                </div>
-
-                <div class="card">
-                    <h2>➕ Add New Link</h2>
-                    <div class="input-group">
-                        <input type="text" id="linkTitle" placeholder="Website Title">
-                        <input type="url" id="linkUrl" placeholder="Website URL">
-                        <input type="text" id="linkCategory" placeholder="Category">
-                        <button class="btn" onclick="addLink()">Add Link</button>
-                    </div>
-                </div>
-
-                <div class="card">
-                    <h2>🌐 Your Links</h2>
-                    <div class="links-grid" id="linksGrid">
-                        <div style="text-align: center; color: #666; padding: 40px; grid-column: 1/-1;">
-                            No links added yet. Add your favorite websites above!
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- To-Do List Tab -->
-            <div id="todos" class="tab-content">
-                <div class="page-header">
-                    <h1>✅ To-Do List</h1>
-                    <p>Manage your tasks and stay productive</p>
-                </div>
-
-                <div class="card">
-                    <h2>➕ Add New Task</h2>
-                    <div class="input-group">
-                        <input type="text" id="todoTitle" placeholder="Task title">
-                        <textarea id="todoDescription" placeholder="Task description (optional)"></textarea>
-                    </div>
-                    <div class="input-group">
-                        <select id="todoPriority">
-                            <option value="low">Low Priority</option>
-                            <option value="medium" selected>Medium Priority</option>
-                            <option value="high">High Priority</option>
-                        </select>
-                        <input type="date" id="todoDueDate">
-                        <button class="btn btn-success" onclick="addTodo()">Add Task</button>
-                    </div>
-                </div>
-
-                <div class="card">
-                    <h2>📝 Your Tasks</h2>
-                    <div id="todosList">
-                        <div style="text-align: center; color: #666; padding: 40px;">
-                            No tasks yet. Add some tasks to get started!
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Gallery Tab -->
-            <div id="gallery" class="tab-content">
-                <div class="page-header">
-                    <h1>🖼️ Image Gallery</h1>
-                    <p>Organize and view your images</p>
-                </div>
-
-                <div class="card">
-                    <h2>📁 Upload Images</h2>
-                    <div class="upload-area" id="uploadArea">
-                        <div style="font-size: 3em; margin-bottom: 20px;">📸</div>
-                        <h3>Drop images here or click to upload</h3>
-                        <p>Supports JPG, PNG, GIF files</p>
-                        <input type="file" id="imageUpload" multiple accept="image/*" style="display: none;">
-                    </div>
-                    <div class="input-group mt-20">
-                        <input type="text" id="imageTitle" placeholder="Image title (optional)">
-                        <input type="text" id="imageCategory" placeholder="Category (optional)">
-                    </div>
-                </div>
-
-                <div class="card">
-                    <h2>🎨 Your Gallery</h2>
-                    <div class="gallery-grid" id="galleryGrid">
-                        <div style="text-align: center; color: #666; padding: 40px; grid-column: 1/-1;">
-                            No images yet. Upload some images to get started!
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </main>
-    </div>
-
-    <!-- Image Modal -->
-    <div class="modal" id="imageModal">
-        <div class="modal-content">
-            <img id="modalImage" alt="Full size image">
+        
+        <button class="refresh-btn" onclick="updateStatus()">Refresh Status</button>
+        
+        <div class="footer">
+            <p>Bot hosted for free • Always online</p>
+            <p>Last updated: <span id="lastUpdate"></span></p>
         </div>
     </div>
 
     <script>
-        // Global data storage
-        let currentBalance = 0;
-        let transactions = [];
-        let links = [];
-        let todos = [];
-        let images = [];
-        let currentTab = 'dashboard';
-        const ACCESS_KEY = 'ASDFGHJKL';
-
-        // Initialize the application
-        function init() {
-            loadData(); // Load from localStorage first
-            setupNavigation();
-            setupEventListeners();
-            updateAllDisplays();
-            // Recent activity is not implemented, so leaving it as is
+        function formatUptime(seconds) {
+            const hours = Math.floor(seconds / 3600);
+            const minutes = Math.floor((seconds % 3600) / 60);
+            return `${hours}h ${minutes}m`;
         }
-
-        // Key check function
-        function checkKey() {
-            const enteredKey = document.getElementById('accessKey').value;
-            if (enteredKey === ACCESS_KEY) {
-                document.getElementById('loginModal').style.display = 'none';
-                document.getElementById('dashboardContainer').classList.remove('hidden');
-                init(); // Initialize after login
-            } else {
-                showNotification('Invalid key!', 'error');
-            }
-        }
-
-        // LocalStorage save/load functions
-        function saveData() {
-            localStorage.setItem('dashboard_currentBalance', currentBalance);
-            localStorage.setItem('dashboard_transactions', JSON.stringify(transactions.map(t => ({
-                ...t,
-                date: t.date.toISOString(),
-                timestamp: t.timestamp
-            }))));
-            localStorage.setItem('dashboard_links', JSON.stringify(links.map(l => ({
-                ...l,
-                dateAdded: l.dateAdded.toISOString()
-            }))));
-            localStorage.setItem('dashboard_todos', JSON.stringify(todos.map(td => ({
-                ...td,
-                dueDate: td.dueDate ? td.dueDate.toISOString() : null,
-                createdAt: td.createdAt.toISOString()
-            }))));
-            localStorage.setItem('dashboard_images', JSON.stringify(images.map(img => ({
-                ...img,
-                uploadDate: img.uploadDate.toISOString()
-            }))));
-        }
-
-        function loadData() {
-            if (localStorage.getItem('dashboard_currentBalance')) {
-                currentBalance = parseFloat(localStorage.getItem('dashboard_currentBalance'));
-            }
-            if (localStorage.getItem('dashboard_transactions')) {
-                transactions = JSON.parse(localStorage.getItem('dashboard_transactions')).map(t => ({
-                    ...t,
-                    date: new Date(t.date),
-                    timestamp: t.timestamp
-                }));
-            }
-            if (localStorage.getItem('dashboard_links')) {
-                links = JSON.parse(localStorage.getItem('dashboard_links')).map(l => ({
-                    ...l,
-                    dateAdded: new Date(l.dateAdded)
-                }));
-            }
-            if (localStorage.getItem('dashboard_todos')) {
-                todos = JSON.parse(localStorage.getItem('dashboard_todos')).map(td => ({
-                    ...td,
-                    dueDate: td.dueDate ? new Date(td.dueDate) : null,
-                    createdAt: new Date(td.createdAt)
-                }));
-            }
-            if (localStorage.getItem('dashboard_images')) {
-                images = JSON.parse(localStorage.getItem('dashboard_images')).map(img => ({
-                    ...img,
-                    uploadDate: new Date(img.uploadDate)
-                }));
-            }
-        }
-
-        // Navigation setup
-        function setupNavigation() {
-            const navItems = document.querySelectorAll('.nav-item');
-            navItems.forEach(item => {
-                item.addEventListener('click', function() {
-                    const tabId = this.getAttribute('data-tab');
-                    switchTab(tabId);
+        
+        function updateStatus() {
+            fetch('/status')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('servers').textContent = data.servers;
+                    document.getElementById('uptime').textContent = formatUptime(data.uptime);
+                    document.getElementById('lastUpdate').textContent = new Date().toLocaleTimeString();
+                })
+                .catch(error => {
+                    console.error('Error fetching status:', error);
+                    document.getElementById('status').textContent = '🔴 Connection Error';
                 });
-            });
         }
-
-        function switchTab(tabId) {
-            // Update navigation
-            document.querySelectorAll('.nav-item').forEach(item => {
-                item.classList.remove('active');
-            });
-            document.querySelector(`[data-tab="${tabId}"]`).classList.add('active');
-
-            // Update content
-            document.querySelectorAll('.tab-content').forEach(content => {
-                content.classList.remove('active');
-            });
-            document.getElementById(tabId).classList.add('active');
-
-            currentTab = tabId;
-        }
-
-        // Event listeners setup
-        function setupEventListeners() {
-            // Period selector buttons
-            document.querySelectorAll('.period-btn').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    document.querySelectorAll('.period-btn').forEach(b => b.classList.remove('active'));
-                    this.classList.add('active');
-                    updateRevenueStats();
-                });
-            });
-
-            // Enter key handlers
-            document.getElementById('revenueAmount').addEventListener('keypress', function(e) {
-                if (e.key === 'Enter') addRevenue();
-            });
-            
-            document.getElementById('expenseAmount').addEventListener('keypress', function(e) {
-                if (e.key === 'Enter') addExpense();
-            });
-            
-            document.getElementById('linkUrl').addEventListener('keypress', function(e) {
-                if (e.key === 'Enter') addLink();
-            });
-
-            document.getElementById('todoTitle').addEventListener('keypress', function(e) {
-                if (e.key === 'Enter') addTodo();
-            });
-
-            // Image upload setup
-            const uploadArea = document.getElementById('uploadArea');
-            const imageUpload = document.getElementById('imageUpload');
-
-            uploadArea.addEventListener('click', () => imageUpload.click());
-            uploadArea.addEventListener('dragover', handleDragOver);
-            uploadArea.addEventListener('drop', handleDrop);
-            uploadArea.addEventListener('dragleave', handleDragLeave);
-            imageUpload.addEventListener('change', handleFileSelect);
-
-            // Modal setup
-            document.getElementById('imageModal').addEventListener('click', closeModal);
-
-            // Access key enter handler
-            document.getElementById('accessKey').addEventListener('keypress', function(e) {
-                if (e.key === 'Enter') checkKey();
-            });
-        }
-
-        // Revenue functions
-        function addRevenue() {
-            const amount = parseFloat(document.getElementById('revenueAmount').value);
-            const description = document.getElementById('revenueDescription').value;
-            const category = document.getElementById('revenueCategory').value;
-
-            if (!amount || amount <= 0) {
-                showNotification('Please enter a valid amount', 'error');
-                return;
-            }
-
-            const transaction = {
-                id: Date.now(),
-                type: 'income',
-                amount: amount,
-                description: description || 'Revenue',
-                category: category,
-                date: new Date(),
-                timestamp: Date.now()
-            };
-
-            transactions.unshift(transaction);
-            currentBalance += amount;
-
-            // Clear inputs
-            document.getElementById('revenueAmount').value = '';
-            document.getElementById('revenueDescription').value = '';
-
-            updateAllDisplays();
-            saveData();
-            showNotification(`Added $${amount.toFixed(2)} revenue!`, 'success');
-        }
-
-        function addExpense() {
-            const amount = parseFloat(document.getElementById('expenseAmount').value);
-            const description = document.getElementById('expenseDescription').value;
-            const category = document.getElementById('expenseCategory').value;
-
-            if (!amount || amount <= 0) {
-                showNotification('Please enter a valid amount', 'error');
-                return;
-            }
-
-            if (amount > currentBalance) {
-                if (!confirm(`This expense ($${amount.toFixed(2)}) exceeds your current balance ($${currentBalance.toFixed(2)}). Continue?`)) {
-                    return;
-                }
-            }
-
-            const transaction = {
-                id: Date.now(),
-                type: 'expense',
-                amount: amount,
-                description: description || 'Expense',
-                category: category,
-                date: new Date(),
-                timestamp: Date.now()
-            };
-
-            transactions.unshift(transaction);
-            currentBalance -= amount;
-
-            // Clear inputs
-            document.getElementById('expenseAmount').value = '';
-            document.getElementById('expenseDescription').value = '';
-
-            updateAllDisplays();
-            saveData();
-            showNotification(`Added $${amount.toFixed(2)} expense!`, 'expense');
-        }
-
-        function deleteTransaction(id) {
-            const transaction = transactions.find(t => t.id === id);
-            if (transaction) {
-                if (transaction.type === 'income') {
-                    currentBalance -= transaction.amount;
-                } else {
-                    currentBalance += transaction.amount;
-                }
-                transactions = transactions.filter(t => t.id !== id);
-                updateAllDisplays();
-                saveData();
-                showNotification('Transaction deleted!', 'info');
-            }
-        }
-
-        // Links functions
-        function addLink() {
-            const title = document.getElementById('linkTitle').value;
-            const url = document.getElementById('linkUrl').value;
-            const category = document.getElementById('linkCategory').value;
-
-            if (!title || !url) {
-                showNotification('Please enter both title and URL', 'error');
-                return;
-            }
-
-            // Add protocol if missing
-            let formattedUrl = url;
-            if (!url.startsWith('http://') && !url.startsWith('https://')) {
-                formattedUrl = 'https://' + url;
-            }
-
-            const link = {
-                id: Date.now(),
-                title: title,
-                url: formattedUrl,
-                category: category || 'General',
-                dateAdded: new Date()
-            };
-
-            links.unshift(link);
-
-            // Clear inputs
-            document.getElementById('linkTitle').value = '';
-            document.getElementById('linkUrl').value = '';
-            document.getElementById('linkCategory').value = '';
-
-            updateLinksDisplay();
-            updateDashboardStats();
-            saveData();
-            showNotification('Link added successfully!', 'success');
-        }
-
-        function deleteLink(id) {
-            links = links.filter(l => l.id !== id);
-            updateLinksDisplay();
-            updateDashboardStats();
-            saveData();
-            showNotification('Link deleted!', 'info');
-        }
-
-        // Todo functions
-        function addTodo() {
-            const title = document.getElementById('todoTitle').value;
-            const description = document.getElementById('todoDescription').value;
-            const priority = document.getElementById('todoPriority').value;
-            const dueDate = document.getElementById('todoDueDate').value;
-
-            if (!title.trim()) {
-                showNotification('Please enter a task title', 'error');
-                return;
-            }
-
-            const todo = {
-                id: Date.now(),
-                title: title.trim(),
-                description: description.trim(),
-                priority: priority,
-                dueDate: dueDate ? new Date(dueDate) : null,
-                completed: false,
-                createdAt: new Date()
-            };
-
-            todos.unshift(todo);
-
-            // Clear inputs
-            document.getElementById('todoTitle').value = '';
-            document.getElementById('todoDescription').value = '';
-            document.getElementById('todoDueDate').value = '';
-
-            updateTodosDisplay();
-            updateDashboardStats();
-            saveData();
-            showNotification('Task added successfully!', 'success');
-        }
-
-        function toggleTodo(id) {
-            const todo = todos.find(t => t.id === id);
-            if (todo) {
-                todo.completed = !todo.completed;
-                updateTodosDisplay();
-                updateDashboardStats();
-                saveData();
-                showNotification(todo.completed ? 'Task completed!' : 'Task reopened!', 'info');
-            }
-        }
-
-        function deleteTodo(id) {
-            todos = todos.filter(t => t.id !== id);
-            updateTodosDisplay();
-            updateDashboardStats();
-            saveData();
-            showNotification('Task deleted!', 'info');
-        }
-
-        // Image gallery functions
-        function handleDragOver(e) {
-            e.preventDefault();
-            e.currentTarget.classList.add('dragover');
-        }
-
-        function handleDragLeave(e) {
-            e.currentTarget.classList.remove('dragover');
-        }
-
-        function handleDrop(e) {
-            e.preventDefault();
-            e.currentTarget.classList.remove('dragover');
-            const files = e.dataTransfer.files;
-            handleFiles(files);
-        }
-
-        function handleFileSelect(e) {
-            const files = e.target.files;
-            handleFiles(files);
-        }
-
-        function handleFiles(files) {
-            for (let file of files) {
-                if (file.type.startsWith('image/')) {
-                    const reader = new FileReader();
-                    reader.onload = function(e) {
-                        addImageToGallery(e.target.result, file.name);
-                    };
-                    reader.readAsDataURL(file);
-                }
-            }
-        }
-
-        function addImageToGallery(imageSrc, fileName) {
-            const title = document.getElementById('imageTitle').value || fileName;
-            const category = document.getElementById('imageCategory').value || 'General';
-
-            const image = {
-                id: Date.now() + Math.random(),
-                src: imageSrc,
-                title: title,
-                category: category,
-                fileName: fileName,
-                uploadDate: new Date()
-            };
-
-            images.unshift(image);
-
-            // Clear inputs
-            document.getElementById('imageTitle').value = '';
-            document.getElementById('imageCategory').value = '';
-
-            updateGalleryDisplay();
-            updateDashboardStats();
-            saveData();
-            showNotification('Image uploaded successfully!', 'success');
-        }
-
-        function deleteImage(id) {
-            images = images.filter(img => img.id !== id);
-            updateGalleryDisplay();
-            updateDashboardStats();
-            saveData();
-            showNotification('Image deleted!', 'info');
-        }
-
-        function openImageModal(imageSrc) {
-            document.getElementById('modalImage').src = imageSrc;
-            document.getElementById('imageModal').classList.add('active');
-        }
-
-        function closeModal() {
-            document.getElementById('imageModal').classList.remove('active');
-        }
-
-        // Display update functions
-        function updateAllDisplays() {
-            updateBalance();
-            updateRevenueStats();
-            updateTransactionsList();
-            updateLinksDisplay();
-            updateTodosDisplay();
-            updateGalleryDisplay();
-            updateDashboardStats();
-        }
-
-        function updateBalance() {
-            document.getElementById('currentBalance').textContent = `$${currentBalance.toFixed(2)}`;
-            document.getElementById('dashboardBalance').textContent = `$${currentBalance.toFixed(2)}`;
-        }
-
-        function updateRevenueStats() {
-            const today = new Date();
-            const startOfToday = new Date(today.getFullYear(), today.getMonth(), today.getDate());
-            const startOfWeek = new Date(today.getFullYear(), today.getMonth(), today.getDate() - today.getDay());
-            const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
-
-            const todayRevenue = transactions
-                .filter(t => t.type === 'income' && t.date >= startOfToday)
-                .reduce((sum, t) => sum + t.amount, 0);
-
-            const weekRevenue = transactions
-                .filter(t => t.type === 'income' && t.date >= startOfWeek)
-                .reduce((sum, t) => sum + t.amount, 0);
-
-            const monthRevenue = transactions
-                .filter(t => t.type === 'income' && t.date >= startOfMonth)
-                .reduce((sum, t) => sum + t.amount, 0);
-
-            const totalExpenses = transactions
-                .filter(t => t.type === 'expense')
-                .reduce((sum, t) => sum + t.amount, 0);
-
-            document.getElementById('todayRevenue').textContent = `$${todayRevenue.toFixed(2)}`;
-            document.getElementById('weekRevenue').textContent = `$${weekRevenue.toFixed(2)}`;
-            document.getElementById('monthRevenue').textContent = `$${monthRevenue.toFixed(2)}`;
-            document.getElementById('totalExpenses').textContent = `$${totalExpenses.toFixed(2)}`;
-            document.getElementById('dashboardTodayRevenue').textContent = `$${todayRevenue.toFixed(2)}`;
-        }
-
-        function updateTransactionsList() {
-            const listElement = document.getElementById('transactionList');
-            
-            if (transactions.length === 0) {
-                listElement.innerHTML = `
-                    <div style="text-align: center; color: #666; padding: 40px;">
-                        No transactions yet. Add some revenue or expenses to get started!
-                    </div>
-                `;
-                return;
-            }
-
-            const recentTransactions = transactions.slice(0, 10);
-            
-            listElement.innerHTML = recentTransactions.map(transaction => `
-                <div class="transaction-item">
-                    <div class="transaction-details">
-                        <strong>${transaction.description}</strong>
-                        <div class="transaction-category">${transaction.category}</div>
-                        <div style="font-size: 0.8em; color: #666; margin-top: 3px;">
-                            ${transaction.date.toLocaleDateString()} ${transaction.date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
-                        </div>
-                    </div>
-                    <div class="transaction-amount ${transaction.type}">
-                        ${transaction.type === 'income' ? '+' : '-'}$${transaction.amount.toFixed(2)}
-                    </div>
-                    <button class="delete-btn" onclick="deleteTransaction(${transaction.id})">×</button>
-                </div>
-            `).join('');
-        }
-
-        function updateLinksDisplay() {
-            const gridElement = document.getElementById('linksGrid');
-            
-            if (links.length === 0) {
-                gridElement.innerHTML = `
-                    <div style="text-align: center; color: #666; padding: 40px; grid-column: 1/-1;">
-                        No links added yet. Add your favorite websites above!
-                    </div>
-                `;
-                return;
-            }
-
-            gridElement.innerHTML = links.map(link => `
-                <div class="link-item" style="position: relative;">
-                    <a href="${link.url}" target="_blank" style="color: inherit; text-decoration: none;">
-                        <div class="link-title">${link.title}</div>
-                        <div class="link-url">${link.url}</div>
-                        <div class="link-category">${link.category}</div>
-                    </a>
-                    <button class="delete-btn" style="position: absolute; top: 15px; right: 15px;" 
-                            onclick="event.preventDefault(); deleteLink(${link.id})">×</button>
-                </div>
-            `).join('');
-        }
-
-        function updateTodosDisplay() {
-            const todosElement = document.getElementById('todosList');
-            
-            if (todos.length === 0) {
-                todosElement.innerHTML = `
-                    <div style="text-align: center; color: #666; padding: 40px;">
-                        No tasks yet. Add some tasks to get started!
-                    </div>
-                `;
-                return;
-            }
-
-            // Sort todos: incomplete first, then by priority
-            const sortedTodos = [...todos].sort((a, b) => {
-                if (a.completed !== b.completed) {
-                    return a.completed - b.completed;
-                }
-                const priorityOrder = { high: 3, medium: 2, low: 1 };
-                return priorityOrder[b.priority] - priorityOrder[a.priority];
-            });
-
-            todosElement.innerHTML = sortedTodos.map(todo => `
-                <div class="todo-item ${todo.completed ? 'completed' : ''}">
-                    <input type="checkbox" class="todo-checkbox" ${todo.completed ? 'checked' : ''} 
-                           onchange="toggleTodo(${todo.id})">
-                    <div class="todo-content">
-                        <div class="todo-title">${todo.title}</div>
-                        ${todo.description ? `<div class="todo-description">${todo.description}</div>` : ''}
-                        <div style="margin-top: 8px;">
-                            <span class="todo-priority priority-${todo.priority}">${todo.priority.toUpperCase()}</span>
-                            ${todo.dueDate ? `<span style="font-size: 0.8em; color: #666; margin-left: 10px;">Due: ${todo.dueDate.toLocaleDateString()}</span>` : ''}
-                        </div>
-                    </div>
-                    <button class="delete-btn" onclick="deleteTodo(${todo.id})">×</button>
-                </div>
-            `).join('');
-        }
-
-        function updateGalleryDisplay() {
-            const galleryElement = document.getElementById('galleryGrid');
-            
-            if (images.length === 0) {
-                galleryElement.innerHTML = `
-                    <div style="text-align: center; color: #666; padding: 40px; grid-column: 1/-1;">
-                        No images yet. Upload some images to get started!
-                    </div>
-                `;
-                return;
-            }
-
-            galleryElement.innerHTML = images.map(image => `
-                <div class="gallery-item">
-                    <img src="${image.src}" alt="${image.title}" class="gallery-image" 
-                         onclick="openImageModal('${image.src}')">
-                    <div class="gallery-info">
-                        <div class="gallery-title">${image.title}</div>
-                        <div class="gallery-category">${image.category}</div>
-                        <button class="delete-btn" style="margin-top: 10px;" onclick="deleteImage(${image.id})">Delete</button>
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        function updateDashboardStats() {
-            const activeTodos = todos.filter(t => !t.completed).length;
-            document.getElementById('dashboardTotalTodos').textContent = activeTodos;
-            document.getElementById('dashboardTotalLinks').textContent = links.length;
-            document.getElementById('dashboardTotalImages').textContent = images.length;
-        }
-
-        function showNotification(message, type) {
-            const notification = document.createElement('div');
-            const colors = {
-                success: '#27ae60',
-                error: '#e74c3c',
-                expense: '#e74c3c',
-                info: '#3498db'
-            };
-            
-            notification.style.cssText = `
-                position: fixed;
-                top: 20px;
-                right: 20px;
-                padding: 15px 25px;
-                background: ${colors[type] || colors.info};
-                color: white;
-                border-radius: 10px;
-                box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-                z-index: 1000;
-                transform: translateX(400px);
-                transition: transform 0.3s ease;
-                font-weight: 500;
-            `;
-            notification.textContent = message;
-            
-            document.body.appendChild(notification);
-            
-            setTimeout(() => notification.style.transform = 'translateX(0)', 100);
-            setTimeout(() => notification.style.transform = 'translateX(400px)', 3000);
-            setTimeout(() => document.body.removeChild(notification), 3300);
-        }
-
-        // Show login modal on load
-        window.onload = function() {
-            document.getElementById('loginModal').style.display = 'flex';
-        };
+        
+        // Update status every 30 seconds
+        updateStatus();
+        setInterval(updateStatus, 30000);
     </script>
 </body>
 </html>
+
+// ===== FILE 4: .env (Environment Variables) =====
+BOT_TOKEN=your_discord_bot_token_here
+
+// ===== INSTRUCTIONS =====
+/*
+HOW TO USE:
+
+1. CREATE THESE FILES:
+   - package.json
+   - server.js  
+   - public/index.html (create 'public' folder first)
+   - .env
+
+2. REPLACE YOUR BOT CODE:
+   - In server.js, replace the section marked "PASTE YOUR BOT CODE HERE" 
+   - Keep the client.login(BOT_TOKEN) line at the bottom
+
+3. ADD YOUR BOT TOKEN:
+   - Put your bot token in the .env file
+   - Or add it as environment variable on hosting platform
+
+4. UPLOAD TO FREE PLATFORM:
+   - Glitch: Drag all files to project
+   - Vercel: Upload folder or connect GitHub
+   - Railway: Connect GitHub repository
+   - Render: Connect GitHub repository
+
+5. YOUR WEBSITE WILL BE LIVE:
+   - Bot runs 24/7
+   - Website shows bot status
+   - Completely free!
+
+PLATFORMS TO UPLOAD:
+- Glitch.com (easiest - just drag files)
+- Vercel.com 
+- Railway.app
+- Render.com
+*/
