@@ -1,17 +1,25 @@
 {
-  "name": "discord-bot-web-runner",
+  "name": "discord-roblox-script-bot",
   "version": "1.0.0",
-  "description": "Roblox Script Submission Bot with Web Interface",
-  "main": "app.js",
+  "description": "Discord bot for Roblox script submissions with verification system",
+  "main": "bot.js",
   "scripts": {
-    "start": "node app.js",
-    "dev": "nodemon app.js"
+    "start": "node bot.js",
+    "dev": "nodemon bot.js"
   },
+  "keywords": [
+    "discord",
+    "bot",
+    "roblox",
+    "script",
+    "submission"
+  ],
   "dependencies": {
-    "express": "^4.18.2",
     "discord.js": "^14.14.1"
   },
   "engines": {
-    "node": "18.x"
-  }
+    "node": ">=16.0.0"
+  },
+  "author": "Your Name",
+  "license": "MIT"
 }
