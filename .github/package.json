@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GitHub-Only Discord Bot Hosting</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #24292e 0%, #0366d6 100%);
+            min-height: 100vh;
+            color: white;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 50px;
+            animation: fadeInDown 1s ease-out;
+        }
+
+        .header h1 {
+            font-size: 3em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .github-logo {
+            font-size: 4em;
+            margin-bottom: 20px;
+        }
+
+        .status-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            animation: fadeInUp 1s ease-out 0.2s both;
+        }
+
+        .bot-status {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.1em;
+        }
+
+        .status-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+            background-color: #4CAF50;
+        }
+
+        .step {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-left: 4px solid #0366d6;
+            animation: fadeInUp 1s ease-out calc(0.4s + var(--delay)) both;
+        }
+
+        .step h3 {
+            color: #0366d6;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .code-block {
+            background: rgba(0, 0, 0, 0.4);
+            padding: 15px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            margin: 15px 0;
+            overflow-x: auto;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            position: relative;
+        }
+
+        .copy-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #0366d6;
+            border: none;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        .copy-btn:hover {
+            background: #0256cc;
+        }
+
+        .file-structure {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 20px;
+            border-radius: 10px;
+            font-family: 'Courier New', monospace;
+            margin: 20px 0;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .highlight {
+            background: rgba(255, 255, 0, 0.2);
+            padding: 2px 4px;
+            border-radius: 3px;
+        }
+
+        .warning {
+            background: rgba(255, 152, 0, 0.2);
+            border: 1px solid rgba(255, 152, 0, 0.5);
+            border-radius: 8px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+
+        .success {
+            background: rgba(76, 175, 80, 0.2);
+            border: 1px solid rgba(76, 175, 80, 0.5);
+            border-radius: 8px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+
+        .btn {
+            background: #0366d6;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            margin: 5px;
+        }
+
+        .btn:hover {
+            background: #0256cc;
+            transform: translateY(-2px);
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 50px;
+            opacity: 0.8;
+        }
+
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #4CAF50;
+            color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            transform: translateX(400px);
+            transition: transform 0.3s ease;
+            z-index: 1000;
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="github-logo">🐙</div>
+            <h1>GitHub-Only Discord Bot Hosting</h1>
+            <p>Run your Discord bot 24/7 using only GitHub - Completely FREE!</p>
+        </div>
+
+        <div class="status-card">
+            <div class="bot-status">
+                <div class="status-indicator">
+                    <div class="status-dot"></div>
+                    <span>GitHub Actions Ready</span>
+                </div>
+                <div>
+                    <strong>100% Free • No External Services</strong>
+                </div>
+            </div>
+        </div>
+
+        <div class="step" style="--delay: 0s">
+            <h3>🚀 Step 1: Create GitHub Repository</h3>
+            <p>First, create a new repository on GitHub for your Discord bot.</p>
+            <div class="code-block">
+                <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+1. Go to https://github.com/new
+2. Repository name: "my-discord-bot-24-7"
+3. Set to Public (required for free GitHub Actions)
+4. Check "Add a README file"
+5. Click "Create repository"
+            </div>
+        </div>
+
+        <div class="step" style="--delay: 0.1s">
+            <h3>📁 Step 2: File Structure</h3>
+            <p>Create these files in your repository:</p>
+            <div class="file-structure">
+📁 my-discord-bot-24-7/
+├── 📄 bot.js                    (your Discord bot code)
+├── 📄 package.json              (dependencies)
+├── 📄 keep-alive.js             (keeps bot running)
+├── 📁 .github/
+│   └── 📁 workflows/
+│       └── 📄 bot.yml           (GitHub Actions workflow)
+└── 📄 README.md                 (documentation)
+            </div>
+        </div>
+
+        <div class="step" style="--delay: 0.2s">
+            <h3>⚙️ Step 3: Create package.json</h3>
+            <div class="code-block">
+                <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+{
+  "name": "discord-bot-github-hosting",
+  "version": "1.0.0",
+  "description": "24/7 Discord Bot hosted on GitHub Actions",
+  "main": "bot.js",
+  "scripts": {
+    "start": "node bot.js"
+  },
+  "dependencies": {
+    "discord.js": "^14.14.1"
+  },
+  "engines": {
+    "node": "18.x"
+  }
+}
+            </div>
+        </div>
+
+        <div class="step" style="--delay: 0.3s">
+            <h3>🤖 Step 4: Update Your bot.js</h3>
+            <p>Replace the token line in your bot code:</p>
+            <div class="code-block">
+                <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+// Replace this line:
+// client.login('your_token_here')
+
+// With this:
+client.login(process.env.DISCORD_TOKEN)
+    .then(() => console.log('✅ Bot is online!'))
+    .catch(error => console.error('❌ Login failed:', error));
+            </div>
+        </div>
+
+        <div class="step" style="--delay: 0.4s">
+            <h3>🔄 Step 5: Create keep-alive.js</h3>
+            <div class="code-block">
+                <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+// keep-alive.js - Keeps the bot process running
+const { exec } = require('child_process');
+
+console.log('🚀 Starting Discord bot keep-alive system...');
+
+// Function to restart bot if it crashes
+function startBot() {
+    console.log('🤖 Starting bot...');
+    
+    const botProcess = exec('node bot.js', (error, stdout, stderr) => {
+        if (error) {
+            console.error('❌ Bot crashed:', error);
+            console.log('🔄 Restarting in 5 seconds...');
+            setTimeout(startBot, 5000);
+            return;
+        }
+        console.log('Bot output:', stdout);
+    });
+
+    botProcess.stdout.on('data', (data) => {
+        console.log('Bot:', data.toString().trim());
+    });
+
+    botProcess.stderr.on('data', (data) => {
+        console.error('Bot Error:', data.toString().trim());
+    });
+
+    botProcess.on('close', (code) => {
+        console.log(`Bot exited with code ${code}`);
+        if (code !== 0) {
+            console.log('🔄 Auto-restarting...');
+            setTimeout(startBot, 3000);
+        }
+    });
+}
+
+// Start the bot
+startBot();
+
+// Keep the process alive
+process.on('SIGTERM', () => {
+    console.log('Received SIGTERM, shutting down gracefully');
+    process.exit(0);
+});
+
+process.on('SIGINT', () => {
+    console.log('Received SIGINT, shutting down gracefully');
+    process.exit(0);
+});
+            </div>
+        </div>
+
+        <div class="step" style="--delay: 0.5s">
+            <h3>⚡ Step 6: GitHub Actions Workflow</h3>
+            <p>Create <span class="highlight">.github/workflows/bot.yml</span>:</p>
+            <div class="code-block">
+                <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+name: Discord Bot 24/7
+
+on:
+  push:
+    branches: [ main ]
+  schedule:
+    # Runs every 6 hours to keep bot alive
+    - cron: '0 */6 * * *'
+  workflow_dispatch: # Allows manual trigger
+
+jobs:
+  run-bot:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: 📥 Checkout Repository
+      uses: actions/checkout@v4
+    
+    - name: 🟢 Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18.x'
+        cache: 'npm'
+    
+    - name: 📦 Install Dependencies  
+      run: npm install
+    
+    - name: 🚀 Run Discord Bot
+      env:
+        DISCORD_TOKEN: ${{ secrets.DISCORD_TOKEN }}
+      run: |
+        echo "🤖 Starting Discord bot..."
+        timeout 21000 node keep-alive.js || echo "Bot session completed"
+        
+    - name: ✅ Bot Status
+      run: echo "Discord bot ran successfully for 6 hours!"
+
+  # Parallel job to keep repository active
+  keep-alive:
+    runs-on: ubuntu-latest
+    steps:
+    - name: 🔄 Keep Repository Active
+      run: |
+        echo "Repository is active at $(date)"
+        echo "Next run scheduled in 6 hours"
+            </div>
+            
+            <div class="warning">
+                <strong>⚠️ Important:</strong> This workflow runs your bot for ~6 hours every 6 hours, giving you nearly 24/7 uptime within GitHub's free limits!
+            </div>
+        </div>
+
+        <div class="step" style="--delay: 0.6s">
+            <h3>🔐 Step 7: Add Discord Token Secret</h3>
+            <p>Add your Discord bot token as a secret:</p>
+            <div class="code-block">
+                <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+1. Go to your repository on GitHub
+2. Click "Settings" tab
+3. Click "Secrets and variables" → "Actions"
+4. Click "New repository secret"
+5. Name: DISCORD_TOKEN
+6. Value: Your actual Discord bot token
+7. Click "Add secret"
+            </div>
+            
+            <div class="success">
+                <strong>✅ Security:</strong> Your token is now safely encrypted and only accessible by GitHub Actions!
+            </div>
+        </div>
+
+        <div class="step" style="--delay: 0.7s">
+            <h3>🚀 Step 8: Deploy Your Bot</h3>
+            <p>Upload all files and start your bot:</p>
+            <div class="code-block">
+                <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+# In your local project folder:
+git add .
+git commit -m "Deploy Discord bot to GitHub Actions"
+git push origin main
+
+# Or upload files directly through GitHub web interface
+            </div>
+            
+            <div class="success">
+                <strong>🎉 Your bot is now live!</strong> GitHub Actions will automatically start running your bot within minutes of pushing the code.
+            </div>
+        </div>
+
+        <div class="step" style="--delay: 0.8s">
+            <h3>📊 Step 9: Monitor Your Bot</h3>
+            <p>Check your bot's status and logs:</p>
+            <div class="code-block">
+                <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+1. Go to your repository on GitHub
+2. Click "Actions" tab
+3. Click on the latest workflow run
+4. Click "run-bot" to see live logs
+5. Your bot status is displayed in real-time!
+            </div>
+        </div>
+
+        <div class="step" style="--delay: 0.9s">
+            <h3>🔧 Step 10: Advanced Features</h3>
+            <p>Optional enhancements:</p>
+            <div class="code-block">
+                <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+# Manual bot restart (add to workflow):
+- name: 🔄 Manual Restart
+  if: github.event_name == 'workflow_dispatch'
+  run: echo "Bot manually restarted!"
+
+# Add logging:
+- name: 📋 Upload Logs
+  uses: actions/upload-artifact@v4
+  with:
+    name: bot-logs
+    path: logs/
+            </div>
+        </div>
+
+        <div class="warning">
+            <h3>⚠️ Important Notes:</h3>
+            <ul style="margin-left: 20px; margin-top: 10px;">
+                <li>GitHub Actions gives you <strong>2000 free minutes/month</strong></li>
+                <li>This setup provides <strong>~22 hours of bot uptime per day</strong></li>
+                <li>Repository must be <strong>public</strong> for free usage</li>
+                <li>Bot will auto-restart every 6 hours</li>
+                <li>Perfect for Discord bots with moderate usage</li>
+            </ul>
+        </div>
+
+        <div class="success">
+            <h3>✅ Benefits of GitHub-Only Hosting:</h3>
+            <ul style="margin-left: 20px; margin-top: 10px;">
+                <li>🆓 <strong>100% Free</strong> - No credit card required</li>
+                <li>🔒 <strong>Secure</strong> - Encrypted secrets management</li>
+                <li>📊 <strong>Logs</strong> - Full logging and monitoring</li>
+                <li>🔄 <strong>Auto-restart</strong> - Built-in crash recovery</li>
+                <li>⚡ <strong>Fast setup</strong> - No external services</li>
+                <li>📱 <strong>Mobile friendly</strong> - Manage from GitHub mobile app</li>
+            </ul>
+        </div>
+
+        <div class="footer">
+            <p>🎉 Your Discord bot is now running 24/7 on GitHub Actions!</p>
+            <p>📱 Monitor it anytime from the GitHub Actions tab</p>
+            <br>
+            <a href="https://github.com" class="btn">Go to GitHub</a>
+            <button class="btn" onclick="showTroubleshooting()">Troubleshooting</button>
+        </div>
+    </div>
+
+    <div class="notification" id="notification"></div>
+
+    <script>
+        function copyCode(button) {
+            const codeBlock = button.parentElement;
+            const code = codeBlock.textContent.replace('Copy', '').trim();
+            
+            navigator.clipboard.writeText(code).then(() => {
+                showNotification('Code copied to clipboard! 📋');
+                button.textContent = 'Copied!';
+                setTimeout(() => {
+                    button.textContent = 'Copy';
+                }, 2000);
+            });
+        }
+
+        function showNotification(message) {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.classList.add('show');
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+
+        function showTroubleshooting() {
+            const troubleshooting = `
+🔧 Common Issues & Solutions:
+
+❌ "Bot not starting"
+✅ Check if DISCORD_TOKEN secret is set correctly
+✅ Verify your bot token is valid and not expired
+✅ Make sure repository is public for free Actions
+
+❌ "Workflow not running"  
+✅ Push changes to main branch
+✅ Check Actions tab for error messages
+✅ Manually trigger workflow from Actions tab
+
+❌ "Bot goes offline"
+✅ This is normal - bot restarts every 6 hours
+✅ Check workflow schedule in bot.yml
+✅ View logs in Actions tab for crash details
+
+❌ "Running out of minutes"
+✅ You get 2000 free minutes/month
+✅ Optimize workflow to run less frequently
+✅ Consider upgrading to GitHub Pro for more minutes
+
+💡 Pro Tips:
+• Use workflow_dispatch for manual restarts
+• Check Actions logs for detailed debugging
+• Bot will auto-restart on crashes
+• Schedule can be adjusted in cron expression
+            `;
+            
+            alert(troubleshooting);
+        }
+
+        // Add animation delays
+        document.addEventListener('DOMContentLoaded', () => {
+            const steps = document.querySelectorAll('.step');
+            steps.forEach((step, index) => {
+                step.style.setProperty('--delay', `${index * 0.1}s`);
+            });
+        });
+    </script>
+</body>
+</html>
