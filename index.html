@@ -1,1 +1,834 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Roblox Script Submission System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #2c2f33;
+            color: #ffffff;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: #36393f;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+        }
+
+        .header {
+            background: #5865f2;
+            padding: 15px;
+            text-align: center;
+        }
+
+        .header h1 {
+            margin-bottom: 8px;
+            font-size: 24px;
+        }
+
+        .chat-container {
+            height: 400px;
+            overflow-y: auto;
+            padding: 15px;
+            background: #40444b;
+            scroll-behavior: smooth;
+        }
+
+        .message {
+            margin-bottom: 12px;
+            padding: 8px 12px;
+            border-radius: 8px;
+            max-width: 80%;
+            animation: fadeIn 0.3s ease-in;
+        }
+
+        .bot-message {
+            background: #5865f2;
+            margin-right: auto;
+        }
+
+        .user-message {
+            background: #4f545c;
+            margin-left: auto;
+            text-align: right;
+        }
+
+        .form-step {
+            display: none;
+            background: #36393f;
+            padding: 15px;
+            margin: 8px 0;
+            border-radius: 8px;
+            border-left: 4px solid #5865f2;
+        }
+
+        .form-step.active {
+            display: block;
+        }
+
+        .form-group {
+            margin-bottom: 12px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 4px;
+            color: #b9bbbe;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 8px;
+            background: #40444b;
+            border: 1px solid #4f545c;
+            border-radius: 4px;
+            color: #ffffff;
+            font-size: 14px;
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .button {
+            background: #5865f2;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            margin: 4px;
+            transition: background 0.2s;
+        }
+
+        .button:hover {
+            background: #4752c4;
+        }
+
+        .button.secondary {
+            background: #4f545c;
+        }
+
+        .button.secondary:hover {
+            background: #5d6269;
+        }
+
+        .button.success {
+            background: #3ba55c;
+        }
+
+        .button.success:hover {
+            background: #2d7d32;
+        }
+
+        .button.danger {
+            background: #ed4245;
+        }
+
+        .button.danger:hover {
+            background: #c62828;
+        }
+
+        .verification-links {
+            background: #2f3136;
+            padding: 12px;
+            border-radius: 8px;
+            margin: 8px 0;
+        }
+
+        .verification-link {
+            display: block;
+            color: #00aff4;
+            text-decoration: none;
+            padding: 6px;
+            border-radius: 4px;
+            margin: 4px 0;
+            transition: background 0.2s;
+        }
+
+        .verification-link:hover {
+            background: #40444b;
+        }
+
+        .status {
+            padding: 8px;
+            border-radius: 4px;
+            margin: 8px 0;
+        }
+
+        .status.success {
+            background: rgba(59, 165, 92, 0.2);
+            border: 1px solid #3ba55c;
+        }
+
+        .status.error {
+            background: rgba(237, 66, 69, 0.2);
+            border: 1px solid #ed4245;
+        }
+
+        .status.warning {
+            background: rgba(255, 170, 0, 0.2);
+            border: 1px solid #ffaa00;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 15px;
+            color: #b9bbbe;
+        }
+
+        .progress {
+            background: #2f3136;
+            height: 4px;
+            border-radius: 2px;
+            margin: 8px 0;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            background: #5865f2;
+            height: 100%;
+            transition: width 0.3s ease;
+        }
+
+        .start-button {
+            text-align: center;
+            padding: 15px;
+            background: #36393f;
+            margin: 8px;
+            border-radius: 8px;
+            border: 2px solid #5865f2;
+        }
+
+        .start-button.hidden {
+            display: none;
+        }
+
+        .image-preview {
+            margin: 10px 0;
+            text-align: center;
+        }
+
+        .image-preview img {
+            max-width: 250px;
+            max-height: 150px;
+            border-radius: 8px;
+            border: 1px solid #4f545c;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚀 Roblox Script Submission</h1>
+            <p>Submit your Roblox script for review!</p>
+        </div>
+
+        <div class="chat-container" id="chatContainer">
+            <div class="message bot-message">
+                <strong>ScriptBot:</strong> Welcome! Ready to submit your Roblox script? Click the button below to start the process!
+            </div>
+        </div>
+
+        <!-- Start Button -->
+        <div class="start-button" id="startSection">
+            <button class="button success" onclick="startSubmission()">📝 Start Application</button>
+        </div>
+
+        <!-- Form Steps -->
+        <div class="form-step" id="step1">
+            <h3>📝 Script Details</h3>
+            <div class="progress">
+                <div class="progress-bar" style="width: 20%"></div>
+            </div>
+            
+            <div class="form-group">
+                <label>Script Name *</label>
+                <input type="text" id="scriptName" placeholder="Enter your script name..." maxlength="100" required>
+            </div>
+            
+            <div class="form-group">
+                <label>Roblox Game Link *</label>
+                <input type="url" id="gameLink" placeholder="https://www.roblox.com/games/..." required>
+            </div>
+            
+            <div class="form-group">
+                <label>Script Features *</label>
+                <textarea id="features" placeholder="List the main features of your script..." required></textarea>
+            </div>
+            
+            <div class="form-group">
+                <label>Script Code *</label>
+                <textarea id="scriptCode" placeholder="Paste your Lua/Roblox script here..." required style="min-height: 120px;"></textarea>
+            </div>
+            
+            <div class="form-group">
+                <label>Description (Optional)</label>
+                <textarea id="description" placeholder="Describe your script, how it works, etc..."></textarea>
+            </div>
+            
+            <button class="button" onclick="nextStep()">Next: Key System ➡️</button>
+        </div>
+
+        <div class="form-step" id="step2">
+            <h3>🔑 Key System Setup</h3>
+            <div class="progress">
+                <div class="progress-bar" style="width: 40%"></div>
+            </div>
+            
+            <p>Do you want your script to have a key system?</p>
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 15px 0;">
+                <div style="background: #2f3136; padding: 12px; border-radius: 8px;">
+                    <h4>✅ With Key System</h4>
+                    <ul style="margin-left: 20px; margin-top: 8px;">
+                        <li>More secure</li>
+                        <li>You provide the key</li>
+                        <li>Users must enter key to use script</li>
+                    </ul>
+                </div>
+                <div style="background: #2f3136; padding: 12px; border-radius: 8px;">
+                    <h4>❌ No Key System</h4>
+                    <ul style="margin-left: 20px; margin-top: 8px;">
+                        <li>Public access</li>
+                        <li>No key required</li>
+                        <li>Anyone can use the script</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div style="text-align: center;">
+                <button class="button success" onclick="enableKeySystem()">🔐 Enable Key System</button>
+                <button class="button secondary" onclick="disableKeySystem()">🚫 No Key System</button>
+            </div>
+        </div>
+
+        <div class="form-step" id="step3">
+            <h3>🔑 Enter Your Script Key</h3>
+            <div class="progress">
+                <div class="progress-bar" style="width: 60%"></div>
+            </div>
+            
+            <p>Please enter the key that users will need to access your script (1-100 characters):</p>
+            
+            <div class="form-group">
+                <label>Script Key *</label>
+                <input type="text" id="scriptKey" placeholder="Enter your script key..." maxlength="100" required>
+            </div>
+            
+            <button class="button" onclick="saveKey()">Save Key & Continue ➡️</button>
+        </div>
+
+        <div class="form-step" id="step4">
+            <h3>📷 Image URL (Optional)</h3>
+            <div class="progress">
+                <div class="progress-bar" style="width: 80%"></div>
+            </div>
+            
+            <p>Enter an image URL for your script submission (optional):</p>
+            
+            <div class="form-group">
+                <label>Script Image URL</label>
+                <input type="url" id="imageUrl" placeholder="https://example.com/image.png" onchange="handleImageUrl()">
+                <small style="color: #b9bbbe;">Enter a direct link to an image (JPG, PNG, GIF)</small>
+            </div>
+            
+            <div id="imagePreview" class="hidden image-preview">
+                <img id="previewImg" alt="Script Image Preview">
+                <p style="color: #3ba55c; margin-top: 8px;">✅ Image preview loaded!</p>
+            </div>
+            
+            <button class="button" onclick="proceedToVerification()">Continue to Verification ➡️</button>
+        </div>
+
+        <div class="form-step" id="step5">
+            <h3>✅ Review & Submit</h3>
+            <div class="progress">
+                <div class="progress-bar" style="width: 100%"></div>
+            </div>
+            
+            <div id="reviewData" style="background: #2f3136; padding: 12px; border-radius: 8px; margin: 8px 0;">
+                <!-- Review data will be populated here -->
+            </div>
+            
+            <button class="button success" onclick="confirmSubmission()">🔗 Confirm & Start Verification</button>
+        </div>
+
+        <div class="form-step" id="verification">
+            <h3>🔐 Final Step: Verification</h3>
+            <div class="status warning">
+                <strong>⚠️ IMPORTANT:</strong> You get ONLY 1 ATTEMPT for verification!
+            </div>
+            
+            <p>Complete this verification to submit your script:</p>
+            
+            <div class="verification-links" id="randomLinkContainer">
+                <h4>🔗 Your Verification Link:</h4>
+                <div id="selectedLink"></div>
+            </div>
+            
+            <div class="form-group">
+                <label>Verification Code *</label>
+                <input type="text" id="verificationCode" placeholder="Enter the code you got from the link..." required>
+                <small style="color: #b9bbbe;">Note: Codes are case-sensitive!</small>
+            </div>
+            
+            <button class="button success" onclick="submitVerification()">✅ Submit Final Verification</button>
+        </div>
+    </div>
+
+    <script>
+        // Configuration
+        const WEBHOOK_URL = 'https://discord.com/api/webhooks/1414623463767015515/ERQ69cvA_qR_62jZRmY-qlg1gS1BcaDkWDLQsF9_ZIKRPCAXT1TE_XNNL5E0cvXNquf2';
+        
+        // Verification codes - will select one randomly
+        const verificationOptions = [
+            { link: 'https://linkvertise.com/32828', code: '6234767' },
+            { link: 'https://linkvertise.com/32dgdf8', code: '62etdfgdf767' },
+            { link: 'https://linkvertise.com/abcd12', code: 'abc1234' },
+            { link: 'https://linkvertise.com/xyz987', code: 'xyz5678' },
+            { link: 'https://linkvertise.com/test123', code: 'test456' },
+            { link: 'https://linkvertise.com/demo789', code: 'demo321' }
+        ];
+
+        let selectedVerification = null;
+
+        // Global form data
+        let formData = {
+            scriptName: '',
+            gameLink: '',
+            features: '',
+            scriptCode: '',
+            description: '',
+            hasKeySystem: false,
+            scriptKey: '',
+            imageUrl: null,
+            timestamp: new Date()
+        };
+
+        function scrollToBottom() {
+            const chatContainer = document.getElementById('chatContainer');
+            setTimeout(() => {
+                chatContainer.scrollTop = chatContainer.scrollHeight;
+            }, 100);
+        }
+
+        function addBotMessage(message) {
+            const chatContainer = document.getElementById('chatContainer');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'message bot-message';
+            messageDiv.innerHTML = `<strong>ScriptBot:</strong> ${message}`;
+            chatContainer.appendChild(messageDiv);
+            scrollToBottom();
+        }
+
+        function addUserMessage(message) {
+            const chatContainer = document.getElementById('chatContainer');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'message user-message';
+            messageDiv.innerHTML = `<strong>You:</strong> ${message}`;
+            chatContainer.appendChild(messageDiv);
+            scrollToBottom();
+        }
+
+        function resetToStart() {
+            // Hide all form steps
+            document.querySelectorAll('.form-step').forEach(step => {
+                step.classList.remove('active');
+            });
+            
+            // Show start section
+            document.getElementById('startSection').classList.remove('hidden');
+            
+            // Reset form data
+            formData = {
+                scriptName: '',
+                gameLink: '',
+                features: '',
+                scriptCode: '',
+                description: '',
+                hasKeySystem: false,
+                scriptKey: '',
+                imageUrl: null,
+                timestamp: new Date()
+            };
+            
+            // Reset all form inputs
+            document.querySelectorAll('input, textarea').forEach(input => {
+                input.value = '';
+            });
+            document.getElementById('imagePreview').classList.add('hidden');
+            selectedVerification = null;
+            
+            // Add welcome message
+            addBotMessage("Welcome! Ready to submit your Roblox script? Click the button below to start the process!");
+            scrollToBottom();
+        }
+
+        function startSubmission() {
+            document.getElementById('startSection').classList.add('hidden');
+            addUserMessage("I want to start submitting my script!");
+            setTimeout(() => {
+                addBotMessage("Perfect! Let's get started with your script details. Please fill out the form below.");
+                document.getElementById('step1').classList.add('active');
+                scrollToBottom();
+            }, 500);
+        }
+
+        function nextStep() {
+            // Validate step 1
+            const scriptName = document.getElementById('scriptName').value;
+            const gameLink = document.getElementById('gameLink').value;
+            const features = document.getElementById('features').value;
+            const scriptCode = document.getElementById('scriptCode').value;
+            
+            if (!scriptName || !gameLink || !features || !scriptCode) {
+                addBotMessage("❌ Please fill in all required fields before continuing!");
+                return;
+            }
+            
+            // Save data
+            formData.scriptName = scriptName;
+            formData.gameLink = gameLink;
+            formData.features = features;
+            formData.scriptCode = scriptCode;
+            formData.description = document.getElementById('description').value;
+            
+            // Hide step 1, show step 2
+            document.getElementById('step1').classList.remove('active');
+            addUserMessage(`My script "${scriptName}" is ready for the next step!`);
+            setTimeout(() => {
+                addBotMessage("Great! Now let's set up the key system. Choose your preference:");
+                document.getElementById('step2').classList.add('active');
+                scrollToBottom();
+            }, 500);
+        }
+
+        function enableKeySystem() {
+            document.getElementById('step2').classList.remove('active');
+            addUserMessage("I want to enable a key system for my script.");
+            setTimeout(() => {
+                addBotMessage("🔑 Key System Enabled! Please enter your script key below:");
+                document.getElementById('step3').classList.add('active');
+                scrollToBottom();
+            }, 500);
+        }
+
+        function disableKeySystem() {
+            formData.hasKeySystem = false;
+            formData.scriptKey = '';
+            
+            document.getElementById('step2').classList.remove('active');
+            addUserMessage("I don't want a key system for my script.");
+            setTimeout(() => {
+                addBotMessage("✅ No key system will be used. Let's continue with optional image URL:");
+                document.getElementById('step4').classList.add('active');
+                scrollToBottom();
+            }, 500);
+        }
+
+        function saveKey() {
+            const scriptKey = document.getElementById('scriptKey').value;
+            
+            if (!scriptKey || scriptKey.length < 1 || scriptKey.length > 100) {
+                addBotMessage("❌ Key must be between 1-100 characters! Please try again.");
+                return;
+            }
+            
+            formData.hasKeySystem = true;
+            formData.scriptKey = scriptKey;
+            
+            document.getElementById('step3').classList.remove('active');
+            addUserMessage(`My script key has been set.`);
+            setTimeout(() => {
+                addBotMessage("✅ Key saved! This key is for admin use only to verify and ensure no additional activities. Now let's add an optional image URL:");
+                document.getElementById('step4').classList.add('active');
+                scrollToBottom();
+            }, 500);
+        }
+
+        function handleImageUrl() {
+            const imageUrl = document.getElementById('imageUrl').value.trim();
+            
+            if (imageUrl) {
+                // Simple validation for URL format
+                try {
+                    const url = new URL(imageUrl);
+                    if (url.protocol === 'http:' || url.protocol === 'https:') {
+                        formData.imageUrl = imageUrl;
+                        
+                        // Try to load the image to show preview
+                        const img = document.getElementById('previewImg');
+                        img.onload = function() {
+                            document.getElementById('imagePreview').classList.remove('hidden');
+                            addBotMessage("✅ Image URL loaded successfully!");
+                        };
+                        img.onerror = function() {
+                            document.getElementById('imagePreview').classList.add('hidden');
+                            addBotMessage("⚠️ Image URL added but couldn't load preview. Make sure it's a valid direct image link.");
+                        };
+                        img.src = imageUrl;
+                    } else {
+                        addBotMessage("❌ Please enter a valid HTTP or HTTPS URL.");
+                    }
+                } catch (e) {
+                    addBotMessage("❌ Please enter a valid URL format.");
+                }
+            } else {
+                document.getElementById('imagePreview').classList.add('hidden');
+                formData.imageUrl = null;
+            }
+        }
+
+        function proceedToVerification() {
+            document.getElementById('step4').classList.remove('active');
+            addUserMessage("Ready to review and submit!");
+            setTimeout(() => {
+                showReview();
+            }, 500);
+        }
+
+        function showReview() {
+            const reviewData = document.getElementById('reviewData');
+            reviewData.innerHTML = `
+                <h4>📋 Your Submission Review:</h4>
+                <p><strong>📝 Script Name:</strong> ${formData.scriptName}</p>
+                <p><strong>🎮 Game Link:</strong> ${formData.gameLink}</p>
+                <p><strong>🔑 Key System:</strong> ${formData.hasKeySystem ? '✅ Enabled' : '❌ Disabled'}</p>
+                ${formData.hasKeySystem ? `<p><strong>🗝️ Key:</strong> ${formData.scriptKey} (Admin use only)</p>` : ''}
+                <p><strong>⚡ Features:</strong> ${formData.features.length > 100 ? formData.features.substring(0, 100) + '...' : formData.features}</p>
+                <p><strong>📄 Description:</strong> ${formData.description || 'No description provided'}</p>
+                <p><strong>📷 Image URL:</strong> ${formData.imageUrl ? '✅ Provided' : '❌ None'}</p>
+                <p><strong>📅 Timestamp:</strong> ${formData.timestamp.toLocaleString()}</p>
+            `;
+            
+            addBotMessage("Please review your submission details below. If everything looks good, click confirm to proceed with verification:");
+            document.getElementById('step5').classList.add('active');
+            scrollToBottom();
+        }
+
+        function confirmSubmission() {
+            // Select random verification link
+            selectedVerification = verificationOptions[Math.floor(Math.random() * verificationOptions.length)];
+            
+            document.getElementById('step5').classList.remove('active');
+            addUserMessage("Everything looks good! Let's do the verification.");
+            setTimeout(() => {
+                // Display the randomly selected link (without showing the expected code)
+                document.getElementById('selectedLink').innerHTML = `
+                    <a href="${selectedVerification.link}" class="verification-link" target="_blank">
+                        🔗 ${selectedVerification.link}
+                    </a>
+                    <p style="color: #b9bbbe; margin-top: 8px;">Click the link above, complete it, and enter the code you receive below.</p>
+                `;
+                
+                addBotMessage("🔐 Final step! Complete the verification link below and enter the code you receive:");
+                document.getElementById('verification').classList.add('active');
+                scrollToBottom();
+            }, 500);
+        }
+
+        async function submitVerification() {
+            const verificationCode = document.getElementById('verificationCode').value.trim();
+            
+            if (!verificationCode) {
+                addBotMessage("❌ Please enter the verification code!");
+                return;
+            }
+            
+            // Check if code matches the selected verification code
+            if (verificationCode !== selectedVerification.code) {
+                addBotMessage("❌ Incorrect verification code! Your submission has been cancelled (only 1 attempt allowed). Please start over if you want to try again.");
+                document.getElementById('verification').classList.remove('active');
+                setTimeout(() => {
+                    resetToStart();
+                }, 2000);
+                return;
+            }
+            
+            // Code is correct, submit to Discord
+            try {
+                addBotMessage("✅ Verification successful! Submitting your script...");
+                
+                // Split long script code if needed
+                let scriptContent = formData.scriptCode;
+                let payload;
+                
+                if (scriptContent.length > 1800) {
+                    // If script is too long, send it separately
+                    payload = {
+                        embeds: [{
+                            title: "✅ NEW VERIFIED SCRIPT SUBMISSION",
+                            color: 0x00ff00,
+                            timestamp: new Date().toISOString(),
+                            fields: [
+                                {
+                                    name: "📝 Script Name",
+                                    value: formData.scriptName,
+                                    inline: true
+                                },
+                                {
+                                    name: "🎮 Game Link",
+                                    value: formData.gameLink,
+                                    inline: true
+                                },
+                                {
+                                    name: "📅 Submitted",
+                                    value: formData.timestamp.toLocaleString(),
+                                    inline: true
+                                },
+                                {
+                                    name: "🔑 Key System",
+                                    value: formData.hasKeySystem ? `✅ Enabled\nKey: ${formData.scriptKey} (Admin use only)` : "❌ Disabled",
+                                    inline: true
+                                },
+                                {
+                                    name: "⚡ Features",
+                                    value: formData.features.length > 1024 ? formData.features.substring(0, 1000) + "..." : formData.features,
+                                    inline: false
+                                },
+                                {
+                                    name: "📄 Description",
+                                    value: formData.description || "No description provided",
+                                    inline: false
+                                },
+                                {
+                                    name: "💻 Script Code",
+                                    value: `\`\`\`lua\n${scriptContent.substring(0, 800)}...\`\`\`\n*Full code sent in next message*`,
+                                    inline: false
+                                }
+                            ]
+                        }]
+                    };
+                    
+                    if (formData.imageUrl) {
+                        payload.embeds[0].image = { url: formData.imageUrl };
+                    }
+                } else {
+                    payload = {
+                        embeds: [{
+                            title: "✅ NEW VERIFIED SCRIPT SUBMISSION",
+                            color: 0x00ff00,
+                            timestamp: new Date().toISOString(),
+                            fields: [
+                                {
+                                    name: "📝 Script Name",
+                                    value: formData.scriptName,
+                                    inline: true
+                                },
+                                {
+                                    name: "🎮 Game Link",
+                                    value: formData.gameLink,
+                                    inline: true
+                                },
+                                {
+                                    name: "📅 Submitted",
+                                    value: formData.timestamp.toLocaleString(),
+                                    inline: true
+                                },
+                                {
+                                    name: "🔑 Key System",
+                                    value: formData.hasKeySystem ? `✅ Enabled\nKey: ${formData.scriptKey} (Admin use only)` : "❌ Disabled",
+                                    inline: true
+                                },
+                                {
+                                    name: "⚡ Features",
+                                    value: formData.features.length > 1024 ? formData.features.substring(0, 1000) + "..." : formData.features,
+                                    inline: false
+                                },
+                                {
+                                    name: "📄 Description",
+                                    value: formData.description || "No description provided",
+                                    inline: false
+                                },
+                                {
+                                    name: "💻 Script Code",
+                                    value: `\`\`\`lua\n${scriptContent}\`\`\``,
+                                    inline: false
+                                }
+                            ]
+                        }]
+                    };
+                    
+                    if (formData.imageUrl) {
+                        payload.embeds[0].image = { url: formData.imageUrl };
+                    }
+                }
+                
+                // Send main webhook
+                const response = await fetch(WEBHOOK_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(payload)
+                });
+                
+                // Send full script code if it was too long
+                if (scriptContent.length > 1800) {
+                    setTimeout(async () => {
+                        try {
+                            await fetch(WEBHOOK_URL, {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                },
+                                body: JSON.stringify({
+                                    content: `**Full Script Code for "${formData.scriptName}":**\n\`\`\`lua\n${scriptContent}\`\`\``
+                                })
+                            });
+                        } catch (e) {
+                            console.log('Failed to send full script code');
+                        }
+                    }, 1000);
+                }
+                
+                if (response.ok) {
+                    document.getElementById('verification').classList.remove('active');
+                    setTimeout(() => {
+                        addBotMessage("🎉 Verification Complete! Your script has been successfully submitted and sent to the admin for review. Thank you!");
+                        setTimeout(() => {
+                            resetToStart();
+                        }, 3000);
+                    }, 500);
+                } else {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+            } catch (error) {
+                console.error('Webhook Error:', error);
+                addBotMessage("❌ Verification successful but failed to send to admin. Please contact support!");
+                addBotMessage(`Error details: ${error.message}`);
+                setTimeout(() => {
+                    resetToStart();
+                }, 5000);
+            }
+        }
+    </script>
+</body>
+</html>
