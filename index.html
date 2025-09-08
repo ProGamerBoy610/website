@@ -703,8 +703,14 @@
                         }]
                     };
                     
+                    // Note: Skip image attachment for Discord webhook due to base64 size limits
+                    // Instead, just mention that an image was uploaded
                     if (formData.imageUrl) {
-                        payload.embeds[0].image = { url: formData.imageUrl };
+                        payload.embeds[0].fields.push({
+                            name: "📷 Image Status",
+                            value: "✅ Image was uploaded with submission",
+                            inline: true
+                        });
                     }
                 } else {
                     payload = {
