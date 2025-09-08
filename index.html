@@ -623,7 +623,7 @@
                 ${formData.hasKeySystem ? `<p><strong>🗝️ Key:</strong> ${formData.scriptKey} (Admin use only)</p>` : ''}
                 <p><strong>⚡ Features:</strong> ${formData.features.length > 100 ? formData.features.substring(0, 100) + '...' : formData.features}</p>
                 <p><strong>📄 Description:</strong> ${formData.description || 'No description provided'}</p>
-                <p><strong>📷 Image URL:</strong> ${formData.imageUrl ? '✅ Provided' : '❌ None'}</p>
+                <p><strong>📷 Image:</strong> ✅ Image URL provided (sent to admin only)</p>
                 <p><strong>📅 Timestamp:</strong> ${formData.timestamp.toLocaleString()}</p>
             `;
             
