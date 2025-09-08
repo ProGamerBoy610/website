@@ -467,9 +467,7 @@
             
             // Reset all form inputs
             document.querySelectorAll('input, textarea').forEach(input => {
-                if (input.type !== 'file') {
-                    input.value = '';
-                }
+                input.value = '';
             });
             document.getElementById('imagePreview').classList.add('hidden');
             selectedVerification = null;
