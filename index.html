@@ -43,6 +43,7 @@
             overflow-y: auto;
             padding: 20px;
             background: #40444b;
+            scroll-behavior: smooth;
         }
 
         .message {
@@ -213,6 +214,19 @@
             height: 100%;
             transition: width 0.3s ease;
         }
+
+        .start-button {
+            text-align: center;
+            padding: 20px;
+            background: #36393f;
+            margin: 10px;
+            border-radius: 8px;
+            border: 2px solid #5865f2;
+        }
+
+        .start-button.hidden {
+            display: none;
+        }
     </style>
 </head>
 <body>
@@ -225,10 +239,12 @@
         <div class="chat-container" id="chatContainer">
             <div class="message bot-message">
                 <strong>ScriptBot:</strong> Welcome! Ready to submit your Roblox script? Click the button below to start the process!
-                <div style="margin-top: 10px;">
-                    <button class="button" onclick="startSubmission()">📝 Start Application</button>
-                </div>
             </div>
+        </div>
+
+        <!-- Start Button -->
+        <div class="start-button" id="startSection">
+            <button class="button success" onclick="startSubmission()">📝 Start Application</button>
         </div>
 
         <!-- Form Steps -->
@@ -358,26 +374,9 @@
             
             <p>Complete this verification to submit your script:</p>
             
-            <div class="verification-links">
-                <h4>🔗 Verification Links (Choose any one):</h4>
-                <a href="https://linkvertise.com/32828" class="verification-link" target="_blank">
-                    Option 1: https://linkvertise.com/32828 → Expected: 6234767
-                </a>
-                <a href="https://linkvertise.com/32dgdf8" class="verification-link" target="_blank">
-                    Option 2: https://linkvertise.com/32dgdf8 → Expected: 62etdfgdf767
-                </a>
-                <a href="https://linkvertise.com/abcd12" class="verification-link" target="_blank">
-                    Option 3: https://linkvertise.com/abcd12 → Expected: abc1234
-                </a>
-                <a href="https://linkvertise.com/xyz987" class="verification-link" target="_blank">
-                    Option 4: https://linkvertise.com/xyz987 → Expected: xyz5678
-                </a>
-                <a href="https://linkvertise.com/test123" class="verification-link" target="_blank">
-                    Option 5: https://linkvertise.com/test123 → Expected: test456
-                </a>
-                <a href="https://linkvertise.com/demo789" class="verification-link" target="_blank">
-                    Option 6: https://linkvertise.com/demo789 → Expected: demo321
-                </a>
+            <div class="verification-links" id="randomLinkContainer">
+                <h4>🔗 Your Verification Link:</h4>
+                <div id="selectedLink"></div>
             </div>
             
             <div class="form-group">
@@ -394,15 +393,17 @@
         // Configuration
         const WEBHOOK_URL = 'https://discord.com/api/webhooks/1414623463767015515/ERQ69cvA_qR_62jZRmY-qlg1gS1BcaDkWDLQsF9_ZIKRPCAXT1TE_XNNL5E0cvXNquf2';
         
-        // Verification codes
-        const verificationCodes = {
-            'https://linkvertise.com/32828': '6234767',
-            'https://linkvertise.com/32dgdf8': '62etdfgdf767',
-            'https://linkvertise.com/abcd12': 'abc1234',
-            'https://linkvertise.com/xyz987': 'xyz5678',
-            'https://linkvertise.com/test123': 'test456',
-            'https://linkvertise.com/demo789': 'demo321'
-        };
+        // Verification codes - will select one randomly
+        const verificationOptions = [
+            { link: 'https://linkvertise.com/32828', code: '6234767' },
+            { link: 'https://linkvertise.com/32dgdf8', code: '62etdfgdf767' },
+            { link: 'https://linkvertise.com/abcd12', code: 'abc1234' },
+            { link: 'https://linkvertise.com/xyz987', code: 'xyz5678' },
+            { link: 'https://linkvertise.com/test123', code: 'test456' },
+            { link: 'https://linkvertise.com/demo789', code: 'demo321' }
+        ];
+
+        let selectedVerification = null;
 
         // Global form data
         let formData = {
@@ -416,6 +417,13 @@
             imageUrl: null,
             timestamp: new Date()
         };
+
+        function scrollToBottom() {
+            const chatContainer = document.getElementById('chatContainer');
+            setTimeout(() => {
+                chatContainer.scrollTop = chatContainer.scrollHeight;
+            }, 100);
+        }
 
         function addBotMessage(message) {
             const chatContainer = document.getElementById('chatContainer');
@@ -435,11 +443,49 @@
             scrollToBottom();
         }
 
+        function resetToStart() {
+            // Hide all form steps
+            document.querySelectorAll('.form-step').forEach(step => {
+                step.classList.remove('active');
+            });
+            
+            // Show start section
+            document.getElementById('startSection').classList.remove('hidden');
+            
+            // Reset form data
+            formData = {
+                scriptName: '',
+                gameLink: '',
+                features: '',
+                scriptCode: '',
+                description: '',
+                hasKeySystem: false,
+                scriptKey: '',
+                imageUrl: null,
+                timestamp: new Date()
+            };
+            
+            // Reset all form inputs
+            document.querySelectorAll('input, textarea').forEach(input => {
+                if (input.type !== 'file') {
+                    input.value = '';
+                }
+            });
+            document.getElementById('imagePreview').classList.add('hidden');
+            selectedVerification = null;
+            
+            // Add welcome message
+            addBotMessage("Welcome! Ready to submit your Roblox script? Click the button below to start the process!");
+            scrollToBottom();
+        }
+
         function startSubmission() {
+            document.getElementById('startSection').classList.add('hidden');
             addUserMessage("I want to start submitting my script!");
             setTimeout(() => {
                 addBotMessage("Perfect! Let's get started with your script details. Please fill out the form below.");
                 document.getElementById('step1').classList.add('active');
+                scrollToBottom();
             }, 500);
         }
 
@@ -468,6 +514,7 @@
             setTimeout(() => {
                 addBotMessage("Great! Now let's set up the key system. Choose your preference:");
                 document.getElementById('step2').classList.add('active');
+                scrollToBottom();
             }, 500);
         }
 
@@ -477,6 +524,7 @@
             setTimeout(() => {
                 addBotMessage("🔑 Key System Enabled! Please enter your script key below:");
                 document.getElementById('step3').classList.add('active');
+                scrollToBottom();
             }, 500);
         }
 
@@ -489,6 +537,7 @@
             setTimeout(() => {
                 addBotMessage("✅ No key system will be used. Let's continue with optional image upload:");
                 document.getElementById('step4').classList.add('active');
+                scrollToBottom();
             }, 500);
         }
 
@@ -508,6 +557,7 @@
             setTimeout(() => {
                 addBotMessage("✅ Key saved! This key is for admin use only to verify and ensure no additional activities. Now let's add an optional image:");
                 document.getElementById('step4').classList.add('active');
+                scrollToBottom();
             }, 500);
         }
 
@@ -556,14 +606,27 @@
             
             addBotMessage("Please review your submission details below. If everything looks good, click confirm to proceed with verification:");
             document.getElementById('step5').classList.add('active');
+            scrollToBottom();
         }
 
         function confirmSubmission() {
+            // Select random verification link
+            selectedVerification = verificationOptions[Math.floor(Math.random() * verificationOptions.length)];
+            
             document.getElementById('step5').classList.remove('active');
             addUserMessage("Everything looks good! Let's do the verification.");
             setTimeout(() => {
-                addBotMessage("🔐 Final step! Complete ONE of the verification links below and enter the code you receive:");
+                // Display the randomly selected link
+                document.getElementById('selectedLink').innerHTML = `
+                    <a href="${selectedVerification.link}" class="verification-link" target="_blank">
+                        🔗 ${selectedVerification.link} → Expected: ${selectedVerification.code}
+                    </a>
+                    <p style="color: #b9bbbe; margin-top: 10px;">Click the link above, complete it, and enter the code you receive below.</p>
+                `;
+                
+                addBotMessage("🔐 Final step! Complete the verification link below and enter the code you receive:");
                 document.getElementById('verification').classList.add('active');
+                scrollToBottom();
             }, 500);
         }
 
@@ -575,11 +638,13 @@
                 return;
             }
             
-            // Check if code matches any expected codes
-            const validCodes = Object.values(verificationCodes);
-            if (!validCodes.includes(verificationCode)) {
+            // Check if code matches the selected verification code
+            if (verificationCode !== selectedVerification.code) {
                 addBotMessage("❌ Incorrect verification code! Your submission has been cancelled (only 1 attempt allowed). Please start over if you want to try again.");
                 document.getElementById('verification').classList.remove('active');
+                setTimeout(() => {
+                    resetToStart();
+                }, 2000);
                 return;
             }
             
@@ -646,23 +711,9 @@
                     document.getElementById('verification').classList.remove('active');
                     setTimeout(() => {
                         addBotMessage("🎉 Verification Complete! Your script has been successfully submitted and sent to the admin for review. Thank you!");
-                        
-                        // Reset form
-                        formData = {
-                            scriptName: '',
-                            gameLink: '',
-                            features: '',
-                            scriptCode: '',
-                            description: '',
-                            hasKeySystem: false,
-                            scriptKey: '',
-                            imageUrl: null,
-                            timestamp: new Date()
-                        };
-                        
-                        // Reset all form inputs
-                        document.querySelectorAll('input, textarea').forEach(input => input.value = '');
-                        document.getElementById('imagePreview').classList.add('hidden');
+                        setTimeout(() => {
+                            resetToStart();
+                        }, 3000);
                     }, 500);
                 } else {
                     throw new Error('Failed to send webhook');
@@ -671,6 +722,9 @@
             } catch (error) {
                 console.error('Error:', error);
                 addBotMessage("❌ Verification successful but failed to send to admin. Please contact support!");
+                setTimeout(() => {
+                    resetToStart();
+                }, 3000);
             }
         }
     </script>
