@@ -616,10 +616,10 @@
             document.getElementById('step5').classList.remove('active');
             addUserMessage("Everything looks good! Let's do the verification.");
             setTimeout(() => {
-                // Display the randomly selected link
+                // Display the randomly selected link (without showing the expected code)
                 document.getElementById('selectedLink').innerHTML = `
                     <a href="${selectedVerification.link}" class="verification-link" target="_blank">
-                        🔗 ${selectedVerification.link} → Expected: ${selectedVerification.code}
+                        🔗 ${selectedVerification.link}
                     </a>
                     <p style="color: #b9bbbe; margin-top: 10px;">Click the link above, complete it, and enter the code you receive below.</p>
                 `;
