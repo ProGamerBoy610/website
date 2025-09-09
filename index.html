@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Roblox Script Submission v4</title>
+    <title>Roblox Script Submission v2</title>
     <style>
         * {
             margin: 0;
@@ -248,12 +248,6 @@
             margin: 8px;
             border-radius: 8px;
         }
-
-        .discord-footer img {
-            width: 32px;
-            vertical-align: middle;
-            margin-right: 8px;
-        }
     </style>
 </head>
 <body>
@@ -416,9 +410,7 @@
         </div>
 
         <div class="discord-footer">
-            <a href="https://discord.gg/8THMQmXvuK" target="_blank" class="verification-link">
-                <img src="https://discord.com/assets/2c21aeda9de8715a1a2e6d84a3ffb838.svg" alt="Discord Logo"> Join our Discord Community
-            </a>
+            <a href="https://discord.gg/8THMQmXvuK" target="_blank" class="verification-link">Join our Discord Community</a>
         </div>
     </div>
 
@@ -534,7 +526,8 @@
             }
             
             // Validate word count for features (minimum 40 words)
-            const wordCount = features.trim().split(/\s+/).length;
+            const words = features.trim().split(/\s+/).filter(word => word.length > 0);
+            const wordCount = words.length;
             if (wordCount < 40) {
                 addBotMessage(`❌ The Script Features field must contain at least 40 words. Current count: ${wordCount}. Please add more details.`);
                 return;
