@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Roblox Script Submission System</title>
+    <title>Roblox Script Submission v2</title>
     <style>
         * {
             margin: 0;
@@ -119,12 +119,6 @@
 
         .button:hover {
             background: #4752c4;
-        }
-
-        .button:disabled {
-            background: #4f545c;
-            cursor: not-allowed;
-            opacity: 0.6;
         }
 
         .button.secondary {
@@ -246,39 +240,6 @@
             border-radius: 8px;
             border: 1px solid #4f545c;
         }
-
-        .help-box {
-            background: #2f3136;
-            padding: 12px;
-            border-radius: 8px;
-            margin: 8px 0;
-            border-left: 4px solid #ffaa00;
-        }
-
-        .key-system-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
-            margin: 15px 0;
-        }
-
-        .key-system-option {
-            background: #2f3136;
-            padding: 12px;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: background 0.2s;
-            border: 2px solid transparent;
-        }
-
-        .key-system-option:hover {
-            background: #3a3f45;
-        }
-
-        .key-system-option.selected {
-            border-color: #5865f2;
-            background: #3a3f45;
-        }
     </style>
 </head>
 <body>
@@ -335,34 +296,35 @@
         </div>
 
         <div class="form-step" id="step2">
-            <h3>🔑 Key System Setup</h3>
+            <h3>🔑 Key System </h3>
             <div class="progress">
                 <div class="progress-bar" style="width: 40%"></div>
             </div>
             
-            <p>Choose how you want to handle your script's key system:</p>
+            <p>Do you want your script to have a key system?</p>
             
-            <div class="key-system-grid">
-                <div class="key-system-option" id="hasKeyOption" onclick="selectKeyOption('has')">
-                    <h4>✅ I Have A Key System</h4>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 15px 0;">
+                <div style="background: #2f3136; padding: 12px; border-radius: 8px;">
+                    <h4>✅ I Have Key System</h4>
                     <ul style="margin-left: 20px; margin-top: 8px;">
-                        <li>More secure script</li>
-                        <li>Users need a key to access</li>
-                        <li>Better control over usage</li>
+                        <li>More secure</li>
+                        <li></li>
+                        <li>Users must enter key to use script</li>
                     </ul>
                 </div>
-                <div class="key-system-option" id="noKeyOption" onclick="selectKeyOption('none')">
-                    <h4>❌ No Key System</h4>
+                <div style="background: #2f3136; padding: 12px; border-radius: 8px;">
+                    <h4>❌ I Don't Have Key System</h4>
                     <ul style="margin-left: 20px; margin-top: 8px;">
-                        <li>Open access script</li>
-                        <li>Anyone can use it</li>
-                        <li>Simpler implementation</li>
+                        <li>Public access</li>
+                        <li>No key required</li>
+                        <li>Anyone can use the script</li>
                     </ul>
                 </div>
             </div>
             
-            <div id="keySystemButtons" style="text-align: center; margin-top: 15px;">
-                <button class="button" id="proceedKeyButton" onclick="proceedFromKeySystem()" disabled>Continue ➡️</button>
+            <div style="text-align: center;">
+                <button class="button success" onclick="enableKeySystem()">🔐 Enable Key System</button>
+                <button class="button secondary" onclick="disableKeySystem()">🚫 No Key System</button>
             </div>
         </div>
 
@@ -372,7 +334,7 @@
                 <div class="progress-bar" style="width: 60%"></div>
             </div>
             
-            <p>Please enter the key that users will need to access your script. This key is for admin verification purposes (1-100 characters):</p>
+            <p>Please enter the key that users will need to access your script. This key is for admin only to check the script (1-100 characters):</p>
             
             <div class="form-group">
                 <label>Script Key *</label>
@@ -383,25 +345,16 @@
         </div>
 
         <div class="form-step" id="step4">
-            <h3>📷 Script Image URL *</h3>
+            <h3>📷 Image URL (Optional)</h3>
             <div class="progress">
                 <div class="progress-bar" style="width: 80%"></div>
             </div>
             
-            <p>Please provide an image URL for your script submission:</p>
-            
-            <div class="help-box">
-                <h4>📝 Don't have an image URL?</h4>
-                <p>Upload your image to get a direct URL:</p>
-                <a href="https://pages.edgeone.ai/drop" target="_blank" class="verification-link">
-                    🔗 https://pages.edgeone.ai/drop
-                </a>
-                <p style="color: #b9bbbe; margin-top: 8px;">Upload your image there and copy the direct link it gives you.</p>
-            </div>
+            <p>Enter an image URL for your script submission (optional):</p>
             
             <div class="form-group">
-                <label>Script Image URL *</label>
-                <input type="url" id="imageUrl" placeholder="https://example.com/image.png" onchange="handleImageUrl()" required>
+                <label>Script Image URL</label>
+                <input type="url" id="imageUrl" placeholder="https://example.com/image.png" onchange="handleImageUrl()">
                 <small style="color: #b9bbbe;">Enter a direct link to an image (JPG, PNG, GIF)</small>
             </div>
             
@@ -410,7 +363,7 @@
                 <p style="color: #3ba55c; margin-top: 8px;">✅ Image preview loaded!</p>
             </div>
             
-            <button class="button" id="proceedToReviewBtn" onclick="proceedToVerification()" disabled>Continue to Review ➡️</button>
+            <button class="button" onclick="proceedToVerification()">Continue to Verification ➡️</button>
         </div>
 
         <div class="form-step" id="step5">
@@ -429,7 +382,7 @@
         <div class="form-step" id="verification">
             <h3>🔐 Final Step: Verification</h3>
             <div class="status warning">
-                <strong>⚠️ IMPORTANT:</strong> Click the link and complete the task, then enter the code you receive
+                <strong>⚠️ IMPORTANT:</strong> Click the link and complete task and enter the code
             </div>
             
             <p>Complete this verification to submit your script:</p>
@@ -464,8 +417,6 @@
         ];
 
         let selectedVerification = null;
-        let selectedKeySystem = null;
-        let imageUrlValid = false;
 
         // Global form data
         let formData = {
@@ -532,15 +483,7 @@
                 input.value = '';
             });
             document.getElementById('imagePreview').classList.add('hidden');
-            document.getElementById('proceedToReviewBtn').disabled = true;
             selectedVerification = null;
-            selectedKeySystem = null;
-            imageUrlValid = false;
-            
-            // Reset key system options
-            document.getElementById('hasKeyOption').classList.remove('selected');
-            document.getElementById('noKeyOption').classList.remove('selected');
-            document.getElementById('proceedKeyButton').disabled = true;
             
             // Add welcome message
             addBotMessage("Welcome! Ready to submit your Roblox script? Click the button below to start the process!");
@@ -580,55 +523,33 @@
             document.getElementById('step1').classList.remove('active');
             addUserMessage(`My script "${scriptName}" is ready for the next step!`);
             setTimeout(() => {
-                addBotMessage("Great! Now let's set up the key system. Please choose an option below:");
+                addBotMessage("Great! Now let's set up the key system. Choose your preference:");
                 document.getElementById('step2').classList.add('active');
                 scrollToBottom();
             }, 500);
         }
 
-        function selectKeyOption(option) {
-            selectedKeySystem = option;
-            
-            // Update visual selection
-            document.getElementById('hasKeyOption').classList.remove('selected');
-            document.getElementById('noKeyOption').classList.remove('selected');
-            
-            if (option === 'has') {
-                document.getElementById('hasKeyOption').classList.add('selected');
-            } else {
-                document.getElementById('noKeyOption').classList.add('selected');
-            }
-            
-            // Enable proceed button
-            document.getElementById('proceedKeyButton').disabled = false;
+        function enableKeySystem() {
+            document.getElementById('step2').classList.remove('active');
+            addUserMessage("I want to enable a key system for my script.");
+            setTimeout(() => {
+                addBotMessage("🔑 Key System Enabled! Please enter your script key below:");
+                document.getElementById('step3').classList.add('active');
+                scrollToBottom();
+            }, 500);
         }
 
-        function proceedFromKeySystem() {
-            if (!selectedKeySystem) {
-                addBotMessage("❌ Please select a key system option first!");
-                return;
-            }
+        function disableKeySystem() {
+            formData.hasKeySystem = false;
+            formData.scriptKey = '';
             
             document.getElementById('step2').classList.remove('active');
-            
-            if (selectedKeySystem === 'has') {
-                addUserMessage("I want to enable a key system for my script.");
-                setTimeout(() => {
-                    addBotMessage("🔑 Key System Selected! Please enter your script key below:");
-                    document.getElementById('step3').classList.add('active');
-                    scrollToBottom();
-                }, 500);
-            } else {
-                formData.hasKeySystem = false;
-                formData.scriptKey = '';
-                
-                addUserMessage("I don't want a key system for my script.");
-                setTimeout(() => {
-                    addBotMessage("✅ No key system selected. Now please provide an image URL for your script:");
-                    document.getElementById('step4').classList.add('active');
-                    scrollToBottom();
-                }, 500);
-            }
+            addUserMessage("I don't want a key system for my script.");
+            setTimeout(() => {
+                addBotMessage("✅ No key system will be used. Let's continue with optional image URL:");
+                document.getElementById('step4').classList.add('active');
+                scrollToBottom();
+            }, 500);
         }
 
         function saveKey() {
@@ -645,7 +566,7 @@
             document.getElementById('step3').classList.remove('active');
             addUserMessage(`My script key has been set.`);
             setTimeout(() => {
-                addBotMessage("✅ Key saved! This key is for admin use only to verify and ensure no additional activities. Now please provide an image URL for your script:");
+                addBotMessage("✅ Key saved! This key is for admin use only to verify and ensure no additional activities. Now let's add an optional image URL:");
                 document.getElementById('step4').classList.add('active');
                 scrollToBottom();
             }, 500);
@@ -653,56 +574,40 @@
 
         function handleImageUrl() {
             const imageUrl = document.getElementById('imageUrl').value.trim();
-            const proceedBtn = document.getElementById('proceedToReviewBtn');
             
-            if (!imageUrl) {
-                imageUrlValid = false;
-                proceedBtn.disabled = true;
-                document.getElementById('imagePreview').classList.add('hidden');
-                return;
-            }
-            
-            // Simple validation for URL format
-            try {
-                const url = new URL(imageUrl);
-                if (url.protocol === 'http:' || url.protocol === 'https:') {
-                    formData.imageUrl = imageUrl;
-                    
-                    // Try to load the image to show preview
-                    const img = document.getElementById('previewImg');
-                    img.onload = function() {
-                        document.getElementById('imagePreview').classList.remove('hidden');
-                        addBotMessage("✅ Image URL loaded successfully!");
-                        imageUrlValid = true;
-                        proceedBtn.disabled = false;
-                    };
-                    img.onerror = function() {
-                        document.getElementById('imagePreview').classList.add('hidden');
-                        addBotMessage("❌ Could not load the image from this URL. Please check the URL and try again.");
-                        imageUrlValid = false;
-                        proceedBtn.disabled = true;
-                    };
-                    img.src = imageUrl;
-                } else {
-                    addBotMessage("❌ Please enter a valid HTTP or HTTPS URL.");
-                    imageUrlValid = false;
-                    proceedBtn.disabled = true;
+            if (imageUrl) {
+                // Simple validation for URL format
+                try {
+                    const url = new URL(imageUrl);
+                    if (url.protocol === 'http:' || url.protocol === 'https:') {
+                        formData.imageUrl = imageUrl;
+                        
+                        // Try to load the image to show preview
+                        const img = document.getElementById('previewImg');
+                        img.onload = function() {
+                            document.getElementById('imagePreview').classList.remove('hidden');
+                            addBotMessage("✅ Image URL loaded successfully!");
+                        };
+                        img.onerror = function() {
+                            document.getElementById('imagePreview').classList.add('hidden');
+                            addBotMessage("⚠️ Image URL added but couldn't load preview. Make sure it's a valid direct image link.");
+                        };
+                        img.src = imageUrl;
+                    } else {
+                        addBotMessage("❌ Please enter a valid HTTP or HTTPS URL.");
+                    }
+                } catch (e) {
+                    addBotMessage("❌ Please enter a valid URL format.");
                 }
-            } catch (e) {
-                addBotMessage("❌ Please enter a valid URL format.");
-                imageUrlValid = false;
-                proceedBtn.disabled = true;
+            } else {
+                document.getElementById('imagePreview').classList.add('hidden');
+                formData.imageUrl = null;
             }
         }
 
         function proceedToVerification() {
-            if (!imageUrlValid) {
-                addBotMessage("❌ Please provide a valid image URL before continuing!");
-                return;
-            }
-            
             document.getElementById('step4').classList.remove('active');
-            addUserMessage("Image URL added! Ready to review and submit!");
+            addUserMessage("Ready to review and submit!");
             setTimeout(() => {
                 showReview();
             }, 500);
@@ -718,7 +623,7 @@
                 ${formData.hasKeySystem ? `<p><strong>🗝️ Key:</strong> ${formData.scriptKey} (Admin use only)</p>` : ''}
                 <p><strong>⚡ Features:</strong> ${formData.features.length > 100 ? formData.features.substring(0, 100) + '...' : formData.features}</p>
                 <p><strong>📄 Description:</strong> ${formData.description || 'No description provided'}</p>
-                <p><strong>📷 Image:</strong> ✅ Image URL provided</p>
+                <p><strong>📷 Image:</strong> ✅ Image URL provided (sent to admin only)</p>
                 <p><strong>📅 Timestamp:</strong> ${formData.timestamp.toLocaleString()}</p>
             `;
             
@@ -739,7 +644,7 @@
                     <a href="${selectedVerification.link}" class="verification-link" target="_blank">
                         🔗 ${selectedVerification.link}
                     </a>
-                    <p style="color: #b9bbbe; margin-top: 8px;">Click the link above, complete the task, and enter the code you receive below.</p>
+                    <p style="color: #b9bbbe; margin-top: 8px;">Click the link above, complete it, and enter the code you receive below.</p>
                 `;
                 
                 addBotMessage("🔐 Final step! Complete the verification link below and enter the code you receive:");
@@ -776,6 +681,55 @@
                 
                 if (scriptContent.length > 1800) {
                     // If script is too long, send it separately
+                    payload = {
+                        embeds: [{
+                            title: "✅ NEW VERIFIED SCRIPT SUBMISSION",
+                            color: 0x00ff00,
+                            timestamp: new Date().toISOString(),
+                            fields: [
+                                {
+                                    name: "📝 Script Name",
+                                    value: formData.scriptName,
+                                    inline: true
+                                },
+                                {
+                                    name: "🎮 Game Link",
+                                    value: formData.gameLink,
+                                    inline: true
+                                },
+                                {
+                                    name: "📅 Submitted",
+                                    value: formData.timestamp.toLocaleString(),
+                                    inline: true
+                                },
+                                {
+                                    name: "🔑 Key System",
+                                    value: formData.hasKeySystem ? `✅ Enabled\nKey: ${formData.scriptKey} (Admin use only)` : "❌ Disabled",
+                                    inline: true
+                                },
+                                {
+                                    name: "⚡ Features",
+                                    value: formData.features.length > 1024 ? formData.features.substring(0, 1000) + "..." : formData.features,
+                                    inline: false
+                                },
+                                {
+                                    name: "📄 Description",
+                                    value: formData.description || "No description provided",
+                                    inline: false
+                                },
+                                {
+                                    name: "💻 Script Code",
+                                    value: `\`\`\`lua\n${scriptContent.substring(0, 800)}...\`\`\`\n*Full code sent in next message*`,
+                                    inline: false
+                                }
+                            ]
+                        }]
+                    };
+                    
+                    if (formData.imageUrl) {
+                        payload.embeds[0].image = { url: formData.imageUrl };
+                    }
+                } else {
                     payload = {
                         embeds: [{
                             title: "✅ NEW VERIFIED SCRIPT SUBMISSION",
@@ -877,53 +831,4 @@
         }
     </script>
 </body>
-</html>: formData.hasKeySystem ? `✅ Enabled\nKey: ${formData.scriptKey} (Admin use only)` : "❌ Disabled",
-                                    inline: true
-                                },
-                                {
-                                    name: "⚡ Features",
-                                    value: formData.features.length > 1024 ? formData.features.substring(0, 1000) + "..." : formData.features,
-                                    inline: false
-                                },
-                                {
-                                    name: "📄 Description",
-                                    value: formData.description || "No description provided",
-                                    inline: false
-                                },
-                                {
-                                    name: "💻 Script Code",
-                                    value: `\`\`\`lua\n${scriptContent.substring(0, 800)}...\`\`\`\n*Full code sent in next message*`,
-                                    inline: false
-                                }
-                            ]
-                        }]
-                    };
-                    
-                    if (formData.imageUrl) {
-                        payload.embeds[0].image = { url: formData.imageUrl };
-                    }
-                } else {
-                    payload = {
-                        embeds: [{
-                            title: "✅ NEW VERIFIED SCRIPT SUBMISSION",
-                            color: 0x00ff00,
-                            timestamp: new Date().toISOString(),
-                            fields: [
-                                {
-                                    name: "📝 Script Name",
-                                    value: formData.scriptName,
-                                    inline: true
-                                },
-                                {
-                                    name: "🎮 Game Link",
-                                    value: formData.gameLink,
-                                    inline: true
-                                },
-                                {
-                                    name: "📅 Submitted",
-                                    value: formData.timestamp.toLocaleString(),
-                                    inline: true
-                                },
-                                {
-                                    name: "🔑 Key System",
-                                    value
+</html>
