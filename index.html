@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Roblox Script Submission v2</title>
+    <title>Roblox Script Submission v6</title>
     <style>
         * {
             margin: 0;
@@ -37,6 +37,25 @@
         .header h1 {
             margin-bottom: 8px;
             font-size: 24px;
+        }
+
+        .header p {
+            margin-bottom: 8px;
+        }
+
+        .discord-link {
+            display: inline-block;
+            color: #ffffff;
+            text-decoration: none;
+            background: #7289da;
+            padding: 6px 12px;
+            border-radius: 4px;
+            font-size: 12px;
+            transition: background 0.2s;
+        }
+
+        .discord-link:hover {
+            background: #5b6eae;
         }
 
         .chat-container {
@@ -103,6 +122,55 @@
         .form-group textarea {
             resize: vertical;
             min-height: 80px;
+        }
+
+        .features-container {
+            background: #2f3136;
+            padding: 10px;
+            border-radius: 6px;
+            border: 1px solid #4f545c;
+        }
+
+        .feature-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .feature-item input {
+            flex: 1;
+            margin-left: 8px;
+            margin-bottom: 0;
+        }
+
+        .add-feature-btn {
+            background: #3ba55c;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            margin-top: 8px;
+        }
+
+        .add-feature-btn:hover {
+            background: #2d7d32;
+        }
+
+        .remove-feature-btn {
+            background: #ed4245;
+            color: white;
+            border: none;
+            padding: 2px 6px;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 10px;
+            margin-left: 8px;
+        }
+
+        .remove-feature-btn:hover {
+            background: #c62828;
         }
 
         .button {
@@ -247,6 +315,7 @@
         <div class="header">
             <h1>🚀 Roblox Script Submission</h1>
             <p>Submit your Roblox script for review!</p>
+            <a href="https://discord.gg/8THMQmXvuK" class="discord-link" target="_blank">💬 Join Our Discord</a>
         </div>
 
         <div class="chat-container" id="chatContainer">
@@ -278,8 +347,14 @@
             </div>
             
             <div class="form-group">
-                <label>Script Features *</label>
-                <textarea id="features" placeholder="List the main features of your script..." required></textarea>
+                <label>Script Features * (Max 10 words per feature)</label>
+                <div class="features-container" id="featuresContainer">
+                    <div class="feature-item">
+                        <span>*</span>
+                        <input type="text" class="feature-input" placeholder="Enter feature (max 10 words)" maxlength="100" required>
+                    </div>
+                </div>
+                <button type="button" class="add-feature-btn" onclick="addFeature()">+ Add Feature</button>
             </div>
             
             <div class="form-group">
@@ -422,7 +497,7 @@
         let formData = {
             scriptName: '',
             gameLink: '',
-            features: '',
+            features: [],
             scriptCode: '',
             description: '',
             hasKeySystem: false,
@@ -430,6 +505,38 @@
             imageUrl: null,
             timestamp: new Date()
         };
+
+        function addFeature() {
+            const container = document.getElementById('featuresContainer');
+            const featureItem = document.createElement('div');
+            featureItem.className = 'feature-item';
+            featureItem.innerHTML = `
+                <span>*</span>
+                <input type="text" class="feature-input" placeholder="Enter feature (max 10 words)" maxlength="100">
+                <button type="button" class="remove-feature-btn" onclick="removeFeature(this)">×</button>
+            `;
+            container.appendChild(featureItem);
+        }
+
+        function removeFeature(button) {
+            const featureItem = button.parentElement;
+            featureItem.remove();
+        }
+
+        function validateFeatureWords(input) {
+            const words = input.value.trim().split(/\s+/).filter(word => word.length > 0);
+            if (words.length > 10) {
+                input.value = words.slice(0, 10).join(' ');
+                addBotMessage("❌ Feature descriptions are limited to 10 words maximum!");
+            }
+        }
+
+        // Add event listeners for word limit validation
+        document.addEventListener('input', function(e) {
+            if (e.target.classList.contains('feature-input')) {
+                validateFeatureWords(e.target);
+            }
+        });
 
         function scrollToBottom() {
             const chatContainer = document.getElementById('chatContainer');
@@ -469,7 +576,7 @@
             formData = {
                 scriptName: '',
                 gameLink: '',
-                features: '',
+                features: [],
                 scriptCode: '',
                 description: '',
                 hasKeySystem: false,
@@ -482,6 +589,16 @@
             document.querySelectorAll('input, textarea').forEach(input => {
                 input.value = '';
             });
+            
+            // Reset features container
+            const featuresContainer = document.getElementById('featuresContainer');
+            featuresContainer.innerHTML = `
+                <div class="feature-item">
+                    <span>*</span>
+                    <input type="text" class="feature-input" placeholder="Enter feature (max 10 words)" maxlength="100" required>
+                </div>
+            `;
+            
             document.getElementById('imagePreview').classList.add('hidden');
             document.getElementById('imageContinueButton').disabled = true;
             selectedVerification = null;
@@ -505,11 +622,23 @@
             // Validate step 1
             const scriptName = document.getElementById('scriptName').value;
             const gameLink = document.getElementById('gameLink').value;
-            const features = document.getElementById('features').value;
             const scriptCode = document.getElementById('scriptCode').value;
             
-            if (!scriptName || !gameLink || !features || !scriptCode) {
-                addBotMessage("❌ Please fill in all required fields before continuing!");
+            // Collect features
+            const featureInputs = document.querySelectorAll('.feature-input');
+            const features = [];
+            let allFeaturesValid = true;
+            
+            featureInputs.forEach(input => {
+                if (input.value.trim()) {
+                    features.push(input.value.trim());
+                } else if (input.hasAttribute('required')) {
+                    allFeaturesValid = false;
+                }
+            });
+            
+            if (!scriptName || !gameLink || !scriptCode || !allFeaturesValid || features.length === 0) {
+                addBotMessage("❌ Please fill in all required fields and at least one feature before continuing!");
                 return;
             }
             
@@ -626,6 +755,8 @@
         }
 
         function showReview() {
+            const featuresText = formData.features.map(feature => `* ${feature}`).join('\n');
+            
             const reviewData = document.getElementById('reviewData');
             reviewData.innerHTML = `
                 <h4>📋 Your Submission Review:</h4>
@@ -633,7 +764,7 @@
                 <p><strong>🎮 Game Link:</strong> ${formData.gameLink}</p>
                 <p><strong>🔑 Key System:</strong> ${formData.hasKeySystem ? '✅ Enabled' : '❌ Disabled'}</p>
                 ${formData.hasKeySystem ? `<p><strong>🗝️ Key:</strong> ${formData.scriptKey} (Admin use only)</p>` : ''}
-                <p><strong>⚡ Features:</strong> ${formData.features.length > 100 ? formData.features.substring(0, 100) + '...' : formData.features}</p>
+                <p><strong>⚡ Features:</strong><br>${featuresText}</p>
                 <p><strong>📄 Description:</strong> ${formData.description || 'No description provided'}</p>
                 <p><strong>📷 Image:</strong> ✅ Image URL provided (sent to admin only)</p>
                 <p><strong>📅 Timestamp:</strong> ${formData.timestamp.toLocaleString()}</p>
@@ -687,6 +818,9 @@
             try {
                 addBotMessage("✅ Verification successful! Submitting your script...");
                 
+                // Format features for display
+                const featuresText = formData.features.map(feature => `* ${feature}`).join('\n');
+                
                 // Split long script code if needed
                 let scriptContent = formData.scriptCode;
                 let payload;
@@ -721,7 +855,7 @@
                                 },
                                 {
                                     name: "⚡ Features",
-                                    value: formData.features.length > 1024 ? formData.features.substring(0, 1000) + "..." : formData.features,
+                                    value: featuresText.length > 1024 ? featuresText.substring(0, 1000) + "..." : featuresText,
                                     inline: false
                                 },
                                 {
@@ -770,7 +904,7 @@
                                 },
                                 {
                                     name: "⚡ Features",
-                                    value: formData.features.length > 1024 ? formData.features.substring(0, 1000) + "..." : formData.features,
+                                    value: featuresText.length > 1024 ? featuresText.substring(0, 1000) + "..." : featuresText,
                                     inline: false
                                 },
                                 {
@@ -843,4 +977,4 @@
         }
     </script>
 </body>
-</html>
+</html> "
