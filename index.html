@@ -121,6 +121,11 @@
             background: #4752c4;
         }
 
+        .button:disabled {
+            background: #72767d;
+            cursor: not-allowed;
+        }
+
         .button.secondary {
             background: #4f545c;
         }
@@ -187,6 +192,11 @@
             border: 1px solid #ffaa00;
         }
 
+        .status.info {
+            background: rgba(88, 101, 242, 0.2);
+            border: 1px solid #5865f2;
+        }
+
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
@@ -239,6 +249,23 @@
             max-height: 150px;
             border-radius: 8px;
             border: 1px solid #4f545c;
+        }
+
+        .helper-link {
+            background: #2f3136;
+            padding: 12px;
+            border-radius: 8px;
+            margin: 8px 0;
+            border-left: 4px solid #00aff4;
+        }
+
+        .helper-link a {
+            color: #00aff4;
+            text-decoration: none;
+        }
+
+        .helper-link a:hover {
+            text-decoration: underline;
         }
     </style>
 </head>
@@ -307,8 +334,8 @@
                 <div style="background: #2f3136; padding: 12px; border-radius: 8px;">
                     <h4>✅ I Have Key System</h4>
                     <ul style="margin-left: 20px; margin-top: 8px;">
-                        <li>More secure</li>
-                        <li></li>
+                        <li>More secure access</li>
+                        <li>Controlled distribution</li>
                         <li>Users must enter key to use script</li>
                     </ul>
                 </div>
@@ -334,36 +361,49 @@
                 <div class="progress-bar" style="width: 60%"></div>
             </div>
             
-            <p>Please enter the key that users will need to access your script. This key is for admin only to check the script (1-100 characters):</p>
+            <p>Please enter the key that users will need to access your script. This can be any text or code you prefer (1-100 characters):</p>
             
             <div class="form-group">
                 <label>Script Key *</label>
-                <input type="text" id="scriptKey" placeholder="Enter your script key..." maxlength="100" required>
+                <input type="text" id="scriptKey" placeholder="Enter your script key (any text)..." maxlength="100" required>
+                <small style="color: #b9bbbe;">Examples: MyScript2024, SuperKey123, or any custom text you want</small>
             </div>
             
             <button class="button" onclick="saveKey()">Save Key & Continue ➡️</button>
         </div>
 
         <div class="form-step" id="step4">
-            <h3>📷 Image URL (Optional)</h3>
+            <h3>📷 Script Image URL (Required)</h3>
             <div class="progress">
                 <div class="progress-bar" style="width: 80%"></div>
             </div>
             
-            <p>Enter an image URL for your script submission (optional):</p>
+            <div class="status info">
+                <strong>📷 Image Required:</strong> You must provide an image URL for your script submission.
+            </div>
+            
+            <div class="helper-link">
+                <h4>📸 Don't have an image URL?</h4>
+                <p>Use this free service to upload your image and get a URL:</p>
+                <a href="https://pages.edgeone.ai/drop" target="_blank">🔗 Upload Image Here - https://pages.edgeone.ai/drop</a>
+                <p style="margin-top: 8px; color: #b9bbbe;">Upload your image there, then copy the direct image URL and paste it below.</p>
+            </div>
             
             <div class="form-group">
-                <label>Script Image URL</label>
-                <input type="url" id="imageUrl" placeholder="https://example.com/image.png" onchange="handleImageUrl()">
-                <small style="color: #b9bbbe;">Enter a direct link to an image (JPG, PNG, GIF)</small>
+                <label>Script Image URL *</label>
+                <input type="url" id="imageUrl" placeholder="https://example.com/image.png" onchange="handleImageUrl()" required>
+                <small style="color: #b9bbbe;">Enter a direct link to an image (JPG, PNG, GIF) - Required to continue</small>
             </div>
             
             <div id="imagePreview" class="hidden image-preview">
                 <img id="previewImg" alt="Script Image Preview">
-                <p style="color: #3ba55c; margin-top: 8px;">✅ Image preview loaded!</p>
+                <p style="color: #3ba55c; margin-top: 8px;">✅ Image preview loaded successfully!</p>
             </div>
             
-            <button class="button" onclick="proceedToVerification()">Continue to Verification ➡️</button>
+            <button class="button" id="proceedBtn" onclick="proceedToVerification()" disabled>Continue to Verification ➡️</button>
+            <div id="imageWarning" class="status warning">
+                ⚠️ Please add a valid image URL before continuing
+            </div>
         </div>
 
         <div class="form-step" id="step5">
@@ -417,6 +457,7 @@
         ];
 
         let selectedVerification = null;
+        let imageUrlValid = false;
 
         // Global form data
         let formData = {
@@ -483,6 +524,9 @@
                 input.value = '';
             });
             document.getElementById('imagePreview').classList.add('hidden');
+            document.getElementById('proceedBtn').disabled = true;
+            document.getElementById('imageWarning').style.display = 'block';
+            imageUrlValid = false;
             selectedVerification = null;
             
             // Add welcome message
@@ -546,7 +590,7 @@
             document.getElementById('step2').classList.remove('active');
             addUserMessage("I don't want a key system for my script.");
             setTimeout(() => {
-                addBotMessage("✅ No key system will be used. Let's continue with optional image URL:");
+                addBotMessage("✅ No key system will be used. Now you need to provide an image URL (required step):");
                 document.getElementById('step4').classList.add('active');
                 scrollToBottom();
             }, 500);
@@ -566,7 +610,7 @@
             document.getElementById('step3').classList.remove('active');
             addUserMessage(`My script key has been set.`);
             setTimeout(() => {
-                addBotMessage("✅ Key saved! This key is for admin use only to verify and ensure no additional activities. Now let's add an optional image URL:");
+                addBotMessage("✅ Key saved! Now you need to provide an image URL (required step):");
                 document.getElementById('step4').classList.add('active');
                 scrollToBottom();
             }, 500);
@@ -574,40 +618,61 @@
 
         function handleImageUrl() {
             const imageUrl = document.getElementById('imageUrl').value.trim();
+            const proceedBtn = document.getElementById('proceedBtn');
+            const imageWarning = document.getElementById('imageWarning');
             
             if (imageUrl) {
                 // Simple validation for URL format
                 try {
                     const url = new URL(imageUrl);
                     if (url.protocol === 'http:' || url.protocol === 'https:') {
-                        formData.imageUrl = imageUrl;
-                        
                         // Try to load the image to show preview
                         const img = document.getElementById('previewImg');
                         img.onload = function() {
                             document.getElementById('imagePreview').classList.remove('hidden');
-                            addBotMessage("✅ Image URL loaded successfully!");
+                            formData.imageUrl = imageUrl;
+                            imageUrlValid = true;
+                            proceedBtn.disabled = false;
+                            imageWarning.style.display = 'none';
+                            addBotMessage("✅ Image URL loaded successfully! You can now continue.");
                         };
                         img.onerror = function() {
                             document.getElementById('imagePreview').classList.add('hidden');
-                            addBotMessage("⚠️ Image URL added but couldn't load preview. Make sure it's a valid direct image link.");
+                            imageUrlValid = false;
+                            proceedBtn.disabled = true;
+                            imageWarning.style.display = 'block';
+                            addBotMessage("❌ Image URL is not valid or cannot be loaded. Please check the URL and try again.");
                         };
                         img.src = imageUrl;
                     } else {
+                        imageUrlValid = false;
+                        proceedBtn.disabled = true;
+                        imageWarning.style.display = 'block';
                         addBotMessage("❌ Please enter a valid HTTP or HTTPS URL.");
                     }
                 } catch (e) {
+                    imageUrlValid = false;
+                    proceedBtn.disabled = true;
+                    imageWarning.style.display = 'block';
                     addBotMessage("❌ Please enter a valid URL format.");
                 }
             } else {
                 document.getElementById('imagePreview').classList.add('hidden');
+                imageUrlValid = false;
+                proceedBtn.disabled = true;
+                imageWarning.style.display = 'block';
                 formData.imageUrl = null;
             }
         }
 
         function proceedToVerification() {
+            if (!imageUrlValid) {
+                addBotMessage("❌ You must provide a valid image URL before continuing!");
+                return;
+            }
+            
             document.getElementById('step4').classList.remove('active');
-            addUserMessage("Ready to review and submit!");
+            addUserMessage("Image uploaded successfully! Ready to review and submit!");
             setTimeout(() => {
                 showReview();
             }, 500);
@@ -620,10 +685,10 @@
                 <p><strong>📝 Script Name:</strong> ${formData.scriptName}</p>
                 <p><strong>🎮 Game Link:</strong> ${formData.gameLink}</p>
                 <p><strong>🔑 Key System:</strong> ${formData.hasKeySystem ? '✅ Enabled' : '❌ Disabled'}</p>
-                ${formData.hasKeySystem ? `<p><strong>🗝️ Key:</strong> ${formData.scriptKey} (Admin use only)</p>` : ''}
+                ${formData.hasKeySystem ? `<p><strong>🗝️ Key:</strong> ${formData.scriptKey}</p>` : ''}
                 <p><strong>⚡ Features:</strong> ${formData.features.length > 100 ? formData.features.substring(0, 100) + '...' : formData.features}</p>
                 <p><strong>📄 Description:</strong> ${formData.description || 'No description provided'}</p>
-                <p><strong>📷 Image:</strong> ✅ Image URL provided (sent to admin only)</p>
+                <p><strong>📷 Image:</strong> ✅ Image URL provided</p>
                 <p><strong>📅 Timestamp:</strong> ${formData.timestamp.toLocaleString()}</p>
             `;
             
@@ -704,56 +769,7 @@
                                 },
                                 {
                                     name: "🔑 Key System",
-                                    value: formData.hasKeySystem ? `✅ Enabled\nKey: ${formData.scriptKey} (Admin use only)` : "❌ Disabled",
-                                    inline: true
-                                },
-                                {
-                                    name: "⚡ Features",
-                                    value: formData.features.length > 1024 ? formData.features.substring(0, 1000) + "..." : formData.features,
-                                    inline: false
-                                },
-                                {
-                                    name: "📄 Description",
-                                    value: formData.description || "No description provided",
-                                    inline: false
-                                },
-                                {
-                                    name: "💻 Script Code",
-                                    value: `\`\`\`lua\n${scriptContent.substring(0, 800)}...\`\`\`\n*Full code sent in next message*`,
-                                    inline: false
-                                }
-                            ]
-                        }]
-                    };
-                    
-                    if (formData.imageUrl) {
-                        payload.embeds[0].image = { url: formData.imageUrl };
-                    }
-                } else {
-                    payload = {
-                        embeds: [{
-                            title: "✅ NEW VERIFIED SCRIPT SUBMISSION",
-                            color: 0x00ff00,
-                            timestamp: new Date().toISOString(),
-                            fields: [
-                                {
-                                    name: "📝 Script Name",
-                                    value: formData.scriptName,
-                                    inline: true
-                                },
-                                {
-                                    name: "🎮 Game Link",
-                                    value: formData.gameLink,
-                                    inline: true
-                                },
-                                {
-                                    name: "📅 Submitted",
-                                    value: formData.timestamp.toLocaleString(),
-                                    inline: true
-                                },
-                                {
-                                    name: "🔑 Key System",
-                                    value: formData.hasKeySystem ? `✅ Enabled\nKey: ${formData.scriptKey} (Admin use only)` : "❌ Disabled",
+                                    value: formData.hasKeySystem ? `✅ Enabled\nKey: ${formData.scriptKey}` : "❌ Disabled",
                                     inline: true
                                 },
                                 {
@@ -832,3 +848,52 @@
     </script>
 </body>
 </html>
+                                },
+                                {
+                                    name: "📄 Description",
+                                    value: formData.description || "No description provided",
+                                    inline: false
+                                },
+                                {
+                                    name: "💻 Script Code",
+                                    value: `\`\`\`lua\n${scriptContent.substring(0, 800)}...\`\`\`\n*Full code sent in next message*`,
+                                    inline: false
+                                }
+                            ]
+                        }]
+                    };
+                    
+                    if (formData.imageUrl) {
+                        payload.embeds[0].image = { url: formData.imageUrl };
+                    }
+                } else {
+                    payload = {
+                        embeds: [{
+                            title: "✅ NEW VERIFIED SCRIPT SUBMISSION",
+                            color: 0x00ff00,
+                            timestamp: new Date().toISOString(),
+                            fields: [
+                                {
+                                    name: "📝 Script Name",
+                                    value: formData.scriptName,
+                                    inline: true
+                                },
+                                {
+                                    name: "🎮 Game Link",
+                                    value: formData.gameLink,
+                                    inline: true
+                                },
+                                {
+                                    name: "📅 Submitted",
+                                    value: formData.timestamp.toLocaleString(),
+                                    inline: true
+                                },
+                                {
+                                    name: "🔑 Key System",
+                                    value: formData.hasKeySystem ? `✅ Enabled\nKey: ${formData.scriptKey}` : "❌ Disabled",
+                                    inline: true
+                                },
+                                {
+                                    name: "⚡ Features",
+                                    value: formData.features.length > 1024 ? formData.features.substring(0, 1000) + "..." : formData.features,
+                                    inline: false
