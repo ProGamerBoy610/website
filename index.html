@@ -240,14 +240,6 @@
             border-radius: 8px;
             border: 1px solid #4f545c;
         }
-
-        .discord-footer {
-            text-align: center;
-            padding: 15px;
-            background: #2f3136;
-            margin: 8px;
-            border-radius: 8px;
-        }
     </style>
 </head>
 <body>
@@ -286,8 +278,8 @@
             </div>
             
             <div class="form-group">
-                <label>Script Features * (Minimum 40 words)</label>
-                <textarea id="features" placeholder="List the main features of your script (minimum 40 words)..." required></textarea>
+                <label>Script Features *</label>
+                <textarea id="features" placeholder="List the main features of your script..." required></textarea>
             </div>
             
             <div class="form-group">
@@ -408,10 +400,6 @@
             
             <button class="button success" onclick="submitVerification()">✅ Submit Final Verification</button>
         </div>
-
-        <div class="discord-footer">
-            <a href="https://discord.gg/8THMQmXvuK" target="_blank" class="verification-link">Join our Discord Community</a>
-        </div>
     </div>
 
     <script>
@@ -522,14 +510,6 @@
             
             if (!scriptName || !gameLink || !features || !scriptCode) {
                 addBotMessage("❌ Please fill in all required fields before continuing!");
-                return;
-            }
-            
-            // Validate word count for features (minimum 40 words)
-            const words = features.trim().split(/\s+/).filter(word => word.length > 0);
-            const wordCount = words.length;
-            if (wordCount < 40) {
-                addBotMessage(`❌ The Script Features field must contain at least 40 words. Current count: ${wordCount}. Please add more details.`);
                 return;
             }
             
