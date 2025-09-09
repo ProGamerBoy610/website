@@ -308,7 +308,7 @@
                     <h4>✅ I Have Key System</h4>
                     <ul style="margin-left: 20px; margin-top: 8px;">
                         <li>More secure</li>
-                        <li></li>
+                        <li>Controlled access</li>
                         <li>Users must enter key to use script</li>
                     </ul>
                 </div>
@@ -345,17 +345,17 @@
         </div>
 
         <div class="form-step" id="step4">
-            <h3>📷 Image URL (Optional)</h3>
+            <h3>📷 Image URL *</h3>
             <div class="progress">
                 <div class="progress-bar" style="width: 80%"></div>
             </div>
             
-            <p>Enter an image URL for your script submission (optional):</p>
+            <p>Enter an image URL for your script submission (required):</p>
             
             <div class="form-group">
-                <label>Script Image URL</label>
-                <input type="url" id="imageUrl" placeholder="https://example.com/image.png" onchange="handleImageUrl()">
-                <small style="color: #b9bbbe;">Enter a direct link to an image (JPG, PNG, GIF)</small>
+                <label>Script Image URL *</label>
+                <input type="url" id="imageUrl" placeholder="https://example.com/image.png" onchange="handleImageUrl()" required>
+                <small style="color: #b9bbbe;">Enter a direct link to an image (JPG, PNG, GIF). Don't have an image URL? Use <a href="https://pages.edgeone.ai/drop" target="_blank" class="verification-link">this tool</a> to create one.</small>
             </div>
             
             <div id="imagePreview" class="hidden image-preview">
@@ -363,7 +363,7 @@
                 <p style="color: #3ba55c; margin-top: 8px;">✅ Image preview loaded!</p>
             </div>
             
-            <button class="button" onclick="proceedToVerification()">Continue to Verification ➡️</button>
+            <button class="button" id="imageContinueButton" onclick="proceedToVerification()" disabled>Continue to Verification ➡️</button>
         </div>
 
         <div class="form-step" id="step5">
@@ -483,6 +483,7 @@
                 input.value = '';
             });
             document.getElementById('imagePreview').classList.add('hidden');
+            document.getElementById('imageContinueButton').disabled = true;
             selectedVerification = null;
             
             // Add welcome message
@@ -546,7 +547,7 @@
             document.getElementById('step2').classList.remove('active');
             addUserMessage("I don't want a key system for my script.");
             setTimeout(() => {
-                addBotMessage("✅ No key system will be used. Let's continue with optional image URL:");
+                addBotMessage("✅ No key system will be used. Let's continue with the required image URL:");
                 document.getElementById('step4').classList.add('active');
                 scrollToBottom();
             }, 500);
@@ -566,7 +567,7 @@
             document.getElementById('step3').classList.remove('active');
             addUserMessage(`My script key has been set.`);
             setTimeout(() => {
-                addBotMessage("✅ Key saved! This key is for admin use only to verify and ensure no additional activities. Now let's add an optional image URL:");
+                addBotMessage("✅ Key saved! This key is for admin use only to verify and ensure no additional activities. Now let's add the required image URL:");
                 document.getElementById('step4').classList.add('active');
                 scrollToBottom();
             }, 500);
@@ -574,6 +575,7 @@
 
         function handleImageUrl() {
             const imageUrl = document.getElementById('imageUrl').value.trim();
+            const continueButton = document.getElementById('imageContinueButton');
             
             if (imageUrl) {
                 // Simple validation for URL format
@@ -587,25 +589,35 @@
                         img.onload = function() {
                             document.getElementById('imagePreview').classList.remove('hidden');
                             addBotMessage("✅ Image URL loaded successfully!");
+                            continueButton.disabled = false;
                         };
                         img.onerror = function() {
                             document.getElementById('imagePreview').classList.add('hidden');
-                            addBotMessage("⚠️ Image URL added but couldn't load preview. Make sure it's a valid direct image link.");
+                            addBotMessage("❌ Invalid image URL. Please use a valid direct image link or create one using the provided tool.");
+                            continueButton.disabled = true;
                         };
                         img.src = imageUrl;
                     } else {
                         addBotMessage("❌ Please enter a valid HTTP or HTTPS URL.");
+                        continueButton.disabled = true;
                     }
                 } catch (e) {
-                    addBotMessage("❌ Please enter a valid URL format.");
+                    addBotMessage("❌ Please enter a valid URL format. Use the provided tool if you need to create an image URL.");
+                    continueButton.disabled = true;
                 }
             } else {
                 document.getElementById('imagePreview').classList.add('hidden');
                 formData.imageUrl = null;
+                continueButton.disabled = true;
+                addBotMessage("❌ Image URL is required. Please enter a valid image URL or use <a href='https://pages.edgeone.ai/drop' target='_blank'>this tool</a> to create one.");
             }
         }
 
         function proceedToVerification() {
+            if (!formData.imageUrl) {
+                addBotMessage("❌ Please provide a valid image URL before continuing.");
+                return;
+            }
             document.getElementById('step4').classList.remove('active');
             addUserMessage("Ready to review and submit!");
             setTimeout(() => {
