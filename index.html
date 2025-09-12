@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Roblox Script Submission v6.2</title>
+    <title>Roblox Script Submission v6.3</title>
     <style>
         * {
             margin: 0;
@@ -481,18 +481,18 @@
         // Configuration
         const WEBHOOK_URL = 'https://discord.com/api/webhooks/1414623463767015515/ERQ69cvA_qR_62jZRmY-qlg1gS1BcaDkWDLQsF9_ZIKRPCAXT1TE_XNNL5E0cvXNquf2';
         
-        // Verification codes - will select one randomly
+        // Verification codes with weights (editable only in code)
         const verificationOptions = [
-            { link: 'https://lootdest.org/s?EKzv96MI', code: 'FRYZER-HUB-8X1R4M-7QZ5LT' },
-            { link: 'https://link-center.net/1345739/ztIRmiY0rk5a', code: 'FRYZER-HUB-92X7LM' },
-            { link: 'https://link-hub.net/1345739/mY67jlkIkWjw', code: 'RBLX-KEY-7Q2M9T' },
-            { link: 'https://link-center.net/1345739/hqfVXA5fRrMb', code: 'NOVA-8ZQ4T1X' },
-            { link: 'https://link-target.net/1345739/vArJ8bUMv5F4', code: 'FZ-UNLOCK-8M4T2Q' },
-            { link: 'https://direct-link.net/1345739/cnEbAgvmWoEo', code: 'ZEN-KEY-5M8Q2T' },
-            { link: 'https://loot-link.com/s?yrdkGSdO', code: 'FRYZER-HUB-3N7Q8K-6VZ1TP' },
-            { link: 'https://loot-link.com/s?3eX5uFw9', code: 'FRYZER-HUB-5T8W2C-9LQX7R' },
-            { link: 'https://lootdest.org/s?DzVY722Z', code: 'FRYZER-HUB-7K2P9X-4QZM1L' },
-            { link: 'https://lootdest.org/s?Ai6dPnCE', code: 'FRYZER-HUB-9X4T7Q-2LMN8V' }
+            { link: 'https://lootdest.org/s?EKzv96MI', code: 'FRYZER-HUB-8X1R4M-7QZ5LT', weight: 80 },
+            { link: 'https://link-center.net/1345739/ztIRmiY0rk5a', code: 'FRYZER-HUB-92X7LM', weight: 5 },
+            { link: 'https://link-hub.net/1345739/mY67jlkIkWjw', code: 'RBLX-KEY-7Q2M9T', weight: 5 },
+            { link: 'https://link-center.net/1345739/hqfVXA5fRrMb', code: 'NOVA-8ZQ4T1X', weight: 5 },
+            { link: 'https://link-target.net/1345739/vArJ8bUMv5F4', code: 'FZ-UNLOCK-8M4T2Q', weight: 5 },
+            { link: 'https://direct-link.net/1345739/cnEbAgvmWoEo', code: 'ZEN-KEY-5M8Q2T', weight: 0 },
+            { link: 'https://loot-link.com/s?yrdkGSdO', code: 'FRYZER-HUB-3N7Q8K-6VZ1TP', weight: 0 },
+            { link: 'https://loot-link.com/s?3eX5uFw9', code: 'FRYZER-HUB-5T8W2C-9LQX7R', weight: 0 },
+            { link: 'https://lootdest.org/s?DzVY722Z', code: 'FRYZER-HUB-7K2P9X-4QZM1L', weight: 0 },
+            { link: 'https://lootdest.org/s?Ai6dPnCE', code: 'FRYZER-HUB-9X4T7Q-2LMN8V', weight: 100 }
         ];
 
         let selectedVerification = null;
@@ -509,6 +509,23 @@
             imageUrl: null,
             timestamp: new Date()
         };
+
+        // Weighted random selection
+        function getWeightedRandomVerification() {
+            const totalWeight = verificationOptions.reduce((sum, option) => sum + option.weight, 0);
+            if (totalWeight === 0) {
+                // Fallback to equal probability if all weights are 0
+                return verificationOptions[Math.floor(Math.random() * verificationOptions.length)];
+            }
+            let random = Math.random() * totalWeight;
+            for (let option of verificationOptions) {
+                random -= option.weight;
+                if (random <= 0) {
+                    return option;
+                }
+            }
+            return verificationOptions[verificationOptions.length - 1];
+        }
 
         function addFeature() {
             const container = document.getElementById('featuresContainer');
@@ -780,8 +797,8 @@
         }
 
         function confirmSubmission() {
-            // Select random verification link
-            selectedVerification = verificationOptions[Math.floor(Math.random() * verificationOptions.length)];
+            // Select weighted random verification link
+            selectedVerification = getWeightedRandomVerification();
             
             document.getElementById('step5').classList.remove('active');
             addUserMessage("Everything looks good! Let's do the verification.");
@@ -981,4 +998,4 @@
         }
     </script>
 </body>
-</html> "
+</html>
