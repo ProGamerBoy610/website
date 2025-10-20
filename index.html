@@ -192,13 +192,26 @@
             color: #cbd5e1;
         }
 
+        .snippet-url {
+            background: #0f172a;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-family: 'Courier New', monospace;
+            font-size: 11px;
+            margin-bottom: 12px;
+            color: #60a5fa;
+            overflow-x: auto;
+            word-break: break-all;
+            border: 1px solid #334155;
+        }
+
         .snippet-actions {
-            display: flex;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
             gap: 8px;
         }
 
         .btn-action {
-            flex: 1;
             padding: 8px 12px;
             border: none;
             border-radius: 6px;
@@ -239,6 +252,15 @@
             background: #991b1b;
         }
 
+        .btn-copy {
+            background: #065f46;
+            color: #fff;
+        }
+
+        .btn-copy:hover {
+            background: #047857;
+        }
+
         .empty-state {
             background: #1e293b;
             border: 1px solid #334155;
@@ -246,13 +268,6 @@
             padding: 40px 20px;
             text-align: center;
             color: #64748b;
-        }
-
-        .empty-state svg {
-            width: 50px;
-            height: 50px;
-            margin: 0 auto 15px;
-            opacity: 0.5;
         }
 
         @media (max-width: 1024px) {
@@ -263,6 +278,10 @@
             .form-section {
                 position: static;
             }
+
+            .snippet-actions {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
@@ -270,7 +289,7 @@
     <div class="container">
         <div class="header">
             <h1>💻 My Code Snippets</h1>
-            <p>Upload and manage your private code snippets</p>
+            <p>Upload and manage your private code snippets with permanent URLs</p>
         </div>
 
         <div class="main-content">
@@ -296,6 +315,7 @@
                         <option value="go">Go</option>
                         <option value="rust">Rust</option>
                         <option value="php">PHP</option>
+                        <option value="lua">Lua (Roblox)</option>
                     </select>
                 </div>
 
@@ -323,6 +343,26 @@
         let snippets = [];
         let editingId = null;
 
+        // Load from localStorage
+        function loadSnippets() {
+            const saved = localStorage.getItem('snippets');
+            if (saved) {
+                snippets = JSON.parse(saved);
+                renderSnippets();
+            }
+        }
+
+        // Save to localStorage
+        function saveSnippets() {
+            localStorage.setItem('snippets', JSON.stringify(snippets));
+        }
+
+        // Generate permanent URL
+        function generatePermanentUrl(id) {
+            // Using a simple encoding scheme
+            return `${window.location.origin}${window.location.pathname}?view=${id}`;
+        }
+
         function addSnippet() {
             const title = document.getElementById('title').value.trim();
             const language = document.getElementById('language').value;
@@ -344,19 +384,23 @@
                 document.getElementById('uploadBtn').textContent = 'Upload';
                 document.getElementById('cancelBtn').style.display = 'none';
             } else {
+                const newId = Date.now().toString();
                 snippets.unshift({
-                    id: Date.now(),
+                    id: newId,
                     title,
                     language,
                     code,
                     createdAt: new Date().toLocaleString(),
-                    updatedAt: new Date().toLocaleString()
+                    updatedAt: new Date().toLocaleString(),
+                    permanentUrl: generatePermanentUrl(newId)
                 });
             }
 
             document.getElementById('title').value = '';
             document.getElementById('language').value = 'javascript';
             document.getElementById('code').value = '';
+            
+            saveSnippets();
             renderSnippets();
         }
 
@@ -385,6 +429,7 @@
         function deleteSnippet(id) {
             if (confirm('Delete this snippet?')) {
                 snippets = snippets.filter(s => s.id !== id);
+                saveSnippets();
                 renderSnippets();
             }
         }
@@ -397,7 +442,7 @@
 <head>
   <title>${snippet.title}</title>
   <style>
-    body { background: #000; color: #0f0; font-family: monospace; margin: 0; padding: 20px; font-size: 14px; }
+    body { background: #000; color: #0f0; font-family: monospace; margin: 0; padding: 20px; font-size: 14px; line-height: 1.5; }
     pre { white-space: pre-wrap; word-wrap: break-word; }
   </style>
 </head>
@@ -408,6 +453,32 @@
                 const blob = new Blob([htmlContent], { type: 'text/html' });
                 const url = URL.createObjectURL(blob);
                 window.open(url, '_blank');
+            }
+        }
+
+        function copyUrl(id) {
+            const snippet = snippets.find(s => s.id === id);
+            if (snippet) {
+                navigator.clipboard.writeText(snippet.permanentUrl).then(() => {
+                    alert('✅ URL Copied!');
+                });
+            }
+        }
+
+        function copyAsLoadstring(id) {
+            const snippet = snippets.find(s => s.id === id);
+            if (snippet && snippet.language === 'lua') {
+                // For local use
+                const escapedCode = snippet.code
+                    .replace(/\\/g, '\\\\')
+                    .replace(/"/g, '\\"')
+                    .replace(/\n/g, '\\n');
+                const loadstring = `loadstring("${escapedCode}")()`;
+                navigator.clipboard.writeText(loadstring).then(() => {
+                    alert('✅ Loadstring Copied!');
+                });
+            } else if (snippet) {
+                alert('⚠️ Set language to Lua for Roblox loadstring format');
             }
         }
 
@@ -429,8 +500,10 @@
                         <span class="language-badge">${snippet.language}</span>
                     </div>
                     <div class="snippet-code">${snippet.code.substring(0, 200)}${snippet.code.length > 200 ? '...' : ''}</div>
+                    <div class="snippet-url">🔗 ${snippet.permanentUrl}</div>
                     <div class="snippet-actions">
-                        <button class="btn-action btn-view" onclick="viewFull(${snippet.id})">👁️ View Full</button>
+                        <button class="btn-action btn-view" onclick="viewFull(${snippet.id})">👁️ View</button>
+                        <button class="btn-action btn-copy" onclick="copyUrl(${snippet.id})">📋 Copy URL</button>
                         <button class="btn-action btn-edit" onclick="startEdit(${snippet.id})">✏️ Edit</button>
                         <button class="btn-action btn-delete" onclick="deleteSnippet(${snippet.id})">🗑️ Delete</button>
                     </div>
@@ -438,8 +511,8 @@
             `).join('');
         }
 
-        // Initial render
-        renderSnippets();
+        // Load snippets on page load
+        loadSnippets();
     </script>
 </body>
-                                                   </html>
+    </html>
