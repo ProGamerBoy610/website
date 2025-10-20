@@ -7,7 +7,7 @@ export default function CodeSharing() {
   const [language, setLanguage] = useState('javascript');
   const [code, setCode] = useState('');
   const [editingId, setEditingId] = useState(null);
-  const [viewFullId, setViewFullId] = useState(null);
+
 
   const languages = ['javascript', 'python', 'html', 'css', 'java', 'cpp', 'ruby', 'go', 'rust', 'php'];
 
@@ -63,36 +63,14 @@ export default function CodeSharing() {
   const viewFull = (id) => {
     const snippet = snippets.find(s => s.id === id);
     if (snippet) {
-      setViewFullId(id);
+      const blob = new Blob([snippet.code], { type: 'text/plain' });
+      const url = URL.createObjectURL(blob);
+      window.open(url, '_blank');
     }
   };
 
-  const fullViewSnippet = snippets.find(s => s.id === viewFullId);
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 to-slate-800 text-white p-6">
-      {fullViewSnippet ? (
-        <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4 z-50">
-          <div className="bg-slate-900 rounded-lg max-w-4xl w-full max-h-96 overflow-auto border border-slate-700">
-            <div className="sticky top-0 bg-slate-800 p-4 border-b border-slate-700 flex justify-between items-center">
-              <div>
-                <h2 className="text-xl font-bold">{fullViewSnippet.title}</h2>
-                <p className="text-sm text-slate-400">{fullViewSnippet.language}</p>
-              </div>
-              <button
-                onClick={() => setViewFullId(null)}
-                className="text-xl hover:text-red-400"
-              >
-                ✕
-              </button>
-            </div>
-            <pre className="p-4 bg-slate-950 text-slate-100 overflow-auto text-sm">
-              <code>{fullViewSnippet.code}</code>
-            </pre>
-          </div>
-        </div>
-      ) : null}
-
       <div className="max-w-6xl mx-auto">
         <div className="mb-8">
           <h1 className="text-4xl font-bold mb-2 flex items-center gap-2">
