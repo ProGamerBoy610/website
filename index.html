@@ -404,16 +404,6 @@
             renderSnippets();
         }
 
-        // Get raw URL for a snippet
-        function getRawUrl(id) {
-            const snippet = snippets.find(s => s.id === id);
-            if (snippet) {
-                const blob = new Blob([snippet.code], { type: 'text/plain' });
-                return URL.createObjectURL(blob);
-            }
-            return '';
-        }
-
         function startEdit(id) {
             const snippet = snippets.find(s => s.id === id);
             document.getElementById('title').value = snippet.title;
@@ -472,18 +462,14 @@
                 // Create a blob URL for raw code
                 const blob = new Blob([snippet.code], { type: 'text/plain' });
                 const blobUrl = URL.createObjectURL(blob);
-                navigator.clipboard.writeText(blobUrl).then(() => {
-                    alert('✅ Raw URL Copied!\n' + blobUrl);
-                });
-            }
-        }
-
-        function viewRawUrl(id) {
-            const snippet = snippets.find(s => s.id === id);
-            if (snippet) {
-                const blob = new Blob([snippet.code], { type: 'text/plain' });
-                const blobUrl = URL.createObjectURL(blob);
-                window.open(blobUrl, '_blank');
+                
+                // Show URL and copy to clipboard
+                const userInput = prompt('📋 Your Raw Code URL:\n\n(Click copy to clipboard)', blobUrl);
+                if (userInput !== null) {
+                    navigator.clipboard.writeText(blobUrl).then(() => {
+                        alert('✅ URL Copied to Clipboard!');
+                    });
+                }
             }
         }
 
@@ -522,7 +508,7 @@
                         <span class="language-badge">${snippet.language}</span>
                     </div>
                     <div class="snippet-code">${snippet.code.substring(0, 200)}${snippet.code.length > 200 ? '...' : ''}</div>
-                    <div class="snippet-url">🔗 <a href="javascript:void(0)" onclick="viewRawUrl(${snippet.id})" style="color: #60a5fa; text-decoration: underline; cursor: pointer;">View Raw Code</a></div>
+                    <div class="snippet-url">🔗 ${snippet.permanentUrl}</div>
                     <div class="snippet-actions">
                         <button class="btn-action btn-view" onclick="viewFull(${snippet.id})">👁️ View</button>
                         <button class="btn-action btn-copy" onclick="copyUrl(${snippet.id})">📋 Copy URL</button>
