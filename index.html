@@ -1,205 +1,445 @@
-import React, { useState } from 'react';
-import { Plus, Edit2, Trash2, Eye, Code } from 'lucide-react';
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Code Snippets</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-export default function CodeSharing() {
-  const [snippets, setSnippets] = useState([]);
-  const [title, setTitle] = useState('');
-  const [language, setLanguage] = useState('javascript');
-  const [code, setCode] = useState('');
-  const [editingId, setEditingId] = useState(null);
+        body {
+            background: linear-gradient(to bottom right, #0f172a, #1e293b);
+            color: #fff;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            min-height: 100vh;
+            padding: 20px;
+        }
 
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
 
-  const languages = ['javascript', 'python', 'html', 'css', 'java', 'cpp', 'ruby', 'go', 'rust', 'php'];
+        .header {
+            margin-bottom: 30px;
+        }
 
-  const addSnippet = () => {
-    if (!title.trim() || !code.trim()) {
-      alert('Please fill in title and code');
-      return;
-    }
+        .header h1 {
+            font-size: 32px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
 
-    if (editingId) {
-      setSnippets(snippets.map(s => 
-        s.id === editingId 
-          ? { ...s, title, language, code, updatedAt: new Date().toLocaleString() }
-          : s
-      ));
-      setEditingId(null);
-    } else {
-      setSnippets([...snippets, {
-        id: Date.now(),
-        title,
-        language,
-        code,
-        createdAt: new Date().toLocaleString(),
-        updatedAt: new Date().toLocaleString()
-      }]);
-    }
+        .header p {
+            color: #94a3b8;
+        }
 
-    setTitle('');
-    setLanguage('javascript');
-    setCode('');
-  };
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 20px;
+        }
 
-  const startEdit = (snippet) => {
-    setEditingId(snippet.id);
-    setTitle(snippet.title);
-    setLanguage(snippet.language);
-    setCode(snippet.code);
-  };
+        .form-section {
+            background: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 8px;
+            padding: 20px;
+            height: fit-content;
+            position: sticky;
+            top: 20px;
+        }
 
-  const cancelEdit = () => {
-    setEditingId(null);
-    setTitle('');
-    setLanguage('javascript');
-    setCode('');
-  };
+        .form-section h2 {
+            font-size: 18px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
 
-  const deleteSnippet = (id) => {
-    if (confirm('Delete this snippet?')) {
-      setSnippets(snippets.filter(s => s.id !== id));
-    }
-  };
+        .form-group {
+            margin-bottom: 15px;
+        }
 
-  const viewFull = (id) => {
-    const snippet = snippets.find(s => s.id === id);
-    if (snippet) {
-      const blob = new Blob([snippet.code], { type: 'text/plain' });
-      const url = URL.createObjectURL(blob);
-      window.open(url, '_blank');
-    }
-  };
+        .form-group label {
+            display: block;
+            font-size: 13px;
+            font-weight: 500;
+            margin-bottom: 8px;
+            color: #cbd5e1;
+        }
 
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 to-slate-800 text-white p-6">
-      <div className="max-w-6xl mx-auto">
-        <div className="mb-8">
-          <h1 className="text-4xl font-bold mb-2 flex items-center gap-2">
-            <Code className="w-8 h-8" />
-            My Code Snippets
-          </h1>
-          <p className="text-slate-400">Upload and manage your private code snippets</p>
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            background: #0f172a;
+            border: 1px solid #475569;
+            border-radius: 6px;
+            padding: 8px 12px;
+            color: #fff;
+            font-size: 14px;
+            font-family: 'Courier New', monospace;
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 150px;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 6px;
+            font-weight: 500;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: #2563eb;
+            color: #fff;
+        }
+
+        .btn-primary:hover {
+            background: #1d4ed8;
+        }
+
+        .btn-secondary {
+            background: #475569;
+            color: #fff;
+        }
+
+        .btn-secondary:hover {
+            background: #334155;
+        }
+
+        .snippets-section {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .snippet-card {
+            background: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 8px;
+            padding: 15px;
+            transition: border-color 0.2s;
+        }
+
+        .snippet-card:hover {
+            border-color: #475569;
+        }
+
+        .snippet-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 10px;
+        }
+
+        .snippet-title {
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .snippet-meta {
+            font-size: 12px;
+            color: #94a3b8;
+            margin-top: 5px;
+        }
+
+        .language-badge {
+            background: #1e3a8a;
+            color: #93c5fd;
+            font-size: 12px;
+            padding: 4px 10px;
+            border-radius: 4px;
+        }
+
+        .snippet-code {
+            background: #0f172a;
+            padding: 12px;
+            border-radius: 6px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            max-height: 150px;
+            overflow: hidden;
+            margin-bottom: 12px;
+            color: #cbd5e1;
+        }
+
+        .snippet-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn-action {
+            flex: 1;
+            padding: 8px 12px;
+            border: none;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+        }
+
+        .btn-view {
+            background: #475569;
+            color: #fff;
+        }
+
+        .btn-view:hover {
+            background: #334155;
+        }
+
+        .btn-edit {
+            background: #92400e;
+            color: #fff;
+        }
+
+        .btn-edit:hover {
+            background: #78350f;
+        }
+
+        .btn-delete {
+            background: #7f1d1d;
+            color: #fff;
+        }
+
+        .btn-delete:hover {
+            background: #991b1b;
+        }
+
+        .empty-state {
+            background: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 8px;
+            padding: 40px 20px;
+            text-align: center;
+            color: #64748b;
+        }
+
+        .empty-state svg {
+            width: 50px;
+            height: 50px;
+            margin: 0 auto 15px;
+            opacity: 0.5;
+        }
+
+        @media (max-width: 1024px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+
+            .form-section {
+                position: static;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>💻 My Code Snippets</h1>
+            <p>Upload and manage your private code snippets</p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Form Section */}
-          <div className="lg:col-span-1">
-            <div className="bg-slate-800 rounded-lg p-6 border border-slate-700 sticky top-6">
-              <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
-                <Plus className="w-5 h-5" />
-                {editingId ? 'Edit Snippet' : 'New Snippet'}
-              </h2>
+        <div class="main-content">
+            <!-- Form Section -->
+            <div class="form-section">
+                <h2>➕ <span id="formTitle">New Snippet</span></h2>
 
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium mb-1 text-slate-300">Title</label>
-                  <input
-                    type="text"
-                    value={title}
-                    onChange={(e) => setTitle(e.target.value)}
-                    placeholder="e.g., React Hook Example"
-                    className="w-full bg-slate-700 border border-slate-600 rounded px-3 py-2 text-white placeholder-slate-400 focus:outline-none focus:border-blue-500"
-                  />
+                <div class="form-group">
+                    <label>Title</label>
+                    <input type="text" id="title" placeholder="e.g., React Hook Example">
                 </div>
 
-                <div>
-                  <label className="block text-sm font-medium mb-1 text-slate-300">Language</label>
-                  <select
-                    value={language}
-                    onChange={(e) => setLanguage(e.target.value)}
-                    className="w-full bg-slate-700 border border-slate-600 rounded px-3 py-2 text-white focus:outline-none focus:border-blue-500"
-                  >
-                    {languages.map(lang => (
-                      <option key={lang} value={lang}>{lang}</option>
-                    ))}
-                  </select>
+                <div class="form-group">
+                    <label>Language</label>
+                    <select id="language">
+                        <option value="javascript">JavaScript</option>
+                        <option value="python">Python</option>
+                        <option value="html">HTML</option>
+                        <option value="css">CSS</option>
+                        <option value="java">Java</option>
+                        <option value="cpp">C++</option>
+                        <option value="ruby">Ruby</option>
+                        <option value="go">Go</option>
+                        <option value="rust">Rust</option>
+                        <option value="php">PHP</option>
+                    </select>
                 </div>
 
-                <div>
-                  <label className="block text-sm font-medium mb-1 text-slate-300">Code</label>
-                  <textarea
-                    value={code}
-                    onChange={(e) => setCode(e.target.value)}
-                    placeholder="Paste your code here..."
-                    rows="8"
-                    className="w-full bg-slate-700 border border-slate-600 rounded px-3 py-2 text-white placeholder-slate-400 focus:outline-none focus:border-blue-500 font-mono text-sm"
-                  />
+                <div class="form-group">
+                    <label>Code</label>
+                    <textarea id="code" placeholder="Paste your code here..."></textarea>
                 </div>
 
-                <div className="flex gap-2">
-                  <button
-                    onClick={addSnippet}
-                    className="flex-1 bg-blue-600 hover:bg-blue-700 rounded px-4 py-2 font-medium transition"
-                  >
-                    {editingId ? 'Update' : 'Upload'}
-                  </button>
-                  {editingId && (
-                    <button
-                      onClick={cancelEdit}
-                      className="flex-1 bg-slate-700 hover:bg-slate-600 rounded px-4 py-2 font-medium transition"
-                    >
-                      Cancel
-                    </button>
-                  )}
+                <div class="button-group">
+                    <button class="btn btn-primary" id="uploadBtn" onclick="addSnippet()">Upload</button>
+                    <button class="btn btn-secondary" id="cancelBtn" onclick="cancelEdit()" style="display: none;">Cancel</button>
                 </div>
-              </div>
             </div>
-          </div>
 
-          {/* Snippets List */}
-          <div className="lg:col-span-2">
-            <div className="space-y-4">
-              {snippets.length === 0 ? (
-                <div className="bg-slate-800 rounded-lg p-8 border border-slate-700 text-center text-slate-400">
-                  <Code className="w-12 h-12 mx-auto mb-3 opacity-50" />
-                  <p>No snippets yet. Create your first one!</p>
+            <!-- Snippets List -->
+            <div class="snippets-section" id="snippetsContainer">
+                <div class="empty-state">
+                    <p>📝 No snippets yet. Create your first one!</p>
                 </div>
-              ) : (
-                snippets.map(snippet => (
-                  <div key={snippet.id} className="bg-slate-800 rounded-lg p-4 border border-slate-700 hover:border-slate-600 transition">
-                    <div className="flex justify-between items-start mb-2">
-                      <div className="flex-1">
-                        <h3 className="text-lg font-bold">{snippet.title}</h3>
-                        <p className="text-sm text-slate-400">{snippet.language} • Updated {snippet.updatedAt}</p>
-                      </div>
-                      <span className="bg-blue-900 text-blue-200 text-xs px-2 py-1 rounded">
-                        {snippet.language}
-                      </span>
-                    </div>
-
-                    <pre className="bg-slate-950 p-3 rounded mb-3 text-slate-100 text-sm overflow-x-auto max-h-24 overflow-y-hidden">
-                      <code>{snippet.code.substring(0, 200)}{snippet.code.length > 200 ? '...' : ''}</code>
-                    </pre>
-
-                    <div className="flex gap-2">
-                      <button
-                        onClick={() => viewFull(snippet.id)}
-                        className="flex-1 bg-slate-700 hover:bg-slate-600 rounded px-3 py-2 text-sm font-medium flex items-center justify-center gap-2 transition"
-                      >
-                        <Eye className="w-4 h-4" />
-                        View Full
-                      </button>
-                      <button
-                        onClick={() => startEdit(snippet)}
-                        className="flex-1 bg-amber-900 hover:bg-amber-800 rounded px-3 py-2 text-sm font-medium flex items-center justify-center gap-2 transition"
-                      >
-                        <Edit2 className="w-4 h-4" />
-                        Edit
-                      </button>
-                      <button
-                        onClick={() => deleteSnippet(snippet.id)}
-                        className="flex-1 bg-red-900 hover:bg-red-800 rounded px-3 py-2 text-sm font-medium flex items-center justify-center gap-2 transition"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                        Delete
-                      </button>
-                    </div>
-                  </div>
-                ))
-              )}
             </div>
-          </div>
         </div>
-      </div>
     </div>
-  );
-}
+
+    <script>
+        let snippets = [];
+        let editingId = null;
+
+        function addSnippet() {
+            const title = document.getElementById('title').value.trim();
+            const language = document.getElementById('language').value;
+            const code = document.getElementById('code').value.trim();
+
+            if (!title || !code) {
+                alert('Please fill in title and code');
+                return;
+            }
+
+            if (editingId) {
+                const snippet = snippets.find(s => s.id === editingId);
+                snippet.title = title;
+                snippet.language = language;
+                snippet.code = code;
+                snippet.updatedAt = new Date().toLocaleString();
+                editingId = null;
+                document.getElementById('formTitle').textContent = 'New Snippet';
+                document.getElementById('uploadBtn').textContent = 'Upload';
+                document.getElementById('cancelBtn').style.display = 'none';
+            } else {
+                snippets.unshift({
+                    id: Date.now(),
+                    title,
+                    language,
+                    code,
+                    createdAt: new Date().toLocaleString(),
+                    updatedAt: new Date().toLocaleString()
+                });
+            }
+
+            document.getElementById('title').value = '';
+            document.getElementById('language').value = 'javascript';
+            document.getElementById('code').value = '';
+            renderSnippets();
+        }
+
+        function startEdit(id) {
+            const snippet = snippets.find(s => s.id === id);
+            document.getElementById('title').value = snippet.title;
+            document.getElementById('language').value = snippet.language;
+            document.getElementById('code').value = snippet.code;
+            editingId = id;
+            document.getElementById('formTitle').textContent = 'Edit Snippet';
+            document.getElementById('uploadBtn').textContent = 'Update';
+            document.getElementById('cancelBtn').style.display = 'block';
+            document.querySelector('.form-section').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function cancelEdit() {
+            editingId = null;
+            document.getElementById('title').value = '';
+            document.getElementById('language').value = 'javascript';
+            document.getElementById('code').value = '';
+            document.getElementById('formTitle').textContent = 'New Snippet';
+            document.getElementById('uploadBtn').textContent = 'Upload';
+            document.getElementById('cancelBtn').style.display = 'none';
+        }
+
+        function deleteSnippet(id) {
+            if (confirm('Delete this snippet?')) {
+                snippets = snippets.filter(s => s.id !== id);
+                renderSnippets();
+            }
+        }
+
+        function viewFull(id) {
+            const snippet = snippets.find(s => s.id === id);
+            if (snippet) {
+                const htmlContent = `<!DOCTYPE html>
+<html>
+<head>
+  <title>${snippet.title}</title>
+  <style>
+    body { background: #000; color: #0f0; font-family: monospace; margin: 0; padding: 20px; font-size: 14px; }
+    pre { white-space: pre-wrap; word-wrap: break-word; }
+  </style>
+</head>
+<body>
+<pre>${snippet.code}</pre>
+</body>
+</html>`;
+                const blob = new Blob([htmlContent], { type: 'text/html' });
+                const url = URL.createObjectURL(blob);
+                window.open(url, '_blank');
+            }
+        }
+
+        function renderSnippets() {
+            const container = document.getElementById('snippetsContainer');
+
+            if (snippets.length === 0) {
+                container.innerHTML = '<div class="empty-state"><p>📝 No snippets yet. Create your first one!</p></div>';
+                return;
+            }
+
+            container.innerHTML = snippets.map(snippet => `
+                <div class="snippet-card">
+                    <div class="snippet-header">
+                        <div>
+                            <div class="snippet-title">${snippet.title}</div>
+                            <div class="snippet-meta">${snippet.language} • Updated ${snippet.updatedAt}</div>
+                        </div>
+                        <span class="language-badge">${snippet.language}</span>
+                    </div>
+                    <div class="snippet-code">${snippet.code.substring(0, 200)}${snippet.code.length > 200 ? '...' : ''}</div>
+                    <div class="snippet-actions">
+                        <button class="btn-action btn-view" onclick="viewFull(${snippet.id})">👁️ View Full</button>
+                        <button class="btn-action btn-edit" onclick="startEdit(${snippet.id})">✏️ Edit</button>
+                        <button class="btn-action btn-delete" onclick="deleteSnippet(${snippet.id})">🗑️ Delete</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Initial render
+        renderSnippets();
+    </script>
+</body>
+                                                   </html>
