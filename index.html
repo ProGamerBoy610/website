@@ -205,14 +205,13 @@
             left: 20px;
             right: 20px;
             z-index: 100;
-            max-width: 600px;
-            left: 50%;
-            transform: translateX(-50%);
+            width: calc(100% - 40px);
+            max-width: 100%;
         }
 
         .banner-bottom iframe {
             width: 100%;
-            height: 100px;
+            height: 250px;
             border: none;
             border-radius: 10px;
             box-shadow: 0 10px 30px rgba(102, 126, 234, 0.5);
@@ -245,15 +244,15 @@
         </div>
     </div>
 
-    <div class="banner-bottom" onclick="showAd()">
-        <iframe src="https://tsyndicate.com/281827"></iframe>
+    <div class="banner-bottom">
+        <iframe width="100%" height="250" frameborder="0" scrolling="no" src="//tsyndicate.com/iframes2/8a18fa5be95646f9a92616283cdffb06.html?extid={extid}"></iframe>
     </div>
 
     <div class="ad-overlay" id="adOverlay">
         <div class="ad-box">
             <h2>Complete The Offer</h2>
             <p>Complete this offer to unlock your key:</p>
-            <iframe class="ad-iframe" src="https://tsyndicate.com/281827"></iframe>
+            <iframe class="ad-iframe" src="//tsyndicate.com/iframes2/8a18fa5be95646f9a92616283cdffb06.html?extid={extid}"></iframe>
             <button class="close-ad-btn" onclick="closeAd()">I Completed The Offer ✓</button>
         </div>
     </div>
