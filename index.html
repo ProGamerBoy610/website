@@ -19,7 +19,6 @@
             justify-content: center;
             align-items: center;
             padding: 20px;
-            padding-bottom: 150px;
         }
 
         .container {
@@ -56,14 +55,9 @@
             width: 100%;
         }
 
-        .get-key-btn:hover:not(:disabled) {
+        .get-key-btn:hover {
             transform: translateY(-4px) scale(1.05);
             box-shadow: 0 25px 70px rgba(255, 255, 255, 0.4);
-        }
-
-        .get-key-btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
         }
 
         .checkpoint {
@@ -133,100 +127,17 @@
         .copy-feedback.show {
             opacity: 1;
         }
-
-        .ad-overlay {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.9);
-            z-index: 9999;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-        }
-
-        .ad-overlay.show {
-            display: flex;
-        }
-
-        .ad-box {
-            background: #fff;
-            padding: 40px;
-            border-radius: 20px;
-            max-width: 600px;
-            width: 100%;
-            text-align: center;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.9);
-        }
-
-        .ad-box h2 {
-            color: #000;
-            margin-bottom: 20px;
-            font-size: 24px;
-        }
-
-        .ad-box p {
-            color: #666;
-            margin-bottom: 20px;
-            font-size: 16px;
-        }
-
-        .ad-iframe {
-            width: 100%;
-            height: 400px;
-            border: none;
-            border-radius: 10px;
-            margin-bottom: 20px;
-        }
-
-        .close-ad-btn {
-            background: #667eea;
-            color: #fff;
-            border: none;
-            padding: 12px 40px;
-            font-size: 16px;
-            font-weight: 600;
-            border-radius: 50px;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-
-        .close-ad-btn:hover {
-            background: #764ba2;
-            transform: scale(1.05);
-        }
-
-        .banner-bottom {
-            position: fixed;
-            bottom: 20px;
-            left: 20px;
-            right: 20px;
-            z-index: 100;
-            width: calc(100% - 40px);
-            max-width: 100%;
-        }
-
-        .banner-bottom iframe {
-            width: 100%;
-            height: 250px;
-            border: none;
-            border-radius: 10px;
-            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.5);
-        }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>🔑 Fryzer Hub Key System</h1>
         
-        <button class="get-key-btn" id="getKeyBtn" disabled>Get Key</button>
+        <button class="get-key-btn" id="getKeyBtn" onclick="getKey()">Get Key</button>
 
         <div class="checkpoint" id="checkpointDiv" style="display: none;">
             <div class="checkmark">✓</div>
-            <span>All Set!</span>
+            <span>Key Generated!</span>
         </div>
 
         <div class="links-section">
@@ -244,28 +155,9 @@
         </div>
     </div>
 
-    <div class="banner-bottom">
-        <iframe width="100%" height="90" frameborder="0" scrolling="no" src="//runative-syndicate.com/iframes2/7b30c87d7e134524a7223af897a9f5ce.html?"></iframe>
-    </div>
-
-    <div class="ad-overlay" id="adOverlay">
-        <div class="ad-box">
-            <h2>Complete The Offer</h2>
-            <p>Complete this offer to unlock your key:</p>
-            <iframe class="ad-iframe" src="https://tsyndicate.com/iframes2/8a18fa5be95646f9a92616283cdffb06.html"></iframe>
-            <button class="close-ad-btn" onclick="closeAd()">I Completed The Offer ✓</button>
-        </div>
-    </div>
-
     <script>
-        function showAd() {
-            document.getElementById('adOverlay').classList.add('show');
-        }
-
-        function closeAd() {
-            document.getElementById('adOverlay').classList.remove('show');
-            document.getElementById('getKeyBtn').disabled = false;
-            document.getElementById('checkpointDiv').style.display = 'flex';
+        function getKey() {
+            window.location.href = 'https://your-redirect-link.com';
         }
 
         function copyLink(url, feedbackId) {
@@ -277,12 +169,6 @@
                 }, 2000);
             });
         }
-
-        document.getElementById('getKeyBtn').onclick = function() {
-            if (!this.disabled) {
-                window.location.href = 'https://your-redirect-link.com';
-            }
-        };
     </script>
 </body>
 </html>
