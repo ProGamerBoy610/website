@@ -19,6 +19,7 @@
             justify-content: center;
             align-items: center;
             padding: 20px;
+            padding-bottom: 150px;
         }
 
         .container {
@@ -102,28 +103,6 @@
             color: #ccc;
             margin-bottom: 10px;
             font-size: 14px;
-        }
-
-        .banner-container {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            padding: 20px;
-            border-radius: 10px;
-            margin: 20px 0;
-            border: 2px solid #fff;
-            min-height: 100px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #fff;
-            font-weight: 600;
-            font-size: 16px;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-
-        .banner-container:hover {
-            transform: scale(1.02);
-            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
         }
 
         .copy-btn {
@@ -220,10 +199,23 @@
             transform: scale(1.05);
         }
 
-        .info-text {
-            color: #888;
-            font-size: 13px;
-            margin-top: 15px;
+        .banner-bottom {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            right: 20px;
+            z-index: 100;
+            max-width: 600px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .banner-bottom iframe {
+            width: 100%;
+            height: 100px;
+            border: none;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.5);
         }
     </style>
 </head>
@@ -240,14 +232,6 @@
 
         <div class="links-section">
             <div class="link-item">
-                <p>💰 Special Offer - Click to View</p>
-                <div class="banner-container" onclick="showAd()">
-                    🎯 Click Here - Unlock Your Key!
-                </div>
-                <p class="info-text">Complete the ad to unlock your key</p>
-            </div>
-
-            <div class="link-item">
                 <p>Join our Discord Community</p>
                 <button class="copy-btn" onclick="copyLink('https://discord.gg/fryzer', 'feedback')">Copy Discord Link</button>
                 <div class="copy-feedback" id="feedback">Copied to clipboard!</div>
@@ -261,13 +245,16 @@
         </div>
     </div>
 
+    <div class="banner-bottom" onclick="showAd()">
+        <iframe src="https://tsyndicate.com/281827"></iframe>
+    </div>
+
     <div class="ad-overlay" id="adOverlay">
         <div class="ad-box">
-            <h2>Special Offer</h2>
+            <h2>Complete The Offer</h2>
             <p>Complete this offer to unlock your key:</p>
             <iframe class="ad-iframe" src="https://tsyndicate.com/281827"></iframe>
             <button class="close-ad-btn" onclick="closeAd()">I Completed The Offer ✓</button>
-            <p class="info-text">Close this after completing the offer</p>
         </div>
     </div>
 
@@ -294,7 +281,7 @@
 
         document.getElementById('getKeyBtn').onclick = function() {
             if (!this.disabled) {
-                alert('🎉 Congratulations! Your key is: KEY-FRYZER-12345\n\nCopy this code and use it!');
+                window.location.href = 'https://your-redirect-link.com';
             }
         };
     </script>
