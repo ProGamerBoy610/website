@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Code Snippets</title>
+    <title>Fryzer Hub Key System</title>
     <style>
         * {
             margin: 0;
@@ -12,515 +12,158 @@
         }
 
         body {
-            background: linear-gradient(to bottom right, #0f172a, #1e293b);
-            color: #fff;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #1a1a1a;
             min-height: 100vh;
-            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
 
         .container {
-            max-width: 1200px;
-            margin: 0 auto;
+            text-align: center;
+            background: #000;
+            padding: 50px;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.7);
+            max-width: 500px;
+            width: 90%;
+            border: 2px solid #fff;
         }
 
-        .header {
-            margin-bottom: 30px;
-        }
-
-        .header h1 {
-            font-size: 32px;
-            margin-bottom: 10px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .header p {
-            color: #94a3b8;
-        }
-
-        .main-content {
-            display: grid;
-            grid-template-columns: 1fr 2fr;
-            gap: 20px;
-        }
-
-        .form-section {
-            background: #1e293b;
-            border: 1px solid #334155;
-            border-radius: 8px;
-            padding: 20px;
-            height: fit-content;
-            position: sticky;
-            top: 20px;
-        }
-
-        .form-section h2 {
-            font-size: 18px;
-            margin-bottom: 20px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .form-group {
-            margin-bottom: 15px;
-        }
-
-        .form-group label {
-            display: block;
-            font-size: 13px;
-            font-weight: 500;
-            margin-bottom: 8px;
-            color: #cbd5e1;
-        }
-
-        .form-group input,
-        .form-group select,
-        .form-group textarea {
-            width: 100%;
-            background: #0f172a;
-            border: 1px solid #475569;
-            border-radius: 6px;
-            padding: 8px 12px;
+        h1 {
             color: #fff;
-            font-size: 14px;
-            font-family: 'Courier New', monospace;
+            margin-bottom: 40px;
+            font-size: 28px;
+            font-weight: 700;
         }
 
-        .form-group textarea {
-            resize: vertical;
-            min-height: 150px;
-        }
-
-        .form-group input:focus,
-        .form-group select:focus,
-        .form-group textarea:focus {
-            outline: none;
-            border-color: #3b82f6;
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-        }
-
-        .button-group {
-            display: flex;
-            gap: 10px;
-        }
-
-        .btn {
-            flex: 1;
-            padding: 10px 15px;
-            border: none;
-            border-radius: 6px;
-            font-weight: 500;
+        .get-key-btn {
+            background: linear-gradient(135deg, #fff 0%, #f0f0f0 100%);
+            color: #000;
+            border: 3px solid #fff;
+            padding: 30px 80px;
+            font-size: 28px;
+            font-weight: 700;
+            border-radius: 60px;
             cursor: pointer;
-            font-size: 14px;
-            transition: all 0.2s;
+            transition: transform 0.3s, box-shadow 0.3s;
+            margin-bottom: 50px;
+            box-shadow: 0 15px 50px rgba(255, 255, 255, 0.2);
+            letter-spacing: 1px;
         }
 
-        .btn-primary {
-            background: #2563eb;
-            color: #fff;
+        .get-key-btn:hover {
+            transform: translateY(-4px) scale(1.05);
+            box-shadow: 0 25px 70px rgba(255, 255, 255, 0.4);
         }
 
-        .btn-primary:hover {
-            background: #1d4ed8;
+        .get-key-btn:active {
+            transform: translateY(-2px) scale(1.02);
         }
 
-        .btn-secondary {
-            background: #475569;
-            color: #fff;
-        }
-
-        .btn-secondary:hover {
-            background: #334155;
-        }
-
-        .snippets-section {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-
-        .snippet-card {
-            background: #1e293b;
-            border: 1px solid #334155;
-            border-radius: 8px;
-            padding: 15px;
-            transition: border-color 0.2s;
-        }
-
-        .snippet-card:hover {
-            border-color: #475569;
-        }
-
-        .snippet-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: start;
-            margin-bottom: 10px;
-        }
-
-        .snippet-title {
-            font-size: 16px;
-            font-weight: 600;
-        }
-
-        .snippet-meta {
-            font-size: 12px;
-            color: #94a3b8;
-            margin-top: 5px;
-        }
-
-        .language-badge {
-            background: #1e3a8a;
-            color: #93c5fd;
-            font-size: 12px;
-            padding: 4px 10px;
-            border-radius: 4px;
-        }
-
-        .snippet-code {
-            background: #0f172a;
-            padding: 12px;
-            border-radius: 6px;
-            font-family: 'Courier New', monospace;
-            font-size: 12px;
-            max-height: 150px;
-            overflow: hidden;
-            margin-bottom: 12px;
-            color: #cbd5e1;
-        }
-
-        .snippet-url {
-            background: #0f172a;
-            padding: 8px 12px;
-            border-radius: 6px;
-            font-family: 'Courier New', monospace;
-            font-size: 11px;
-            margin-bottom: 12px;
-            color: #60a5fa;
-            overflow-x: auto;
-            word-break: break-all;
-            border: 1px solid #334155;
-        }
-
-        .snippet-actions {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 8px;
-        }
-
-        .btn-action {
-            padding: 8px 12px;
-            border: none;
-            border-radius: 6px;
-            font-size: 12px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.2s;
+        .checkpoint {
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 5px;
-        }
-
-        .btn-view {
-            background: #475569;
+            gap: 10px;
+            margin-bottom: 30px;
+            font-size: 18px;
             color: #fff;
         }
 
-        .btn-view:hover {
-            background: #334155;
+        .checkmark {
+            width: 30px;
+            height: 30px;
+            background: #fff;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #000;
+            font-weight: bold;
+            font-size: 20px;
         }
 
-        .btn-edit {
-            background: #92400e;
+        .dc-link-section {
+            margin-top: 40px;
+            padding-top: 30px;
+            border-top: 2px solid #333;
+        }
+
+        .copy-btn {
+            background: #fff;
+            color: #000;
+            border: 2px solid #fff;
+            padding: 12px 30px;
+            font-size: 14px;
+            font-weight: 600;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.2s;
+        }
+
+        .copy-btn:hover {
+            background: #ccc;
+            transform: translateY(-2px);
+        }
+
+        .copy-btn:active {
+            transform: translateY(0);
+        }
+
+        .copy-feedback {
             color: #fff;
+            font-size: 12px;
+            margin-top: 8px;
+            opacity: 0;
+            transition: opacity 0.3s;
         }
 
-        .btn-edit:hover {
-            background: #78350f;
-        }
-
-        .btn-delete {
-            background: #7f1d1d;
-            color: #fff;
-        }
-
-        .btn-delete:hover {
-            background: #991b1b;
-        }
-
-        .btn-copy {
-            background: #065f46;
-            color: #fff;
-        }
-
-        .btn-copy:hover {
-            background: #047857;
-        }
-
-        .empty-state {
-            background: #1e293b;
-            border: 1px solid #334155;
-            border-radius: 8px;
-            padding: 40px 20px;
-            text-align: center;
-            color: #64748b;
-        }
-
-        @media (max-width: 1024px) {
-            .main-content {
-                grid-template-columns: 1fr;
-            }
-
-            .form-section {
-                position: static;
-            }
-
-            .snippet-actions {
-                grid-template-columns: 1fr;
-            }
+        .copy-feedback.show {
+            opacity: 1;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <div class="header">
-            <h1>💻 My Code Snippets</h1>
-            <p>Upload and manage your private code snippets with permanent URLs</p>
+        <h1>🔑 Fryzer Hub Key System</h1>
+        
+        <button class="get-key-btn" onclick="getKey()">Get Key</button>
+        
+        <div class="checkpoint">
+            <div class="checkmark">✓</div>
+            <span>Check Point Verified</span>
+        </div>
+        
+        <div class="dc-link-section">
+            <p>Join our Discord Community</p>
+            <button class="copy-btn" onclick="copyDiscordLink()">Copy Discord Link</button>
+            <div class="copy-feedback" id="feedback">Copied to clipboard!</div>
         </div>
 
-        <div class="main-content">
-            <!-- Form Section -->
-            <div class="form-section">
-                <h2>➕ <span id="formTitle">New Snippet</span></h2>
-
-                <div class="form-group">
-                    <label>Title</label>
-                    <input type="text" id="title" placeholder="e.g., React Hook Example">
-                </div>
-
-                <div class="form-group">
-                    <label>Language</label>
-                    <select id="language">
-                        <option value="javascript">JavaScript</option>
-                        <option value="python">Python</option>
-                        <option value="html">HTML</option>
-                        <option value="css">CSS</option>
-                        <option value="java">Java</option>
-                        <option value="cpp">C++</option>
-                        <option value="ruby">Ruby</option>
-                        <option value="go">Go</option>
-                        <option value="rust">Rust</option>
-                        <option value="php">PHP</option>
-                        <option value="lua">Lua (Roblox)</option>
-                    </select>
-                </div>
-
-                <div class="form-group">
-                    <label>Code</label>
-                    <textarea id="code" placeholder="Paste your code here..."></textarea>
-                </div>
-
-                <div class="button-group">
-                    <button class="btn btn-primary" id="uploadBtn" onclick="addSnippet()">Upload</button>
-                    <button class="btn btn-secondary" id="cancelBtn" onclick="cancelEdit()" style="display: none;">Cancel</button>
-                </div>
-            </div>
-
-            <!-- Snippets List -->
-            <div class="snippets-section" id="snippetsContainer">
-                <div class="empty-state">
-                    <p>📝 No snippets yet. Create your first one!</p>
-                </div>
-            </div>
+        <div class="yt-link-section">
+            <p>Subscribe to our YouTube Channel</p>
+            <button class="copy-btn" onclick="copyYouTubeLink()">Copy YouTube Link</button>
+            <div class="copy-feedback" id="feedback-yt">Copied to clipboard!</div>
         </div>
     </div>
 
     <script>
-        let snippets = [];
-        let editingId = null;
-
-        // Load from localStorage
-        function loadSnippets() {
-            const saved = localStorage.getItem('snippets');
-            if (saved) {
-                snippets = JSON.parse(saved);
-                renderSnippets();
-            }
+        function getKey() {
+            alert('Key generation process started!');
         }
 
-        // Save to localStorage
-        function saveSnippets() {
-            localStorage.setItem('snippets', JSON.stringify(snippets));
+        function copyDiscordLink() {
+            const discordLink = 'https://discord.gg/fryzer';
+            navigator.clipboard.writeText(discordLink).then(() => {
+                const feedback = document.getElementById('feedback');
+                feedback.classList.add('show');
+                setTimeout(() => {
+                    feedback.classList.remove('show');
+                }, 2000);
+            });
         }
-
-        // Generate permanent URL
-        function generatePermanentUrl(id) {
-            // Create a data URL that can be shared
-            return `data:text/plain;charset=utf-8,${id}`;
-        }
-
-        function addSnippet() {
-            const title = document.getElementById('title').value.trim();
-            const language = document.getElementById('language').value;
-            const code = document.getElementById('code').value.trim();
-
-            if (!title || !code) {
-                alert('Please fill in title and code');
-                return;
-            }
-
-            if (editingId) {
-                const snippet = snippets.find(s => s.id === editingId);
-                snippet.title = title;
-                snippet.language = language;
-                snippet.code = code;
-                snippet.updatedAt = new Date().toLocaleString();
-                editingId = null;
-                document.getElementById('formTitle').textContent = 'New Snippet';
-                document.getElementById('uploadBtn').textContent = 'Upload';
-                document.getElementById('cancelBtn').style.display = 'none';
-            } else {
-                const newId = Date.now().toString();
-                snippets.unshift({
-                    id: newId,
-                    title,
-                    language,
-                    code,
-                    createdAt: new Date().toLocaleString(),
-                    updatedAt: new Date().toLocaleString(),
-                    permanentUrl: generatePermanentUrl(newId)
-                });
-            }
-
-            document.getElementById('title').value = '';
-            document.getElementById('language').value = 'javascript';
-            document.getElementById('code').value = '';
-            
-            saveSnippets();
-            renderSnippets();
-        }
-
-        function startEdit(id) {
-            const snippet = snippets.find(s => s.id === id);
-            document.getElementById('title').value = snippet.title;
-            document.getElementById('language').value = snippet.language;
-            document.getElementById('code').value = snippet.code;
-            editingId = id;
-            document.getElementById('formTitle').textContent = 'Edit Snippet';
-            document.getElementById('uploadBtn').textContent = 'Update';
-            document.getElementById('cancelBtn').style.display = 'block';
-            document.querySelector('.form-section').scrollIntoView({ behavior: 'smooth' });
-        }
-
-        function cancelEdit() {
-            editingId = null;
-            document.getElementById('title').value = '';
-            document.getElementById('language').value = 'javascript';
-            document.getElementById('code').value = '';
-            document.getElementById('formTitle').textContent = 'New Snippet';
-            document.getElementById('uploadBtn').textContent = 'Upload';
-            document.getElementById('cancelBtn').style.display = 'none';
-        }
-
-        function deleteSnippet(id) {
-            if (confirm('Delete this snippet?')) {
-                snippets = snippets.filter(s => s.id !== id);
-                saveSnippets();
-                renderSnippets();
-            }
-        }
-
-        function viewFull(id) {
-            const snippet = snippets.find(s => s.id === id);
-            if (snippet) {
-                const htmlContent = `<!DOCTYPE html>
-<html>
-<head>
-  <title>${snippet.title}</title>
-  <style>
-    body { background: #000; color: #0f0; font-family: monospace; margin: 0; padding: 20px; font-size: 14px; line-height: 1.5; }
-    pre { white-space: pre-wrap; word-wrap: break-word; }
-  </style>
-</head>
-<body>
-<pre>${snippet.code}</pre>
-</body>
-</html>`;
-                const blob = new Blob([htmlContent], { type: 'text/html' });
-                const url = URL.createObjectURL(blob);
-                window.open(url, '_blank');
-            }
-        }
-
-        function copyUrl(id) {
-            const snippet = snippets.find(s => s.id === id);
-            if (snippet) {
-                // Create a blob URL for raw code
-                const blob = new Blob([snippet.code], { type: 'text/plain' });
-                const blobUrl = URL.createObjectURL(blob);
-                
-                // Show URL and copy to clipboard
-                const userInput = prompt('📋 Your Raw Code URL:\n\n(Click copy to clipboard)', blobUrl);
-                if (userInput !== null) {
-                    navigator.clipboard.writeText(blobUrl).then(() => {
-                        alert('✅ URL Copied to Clipboard!');
-                    });
-                }
-            }
-        }
-
-        function copyAsLoadstring(id) {
-            const snippet = snippets.find(s => s.id === id);
-            if (snippet && snippet.language === 'lua') {
-                // For local use
-                const escapedCode = snippet.code
-                    .replace(/\\/g, '\\\\')
-                    .replace(/"/g, '\\"')
-                    .replace(/\n/g, '\\n');
-                const loadstring = `loadstring("${escapedCode}")()`;
-                navigator.clipboard.writeText(loadstring).then(() => {
-                    alert('✅ Loadstring Copied!');
-                });
-            } else if (snippet) {
-                alert('⚠️ Set language to Lua for Roblox loadstring format');
-            }
-        }
-
-        function renderSnippets() {
-            const container = document.getElementById('snippetsContainer');
-
-            if (snippets.length === 0) {
-                container.innerHTML = '<div class="empty-state"><p>📝 No snippets yet. Create your first one!</p></div>';
-                return;
-            }
-
-            container.innerHTML = snippets.map(snippet => `
-                <div class="snippet-card">
-                    <div class="snippet-header">
-                        <div>
-                            <div class="snippet-title">${snippet.title}</div>
-                            <div class="snippet-meta">${snippet.language} • Updated ${snippet.updatedAt}</div>
-                        </div>
-                        <span class="language-badge">${snippet.language}</span>
-                    </div>
-                    <div class="snippet-code">${snippet.code.substring(0, 200)}${snippet.code.length > 200 ? '...' : ''}</div>
-                    <div class="snippet-url">🔗 ${snippet.permanentUrl}</div>
-                    <div class="snippet-actions">
-                        <button class="btn-action btn-view" onclick="viewFull(${snippet.id})">👁️ View</button>
-                        <button class="btn-action btn-copy" onclick="copyUrl(${snippet.id})">📋 Copy URL</button>
-                        <button class="btn-action btn-edit" onclick="startEdit(${snippet.id})">✏️ Edit</button>
-                        <button class="btn-action btn-delete" onclick="deleteSnippet(${snippet.id})">🗑️ Delete</button>
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        // Load snippets on page load
-        loadSnippets();
     </script>
 </body>
 </html>
