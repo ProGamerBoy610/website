@@ -143,24 +143,39 @@
         <div class="links-section">
             <div class="link-item">
                 <p>Join our Discord Community</p>
-                <button class="copy-btn" onclick="copyLink('https://discord.gg/fryzer', 'feedback')">Copy Discord Link</button>
+                <button class="copy-btn" onclick="copyLink('discord', 'feedback')">Copy Discord Link</button>
                 <div class="copy-feedback" id="feedback">Copied to clipboard!</div>
             </div>
 
             <div class="link-item">
                 <p>Subscribe to our YouTube Channel</p>
-                <button class="copy-btn" onclick="copyLink('https://www.youtube.com/c/fryzer', 'feedback-yt')">Copy YouTube Link</button>
+                <button class="copy-btn" onclick="copyLink('youtube', 'feedback-yt')">Copy YouTube Link</button>
                 <div class="copy-feedback" id="feedback-yt">Copied to clipboard!</div>
             </div>
         </div>
     </div>
 
     <script>
+        // Links will be injected by GitHub Actions
+        const DISCORD_LINK = 'DISCORD_LINK_PLACEHOLDER';
+        const YOUTUBE_LINK = 'YOUTUBE_LINK_PLACEHOLDER';
+        const REDIRECT_LINK = 'REDIRECT_LINK_PLACEHOLDER';
+
         function getKey() {
-            window.location.href = 'https://your-redirect-link.com';
+            document.getElementById('checkpointDiv').style.display = 'flex';
+            setTimeout(() => {
+                window.location.href = REDIRECT_LINK;
+            }, 500);
         }
 
-        function copyLink(url, feedbackId) {
+        function copyLink(type, feedbackId) {
+            let url = '';
+            if (type === 'discord') {
+                url = DISCORD_LINK;
+            } else if (type === 'youtube') {
+                url = YOUTUBE_LINK;
+            }
+
             navigator.clipboard.writeText(url).then(() => {
                 const feedback = document.getElementById(feedbackId);
                 feedback.classList.add('show');
