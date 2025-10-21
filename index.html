@@ -53,6 +53,8 @@
             box-shadow: 0 15px 50px rgba(255, 255, 255, 0.2);
             letter-spacing: 1px;
             width: 100%;
+            text-decoration: none;
+            display: inline-block;
         }
 
         .get-key-btn:hover {
@@ -99,7 +101,7 @@
             font-size: 14px;
         }
 
-        .copy-btn {
+        .link-btn {
             background: #fff;
             color: #000;
             border: 2px solid #fff;
@@ -109,23 +111,13 @@
             border-radius: 50px;
             cursor: pointer;
             transition: background 0.2s, transform 0.2s;
+            text-decoration: none;
+            display: inline-block;
         }
 
-        .copy-btn:hover {
+        .link-btn:hover {
             background: #ccc;
             transform: translateY(-2px);
-        }
-
-        .copy-feedback {
-            color: #fff;
-            font-size: 12px;
-            margin-top: 8px;
-            opacity: 0;
-            transition: opacity 0.3s;
-        }
-
-        .copy-feedback.show {
-            opacity: 1;
         }
     </style>
 </head>
@@ -133,7 +125,7 @@
     <div class="container">
         <h1>Fryzer Hub Key System</h1>
         
-        <button class="get-key-btn" id="getKeyBtn" onclick="getKey()">Get Key</button>
+        <a href="https://google.com" class="get-key-btn">Get Key</a>
 
         <div class="checkpoint" id="checkpointDiv" style="display: none;">
             <div class="checkmark">✓</div>
@@ -143,47 +135,14 @@
         <div class="links-section">
             <div class="link-item">
                 <p>Join our Discord Community</p>
-                <button class="copy-btn" onclick="copyLink('https://discord.gg/fryzer', 'feedback')">Copy Discord Link</button>
-                <div class="copy-feedback" id="feedback">Copied to clipboard!</div>
+                <a href="https://discord.gg/UKYHGddQD3" target="_blank" class="link-btn">Visit Discord</a>
             </div>
 
             <div class="link-item">
                 <p>Subscribe to our YouTube Channel</p>
-                <button class="copy-btn" onclick="copyLink('https://www.youtube.com/c/fryzer', 'feedback-yt')">Copy YouTube Link</button>
-                <div class="copy-feedback" id="feedback-yt">Copied to clipboard!</div>
+                <a href="https://youtube.com/@p_g_b?si=rhzEWlyRLtEEOOBz" target="_blank" class="link-btn">Visit YouTube</a>
             </div>
         </div>
     </div>
-
-    <script>
-        // ⚙️ SETTINGS - EDIT THESE LINKS EASILY
-        const SETTINGS = {
-            redirectLink: 'https://google.com',
-            discordLink: 'https://discord.gg/UKYHGddQD3',
-            youtubeLink: 'https://youtube.com/@p_g_b?si=rhzEWlyRLtEEOOBz'
-        };
-        
-        // Functions
-        function getKey() {
-            window.location.href = SETTINGS.redirectLink;
-        }
-
-        function copyLink(linkType, feedbackId) {
-            let url;
-            if (linkType === 'discord') {
-                url = SETTINGS.discordLink;
-            } else if (linkType === 'youtube') {
-                url = SETTINGS.youtubeLink;
-            }
-            
-            navigator.clipboard.writeText(url).then(() => {
-                const feedback = document.getElementById(feedbackId);
-                feedback.classList.add('show');
-                setTimeout(() => {
-                    feedback.classList.remove('show');
-                }, 2000);
-            });
-        }
-    </script>
 </body>
 </html>
