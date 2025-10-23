@@ -1,639 +1,189 @@
--- FRYZER HUB Key System
--- Dual verification: Simple keys + Keys with expiry time
--- No Discord webhook, No dragging
-
---! Configuration
-local KEY_CHECK_URL = "https://raw.githubusercontent.com/FryzerHub/keyes/refs/heads/main/System%20key"
-local EXPIRY_CHECK_URL = "https://raw.githubusercontent.com/FryzerHub/Key-system-gui/refs/heads/main/expiry_keys.json"
-local GET_KEY_URL = "https://lootdest.org/s?qE4dIEw2"
-local DISCORD_INVITE = "https://discord.gg/SYHphHCq9a"
-
---[[ 
-EXPIRY KEYS FORMAT (expiry_keys.json):
-Simple format - Just add keys with expiry dates in Indian time (IST)
-{
-    "keys": [
-        {
-            "key": "PREMIUM-ABC123",
-            "expiry": "31-12-2025 23:59"
-        },
-        {
-            "key": "VIP-XYZ789",
-            "expiry": "30-06-2025 18:30"
-        },
-        {
-            "key": "TRIAL-123456",
-            "expiry": "25-10-2025 12:00"
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fryzer Hub Key System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
-    ]
-}
 
-Format: "DD-MM-YYYY HH:MM" (Indian Standard Time - IST)
-Example: "31-12-2025 23:59" means December 31, 2025 at 11:59 PM IST
-]]
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #1a1a1a;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
 
---! Your Main Script Function - REPLACE THIS WITH YOUR ACTUAL CODE
-local function executeMainScript()
-    -- PUT YOUR MAIN SCRIPT CODE HERE
-    
-    local StarterGui = game:GetService("StarterGui")
-    StarterGui:SetCore("SendNotification", {
-        Title = "FRYZER HUB";
-        Text = "Successfully loaded!";
-        Duration = 5;
-    })
-end
+        .container {
+            text-align: center;
+            background: #000;
+            padding: clamp(30px, 8vw, 50px);
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.7);
+            max-width: 600px;
+            width: 100%;
+            border: 2px solid #fff;
+        }
 
---! Wait for game to load
-repeat task.wait(1) until game:IsLoaded()
+        h1 {
+            color: #fff;
+            margin-bottom: 50px;
+            font-size: 28px;
+            font-weight: 700;
+        }
 
---! Services
-local Players = game:GetService("Players")
-local TweenService = game:GetService("TweenService")
-local HttpService = game:GetService("HttpService")
+        .get-key-btn {
+            background: linear-gradient(135deg, #fff 0%, #f0f0f0 100%);
+            color: #000;
+            border: 3px solid #fff;
+            padding: 30px 80px;
+            font-size: 28px;
+            font-weight: 700;
+            border-radius: 60px;
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+            margin-bottom: 40px;
+            box-shadow: 0 15px 50px rgba(255, 255, 255, 0.2);
+            letter-spacing: 1px;
+            width: 100%;
+        }
 
-local player = Players.LocalPlayer
-local playerGui = player:WaitForChild("PlayerGui")
+        .get-key-btn:hover {
+            transform: translateY(-4px) scale(1.05);
+            box-shadow: 0 25px 70px rgba(255, 255, 255, 0.4);
+        }
 
---! Utility Functions
-local fSetClipboard = setclipboard or toclipboard
-local fRequest = request or http_request or syn_request
+        .checkpoint {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 30px;
+            font-size: clamp(14px, 4vw, 18px);
+            color: #fff;
+        }
 
---! Date/Time Parsing Function (Indian Time Format)
-local function parseIndianDate(dateString)
-    -- Parse format: DD-MM-YYYY HH:MM (Indian Standard Time)
-    -- Example: "31-12-2025 23:59"
-    local pattern = "(%d+)-(%d+)-(%d+)%s+(%d+):(%d+)"
-    local day, month, year, hour, min = dateString:match(pattern)
-    
-    if not day then
-        return nil
-    end
-    
-    -- Create time directly (Roblox os.time uses local system time)
-    -- We treat the input as IST and compare directly
-    local expiryTime = os.time({
-        year = tonumber(year),
-        month = tonumber(month),
-        day = tonumber(day),
-        hour = tonumber(hour),
-        min = tonumber(min),
-        sec = 59  -- Set to end of minute
-    })
-    
-    return expiryTime
-end
+        .checkmark {
+            width: clamp(24px, 6vw, 30px);
+            height: clamp(24px, 6vw, 30px);
+            background: #fff;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #000;
+            font-weight: bold;
+            font-size: clamp(16px, 4vw, 20px);
+        }
 
---! Key System Functions
-local function checkSimpleKey(inputKey)
-    local success, result = pcall(function()
-        local response = fRequest({
-            Url = KEY_CHECK_URL,
-            Method = "GET"
-        })
+        .links-section {
+            margin-top: 40px;
+            padding-top: 30px;
+            border-top: 2px solid #333;
+        }
+
+        .link-item {
+            margin-bottom: 15px;
+        }
+
+        .link-item p {
+            color: #ccc;
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+
+        .copy-btn {
+            background: #fff;
+            color: #000;
+            border: 2px solid #fff;
+            padding: 12px 30px;
+            font-size: 14px;
+            font-weight: 600;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.2s;
+        }
+
+        .copy-btn:hover {
+            background: #ccc;
+            transform: translateY(-2px);
+        }
+
+        .copy-feedback {
+            color: #fff;
+            font-size: 12px;
+            margin-top: 8px;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .copy-feedback.show {
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔑 Fryzer Hub Key System</h1>
         
-        if response.StatusCode == 200 then
-            local validKeys = {}
-            for key in string.gmatch(response.Body, "[^\r\n]+") do
-                local cleanKey = string.gsub(key, "%s+", "")
-                if cleanKey ~= "" then
-                    table.insert(validKeys, cleanKey)
-                end
-            end
-            
-            local cleanInputKey = string.gsub(inputKey, "%s+", "")
-            for _, validKey in ipairs(validKeys) do
-                if cleanInputKey == validKey then
-                    return true, "Key verified successfully!"
-                end
-            end
-            
-            return false, "Invalid key"
-        else
-            return false, "Failed to connect to key server"
-        end
-    end)
-    
-    if success then
-        return result
-    else
-        return false, "Error checking key: " .. tostring(result)
-    end
-end
+        <button class="get-key-btn" id="getKeyBtn" onclick="getKey()">Get Key</button>
 
-local function checkExpiryKey(inputKey)
-    local success, result = pcall(function()
-        local response = fRequest({
-            Url = EXPIRY_CHECK_URL,
-            Method = "GET"
-        })
+        <div class="checkpoint" id="checkpointDiv" style="display: none;">
+            <div class="checkmark">✓</div>
+            <span>Key Generated!</span>
+        </div>
+
+        <div class="links-section">
+            <div class="link-item">
+                <p>Join our Discord Community</p>
+                <button class="copy-btn" onclick="copyLink('discord', 'feedback')">Copy Discord Link</button>
+                <div class="copy-feedback" id="feedback">Copied to clipboard!</div>
+            </div>
+
+            <div class="link-item">
+                <p>Subscribe to our YouTube Channel</p>
+                <button class="copy-btn" onclick="copyLink('youtube', 'feedback-yt')">Copy YouTube Link</button>
+                <div class="copy-feedback" id="feedback-yt">Copied to clipboard!</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ⚙️ SETTINGS - EDIT THESE LINKS EASILY
+        const SETTINGS = {
+            redirectLink: 'https://your-redirect-link.com',
+            discordLink: 'https://discord.gg/fryzer',
+            youtubeLink: 'https://www.youtube.com/c/fryzer'
+        };
         
-        if response.StatusCode == 200 then
-            local data = HttpService:JSONDecode(response.Body)
+        // Functions
+        function getKey() {
+            window.location.href = SETTINGS.redirectLink;
+        }
+
+        function copyLink(linkType, feedbackId) {
+            let url;
+            if (linkType === 'discord') {
+                url = SETTINGS.discordLink;
+            } else if (linkType === 'youtube') {
+                url = SETTINGS.youtubeLink;
+            }
             
-            if not data.keys then
-                return false, "Invalid expiry key data format"
-            end
-            
-            local cleanInputKey = string.gsub(inputKey, "%s+", "")
-            
-            -- Get current time with IST offset
-            local currentUTC = os.time()
-            local currentIST = currentUTC + 19800  -- Add 5:30 hours in seconds
-            
-            for _, keyData in ipairs(data.keys) do
-                local cleanKey = string.gsub(keyData.key, "%s+", "")
-                
-                if cleanInputKey == cleanKey then
-                    -- Found matching key, now check expiry
-                    local expiryTime = parseIndianDate(keyData.expiry)
-                    
-                    if not expiryTime then
-                        return false, "Invalid date format (use DD-MM-YYYY HH:MM)"
-                    end
-                    
-                    if currentIST > expiryTime then
-                        return false, "Key has expired"
-                    end
-                    
-                    -- Key is valid and not expired
-                    local secondsLeft = expiryTime - currentIST
-                    local daysLeft = math.floor(secondsLeft / 86400)
-                    local hoursLeft = math.floor((secondsLeft % 86400) / 3600)
-                    
-                    if daysLeft > 0 then
-                        return true, "Key verified! " .. daysLeft .. " days remaining"
-                    else
-                        return true, "Key verified! " .. hoursLeft .. " hours remaining"
-                    end
-                end
-            end
-            
-            return false, "Key not found in expiry database"
-        else
-            return false, "Failed to connect to expiry server"
-        end
-    end)
-    
-    if success then
-        return result
-    else
-        return false, "Error checking expiry key: " .. tostring(result)
-    end
-end
-
-local function checkKey(inputKey)
-    -- First try simple key check
-    local simpleSuccess, simpleMessage = checkSimpleKey(inputKey)
-    if simpleSuccess then
-        return true, simpleMessage
-    end
-    
-    -- If simple key fails, try expiry key check
-    local expirySuccess, expiryMessage = checkExpiryKey(inputKey)
-    if expirySuccess then
-        return true, expiryMessage
-    end
-    
-    -- Both failed, return the expiry message (more informative)
-    return false, expiryMessage
-end
-
---! GUI Creation with Scaling
-local BLACK = Color3.fromRGB(0, 0, 0)
-local WHITE = Color3.fromRGB(255, 255, 255)
-local DARK_GRAY = Color3.fromRGB(20, 20, 20)
-local LIGHT_GRAY = Color3.fromRGB(240, 240, 240)
-local MEDIUM_GRAY = Color3.fromRGB(128, 128, 128)
-
-if playerGui:FindFirstChild("MinimalKeyGUI") then
-    playerGui.MinimalKeyGUI:Destroy()
-end
-
-local screenGui = Instance.new("ScreenGui")
-screenGui.Name = "MinimalKeyGUI"
-screenGui.ResetOnSpawn = false
-screenGui.IgnoreGuiInset = true
-screenGui.Parent = playerGui
-
--- Main container with scale-based sizing
-local mainFrame = Instance.new("Frame")
-mainFrame.Name = "MainFrame"
-mainFrame.Size = UDim2.new(0.35, 0, 0.28, 0)  -- 35% width, 28% height
-mainFrame.Position = UDim2.new(0.5, 0, 0.5, 0)
-mainFrame.AnchorPoint = Vector2.new(0.5, 0.5)
-mainFrame.BackgroundColor3 = BLACK
-mainFrame.BorderSizePixel = 0
-mainFrame.Parent = screenGui
-
--- Size constraints for better mobile/desktop experience
-local sizeConstraint = Instance.new("UISizeConstraint")
-sizeConstraint.MinSize = Vector2.new(300, 200)
-sizeConstraint.MaxSize = Vector2.new(500, 300)
-sizeConstraint.Parent = mainFrame
-
--- White border frame with scale
-local borderFrame = Instance.new("Frame")
-borderFrame.Name = "BorderFrame"
-borderFrame.Size = UDim2.new(1, 0, 1, 0)
-borderFrame.Position = UDim2.new(0, 0, 0, 0)
-borderFrame.AnchorPoint = Vector2.new(0, 0)
-borderFrame.BackgroundColor3 = WHITE
-borderFrame.BorderSizePixel = 0
-borderFrame.ZIndex = -1
-borderFrame.Parent = mainFrame
-
--- Add padding to create border effect
-local borderPadding = Instance.new("UIPadding")
-borderPadding.PaddingAll = UDim.new(0, 3)
-borderPadding.Parent = borderFrame
-
--- Inner black frame
-local innerFrame = Instance.new("Frame")
-innerFrame.Name = "InnerFrame"
-innerFrame.Size = UDim2.new(1, 0, 1, 0)
-innerFrame.BackgroundColor3 = BLACK
-innerFrame.BorderSizePixel = 0
-innerFrame.Parent = borderFrame
-
--- Title section with scale
-local titleSection = Instance.new("Frame")
-titleSection.Name = "TitleSection"
-titleSection.Size = UDim2.new(1, 0, 0.27, 0)  -- 27% of height
-titleSection.Position = UDim2.new(0, 0, 0, 0)
-titleSection.BackgroundColor3 = WHITE
-titleSection.BorderSizePixel = 0
-titleSection.Parent = innerFrame
-
--- Title text with TextScaled
-local titleLabel = Instance.new("TextLabel")
-titleLabel.Name = "Title"
-titleLabel.Size = UDim2.new(1, 0, 1, 0)
-titleLabel.Position = UDim2.new(0, 0, 0, 0)
-titleLabel.BackgroundTransparency = 1
-titleLabel.Text = "FRYZER HUB"
-titleLabel.TextColor3 = BLACK
-titleLabel.TextScaled = true
-titleLabel.Font = Enum.Font.SourceSansBold
-titleLabel.TextXAlignment = Enum.TextXAlignment.Center
-titleLabel.TextYAlignment = Enum.TextYAlignment.Center
-titleLabel.Parent = titleSection
-
--- Add padding for title
-local titlePadding = Instance.new("UIPadding")
-titlePadding.PaddingLeft = UDim.new(0.05, 0)
-titlePadding.PaddingRight = UDim.new(0.05, 0)
-titlePadding.PaddingTop = UDim.new(0.15, 0)
-titlePadding.PaddingBottom = UDim.new(0.15, 0)
-titlePadding.Parent = titleLabel
-
--- Text size constraint for title
-local titleSizeConstraint = Instance.new("UITextSizeConstraint")
-titleSizeConstraint.MaxTextSize = 28
-titleSizeConstraint.MinTextSize = 16
-titleSizeConstraint.Parent = titleLabel
-
--- Separator line
-local separator = Instance.new("Frame")
-separator.Name = "Separator"
-separator.Size = UDim2.new(0.9, 0, 0, 1)
-separator.Position = UDim2.new(0.05, 0, 1, -1)
-separator.BackgroundColor3 = BLACK
-separator.BorderSizePixel = 0
-separator.Parent = titleSection
-
--- Content area with scale
-local contentFrame = Instance.new("Frame")
-contentFrame.Name = "ContentFrame"
-contentFrame.Size = UDim2.new(1, 0, 0.73, 0)  -- 73% of height
-contentFrame.Position = UDim2.new(0, 0, 0.27, 0)
-contentFrame.BackgroundTransparency = 1
-contentFrame.Parent = innerFrame
-
--- Add padding to content
-local contentPadding = Instance.new("UIPadding")
-contentPadding.PaddingLeft = UDim.new(0.05, 0)
-contentPadding.PaddingRight = UDim.new(0.05, 0)
-contentPadding.PaddingTop = UDim.new(0.05, 0)
-contentPadding.PaddingBottom = UDim.new(0.05, 0)
-contentPadding.Parent = contentFrame
-
--- Status label with TextScaled
-local statusLabel = Instance.new("TextLabel")
-statusLabel.Name = "Status"
-statusLabel.Size = UDim2.new(1, 0, 0.15, 0)  -- 15% of content height
-statusLabel.Position = UDim2.new(0, 0, 0, 0)
-statusLabel.BackgroundTransparency = 1
-statusLabel.Text = "Enter your access key"
-statusLabel.TextColor3 = WHITE
-statusLabel.TextScaled = true
-statusLabel.Font = Enum.Font.SourceSans
-statusLabel.TextXAlignment = Enum.TextXAlignment.Left
-statusLabel.TextYAlignment = Enum.TextYAlignment.Top
-statusLabel.Parent = contentFrame
-
--- Text size constraint for status
-local statusSizeConstraint = Instance.new("UITextSizeConstraint")
-statusSizeConstraint.MaxTextSize = 16
-statusSizeConstraint.MinTextSize = 10
-statusSizeConstraint.Parent = statusLabel
-
--- Input container with scale
-local inputContainer = Instance.new("Frame")
-inputContainer.Name = "InputContainer"
-inputContainer.Size = UDim2.new(1, 0, 0.28, 0)  -- 28% of content height
-inputContainer.Position = UDim2.new(0, 0, 0.22, 0)
-inputContainer.BackgroundColor3 = BLACK
-inputContainer.BorderSizePixel = 0
-inputContainer.Parent = contentFrame
-
--- Input border
-local inputBorder = Instance.new("Frame")
-inputBorder.Name = "InputBorder"
-inputBorder.Size = UDim2.new(1, 2, 1, 2)
-inputBorder.Position = UDim2.new(0, -1, 0, -1)
-inputBorder.BackgroundColor3 = WHITE
-inputBorder.BorderSizePixel = 0
-inputBorder.ZIndex = -1
-inputBorder.Parent = inputContainer
-
--- Key input box with TextScaled
-local keyBox = Instance.new("TextBox")
-keyBox.Name = "KeyBox"
-keyBox.Size = UDim2.new(1, 0, 1, 0)
-keyBox.Position = UDim2.new(0, 0, 0, 0)
-keyBox.BackgroundTransparency = 1
-keyBox.Text = ""
-keyBox.PlaceholderText = "Paste key here..."
-keyBox.TextColor3 = WHITE
-keyBox.PlaceholderColor3 = MEDIUM_GRAY
-keyBox.TextScaled = true
-keyBox.Font = Enum.Font.SourceSans
-keyBox.ClearTextOnFocus = false
-keyBox.TextXAlignment = Enum.TextXAlignment.Left
-keyBox.ClipsDescendants = true
-keyBox.Parent = inputContainer
-
--- Add padding to input box
-local inputPadding = Instance.new("UIPadding")
-inputPadding.PaddingLeft = UDim.new(0.03, 0)
-inputPadding.PaddingRight = UDim.new(0.03, 0)
-inputPadding.Parent = keyBox
-
--- Text size constraint for input
-local inputSizeConstraint = Instance.new("UITextSizeConstraint")
-inputSizeConstraint.MaxTextSize = 18
-inputSizeConstraint.MinTextSize = 12
-inputSizeConstraint.Parent = keyBox
-
--- Button container with scale
-local buttonFrame = Instance.new("Frame")
-buttonFrame.Name = "ButtonFrame"
-buttonFrame.Size = UDim2.new(1, 0, 0.28, 0)  -- 28% of content height
-buttonFrame.Position = UDim2.new(0, 0, 0.62, 0)
-buttonFrame.BackgroundTransparency = 1
-buttonFrame.Parent = contentFrame
-
--- Add UIListLayout for automatic button spacing
-local buttonLayout = Instance.new("UIListLayout")
-buttonLayout.FillDirection = Enum.FillDirection.Horizontal
-buttonLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
-buttonLayout.VerticalAlignment = Enum.VerticalAlignment.Center
-buttonLayout.Padding = UDim.new(0.02, 0)
-buttonLayout.Parent = buttonFrame
-
--- Function to create buttons with scale
-local function createButton(name, text, isBlack)
-    local button = Instance.new("TextButton")
-    button.Name = name
-    button.Size = UDim2.new(0.31, 0, 1, 0)  -- 31% width each
-    button.BackgroundColor3 = isBlack and BLACK or WHITE
-    button.BorderSizePixel = 0
-    button.Text = text
-    button.TextColor3 = isBlack and WHITE or BLACK
-    button.TextScaled = true
-    button.Font = Enum.Font.SourceSansBold
-    button.Parent = buttonFrame
-    
-    -- Add padding to button text
-    local buttonTextPadding = Instance.new("UIPadding")
-    buttonTextPadding.PaddingLeft = UDim.new(0.1, 0)
-    buttonTextPadding.PaddingRight = UDim.new(0.1, 0)
-    buttonTextPadding.PaddingTop = UDim.new(0.2, 0)
-    buttonTextPadding.PaddingBottom = UDim.new(0.2, 0)
-    buttonTextPadding.Parent = button
-    
-    -- Text size constraint for buttons
-    local buttonSizeConstraint = Instance.new("UITextSizeConstraint")
-    buttonSizeConstraint.MaxTextSize = 16
-    buttonSizeConstraint.MinTextSize = 10
-    buttonSizeConstraint.Parent = button
-    
-    -- Button border
-    local buttonBorder = Instance.new("Frame")
-    buttonBorder.Name = "Border"
-    buttonBorder.Size = UDim2.new(1, 2, 1, 2)
-    buttonBorder.Position = UDim2.new(0, -1, 0, -1)
-    buttonBorder.BackgroundColor3 = isBlack and WHITE or BLACK
-    buttonBorder.BorderSizePixel = 0
-    buttonBorder.ZIndex = -1
-    buttonBorder.Parent = button
-    
-    return button
-end
-
--- Create buttons
-local getKeyButton = createButton("GetKeyButton", "GET KEY", true)
-local verifyButton = createButton("VerifyButton", "VERIFY", false)
-local discordButton = createButton("DiscordButton", "DISCORD", true)
-
--- Progress indicator with scale
-local progressContainer = Instance.new("Frame")
-progressContainer.Name = "ProgressContainer"
-progressContainer.Size = UDim2.new(1, 0, 0.02, 0)  -- 2% of content height
-progressContainer.Position = UDim2.new(0, 0, 0.95, 0)
-progressContainer.BackgroundColor3 = DARK_GRAY
-progressContainer.BorderSizePixel = 0
-progressContainer.Visible = false
-progressContainer.Parent = contentFrame
-
-local progressBar = Instance.new("Frame")
-progressBar.Name = "ProgressBar"
-progressBar.Size = UDim2.new(0, 0, 1, 0)
-progressBar.Position = UDim2.new(0, 0, 0, 0)
-progressBar.BackgroundColor3 = WHITE
-progressBar.BorderSizePixel = 0
-progressBar.Parent = progressContainer
-
-local function fadeText(element, transparency, duration)
-    return TweenService:Create(
-        element,
-        TweenInfo.new(duration or 0.3, Enum.EasingStyle.Quad),
-        {TextTransparency = transparency}
-    )
-end
-
-local function updateStatus(message, isError, showProgress)
-    statusLabel.Text = message
-    statusLabel.TextColor3 = isError and LIGHT_GRAY or WHITE
-    
-    if showProgress then
-        progressContainer.Visible = true
-        progressBar.Size = UDim2.new(0, 0, 1, 0)
-        
-        local tween = TweenService:Create(
-            progressBar,
-            TweenInfo.new(2, Enum.EasingStyle.Linear),
-            {Size = UDim2.new(1, 0, 1, 0)}
-        )
-        tween:Play()
-        tween.Completed:Connect(function()
-            task.wait(0.5)
-            progressContainer.Visible = false
-        end)
-    else
-        progressContainer.Visible = false
-    end
-end
-
-local function setupButton(button, isBlack)
-    local originalBg = button.BackgroundColor3
-    local originalText = button.TextColor3
-    local hoverBg = isBlack and DARK_GRAY or LIGHT_GRAY
-    
-    button.MouseEnter:Connect(function()
-        TweenService:Create(button, TweenInfo.new(0.2), {BackgroundColor3 = hoverBg}):Play()
-    end)
-    
-    button.MouseLeave:Connect(function()
-        TweenService:Create(button, TweenInfo.new(0.2), {BackgroundColor3 = originalBg}):Play()
-    end)
-    
-    button.MouseButton1Down:Connect(function()
-        local flashTween = TweenService:Create(
-            button,
-            TweenInfo.new(0.1, Enum.EasingStyle.Quad, Enum.EasingDirection.InOut, 0, true),
-            {BackgroundColor3 = isBlack and WHITE or BLACK, TextColor3 = isBlack and BLACK or WHITE}
-        )
-        flashTween:Play()
-    end)
-end
-
-keyBox.Focused:Connect(function()
-    TweenService:Create(inputBorder, TweenInfo.new(0.2), {BackgroundColor3 = LIGHT_GRAY}):Play()
-end)
-
-keyBox.FocusLost:Connect(function(enterPressed)
-    TweenService:Create(inputBorder, TweenInfo.new(0.2), {BackgroundColor3 = WHITE}):Play()
-    if enterPressed then
-        verifyButton.MouseButton1Click:Fire()
-    end
-end)
-
-setupButton(getKeyButton, true)
-setupButton(verifyButton, false)
-setupButton(discordButton, true)
-
-getKeyButton.MouseButton1Click:Connect(function()
-    updateStatus("Opening get key page...", false, true)
-    
-    spawn(function()
-        local success = pcall(function()
-            fSetClipboard(GET_KEY_URL)
-        end)
-        
-        if success then
-            updateStatus("Get key link copied to clipboard!", false)
-        else
-            updateStatus("Get key link: " .. GET_KEY_URL, false)
-        end
-    end)
-end)
-
-verifyButton.MouseButton1Click:Connect(function()
-    local key = keyBox.Text:gsub("%s+", "")
-    
-    if key == "" then
-        updateStatus("Please enter a key", true)
-        return
-    end
-    
-    updateStatus("Verifying access...", false, true)
-    
-    spawn(function()
-        local success, message = checkKey(key)
-        
-        if success then
-            updateStatus("Access granted!", false)
-            task.wait(1)
-            
-            local fadeOut = TweenService:Create(
-                mainFrame,
-                TweenInfo.new(0.5, Enum.EasingStyle.Quad),
-                {BackgroundTransparency = 1}
-            )
-            
-            local borderFadeOut = TweenService:Create(
-                borderFrame,
-                TweenInfo.new(0.5, Enum.EasingStyle.Quad),
-                {BackgroundTransparency = 1}
-            )
-            
-            local titleFadeOut = TweenService:Create(
-                titleSection,
-                TweenInfo.new(0.5, Enum.EasingStyle.Quad),
-                {BackgroundTransparency = 1}
-            )
-            
-            fadeOut:Play()
-            borderFadeOut:Play()
-            titleFadeOut:Play()
-            fadeText(titleLabel, 1, 0.5):Play()
-            fadeText(statusLabel, 1, 0.5):Play()
-            
-            fadeOut.Completed:Connect(function()
-                screenGui:Destroy()
-                executeMainScript()
-            end)
-        else
-            updateStatus(message or "Invalid key", true)
-        end
-    end)
-end)
-
-discordButton.MouseButton1Click:Connect(function()
-    updateStatus("Opening Discord invite...", false, true)
-    
-    spawn(function()
-        local success = pcall(function()
-            fSetClipboard(DISCORD_INVITE)
-        end)
-        
-        if success then
-            updateStatus("Discord invite copied to clipboard!", false)
-        else
-            updateStatus("Discord: " .. DISCORD_INVITE, false)
-        end
-    end)
-end)
-
-mainFrame.BackgroundTransparency = 1
-titleSection.BackgroundTransparency = 1
-borderFrame.BackgroundTransparency = 1
-titleLabel.TextTransparency = 1
-statusLabel.TextTransparency = 1
-
-TweenService:Create(mainFrame, TweenInfo.new(0.4), {BackgroundTransparency = 0}):Play()
-TweenService:Create(titleSection, TweenInfo.new(0.4), {BackgroundTransparency = 0}):Play()
-TweenService:Create(borderFrame, TweenInfo.new(0.4), {BackgroundTransparency = 0}):Play()
-
-task.wait(0.1)
-fadeText(titleLabel, 0, 0.3):Play()
-task.wait(0.1)
-fadeText(statusLabel, 0, 0.3):Play()
-
-updateStatus("Enter your access key", false)
-
-print("[FRYZER HUB] Key system loaded successfully!")
-print("[FRYZER HUB] Dual verification system active!")
-print("[FRYZER HUB] Simple keys + Expiry keys supported!")
+            navigator.clipboard.writeText(url).then(() => {
+                const feedback = document.getElementById(feedbackId);
+                feedback.classList.add('show');
+                setTimeout(() => {
+                    feedback.classList.remove('show');
+                }, 2000);
+            });
+        }
+    </script>
+</body>
+</html>
